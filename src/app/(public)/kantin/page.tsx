@@ -1,15 +1,111 @@
-export default function KantinPage() {
-  return (
-    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Kantin Digital
-        </h1>
+import {
+  UtensilsCrossed,
+} from "lucide-react";
 
-        <p className="mt-1 text-sm text-muted-foreground">
-          Lihat menu kantin, harga, dan ketersediaan produk.
-        </p>
-      </div>
+import { CommerceProductBrowser } from "@/components/commerce/commerce-product-browser";
+
+import {
+  categories,
+} from "@/mocks/categories";
+
+import {
+  getCanteenMerchants,
+} from "@/mocks/merchants";
+
+import {
+  getProductsByMerchantId,
+} from "@/mocks/products";
+
+export default function CanteenPage() {
+  const merchants =
+    getCanteenMerchants();
+
+  const products =
+    merchants.flatMap(
+      (merchant) =>
+        getProductsByMerchantId(
+          merchant.id,
+        ),
+    );
+
+  const merchantIds =
+    new Set(
+      merchants.map(
+        (merchant) =>
+          merchant.id,
+      ),
+    );
+
+  const canteenCategories =
+    categories.filter(
+      (category) =>
+        merchantIds.has(
+          category.merchantId,
+        ),
+    );
+
+  return (
+    <div>
+      {/* Page Header */}
+      <section className="border-b bg-background">
+        <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 flex items-center gap-2 text-sm font-medium text-primary">
+                <UtensilsCrossed className="size-4" />
+                Kantin Digital
+              </div>
+
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                Mau makan apa hari ini?
+              </h1>
+
+              <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
+                Pesan makanan dari kantin
+                sekolah lebih awal dan ambil
+                saat pesanan sudah siap tanpa
+                antre panjang.
+              </p>
+            </div>
+
+            <div className="flex gap-6 text-sm">
+              <div>
+                <p className="text-2xl font-semibold">
+                  {merchants.length}
+                </p>
+
+                <p className="text-muted-foreground">
+                  Kantin aktif
+                </p>
+              </div>
+
+              <div className="border-l pl-6">
+                <p className="text-2xl font-semibold">
+                  {products.length}
+                </p>
+
+                <p className="text-muted-foreground">
+                  Menu tersedia
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Product Browser */}
+      <section className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <CommerceProductBrowser
+          merchants={merchants}
+          products={products}
+          categories={
+            canteenCategories
+          }
+          searchPlaceholder="Cari makanan, minuman, atau kantin..."
+          emptyTitle="Menu tidak ditemukan"
+          emptyDescription="Coba gunakan kata kunci atau kategori makanan yang berbeda."
+        />
+      </section>
     </div>
   );
 }

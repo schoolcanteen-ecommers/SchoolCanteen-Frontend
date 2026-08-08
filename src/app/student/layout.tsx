@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { GlobalHeader } from "@/components/layout/global-header";
 import { StudentBottomNav } from "@/components/layout/student-bottom-nav";
-import { StudentDesktopNav } from "@/components/layout/student-desktop-nav";
+import { TopNavigation } from "@/components/layout/top-navigation";
 
 interface StudentLayoutProps {
   children: ReactNode;
@@ -18,7 +18,9 @@ export default function StudentLayout({
         userRole="XI RPL 1"
         brandHref="/student/dashboard"
         profileHref="/student/profile"
-        navigation={<StudentDesktopNav />}
+        navigation={
+          <TopNavigation source="student" />
+        }
         showWallet
         walletBalance="Rp75.000"
         showCart
