@@ -1,14 +1,10 @@
 import type { ReactNode } from "react";
 
-import { redirect } from "next/navigation";
-
 import { GlobalHeader } from "@/components/layout/global-header";
 import { StudentBottomNav } from "@/components/layout/student-bottom-nav";
 import { TopNavigation } from "@/components/layout/top-navigation";
 
-import { getCurrentUser } from "@/features/auth/server/get-current-user";
-
-import { studentNavigation } from "@/lib/navigation";
+import { requireRole } from "@/features/auth/server/require-role";
 
 interface StudentLayoutProps {
   children: ReactNode;
@@ -17,28 +13,14 @@ interface StudentLayoutProps {
 export default async function StudentLayout({
   children,
 }: StudentLayoutProps) {
-  const currentUser =
-    await getCurrentUser();
-
-  /*
-   * Proxy seharusnya sudah menangani guest.
-   * Ini fallback tambahan jika tidak ada
-   * authenticated user.
-   */
-  if (!currentUser) {
-    redirect(
-      "/login?redirect=/student/dashboard",
-    );
-  }
+  const profile =
+    await requireRole("student");
 
   return (
     <div className="min-h-screen bg-[#F7F8FA]">
       <GlobalHeader
-        userName={currentUser.displayName}
-        userRole={
-          currentUser.email ??
-          "Akun terautentikasi"
-        }
+        userName={profile.name}
+        userRole="Student"
         brandHref="/student/dashboard"
         profileHref="/student/profile"
         navigation={

@@ -118,7 +118,7 @@ export function CartPageContent() {
     (total, item) =>
       total +
       item.product.price *
-        item.quantity,
+      item.quantity,
     0,
   );
 
@@ -323,7 +323,7 @@ export function CartPageContent() {
                                     updateQuantity(
                                       product.id,
                                       quantity -
-                                        1,
+                                      1,
                                     )
                                   }
                                 >
@@ -348,7 +348,7 @@ export function CartPageContent() {
                                     updateQuantity(
                                       product.id,
                                       quantity +
-                                        1,
+                                      1,
                                     )
                                   }
                                 >
@@ -427,15 +427,15 @@ export function CartPageContent() {
             size="lg"
             className="mt-6 w-full"
             render={
-              <Link href="/login?redirect=/student/checkout" />
+              <Link href="/student/checkout" />
             }
           >
             Lanjut Checkout
           </Button>
 
           <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-            Kamu akan diminta masuk
-            sebelum melanjutkan pembayaran.
+            Lanjutkan untuk memilih waktu
+            pengambilan dan pembayaran.
           </p>
 
           <div className="mt-5 border-t pt-5">

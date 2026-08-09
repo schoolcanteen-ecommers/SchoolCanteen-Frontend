@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+
 import {
   NextResponse,
   type NextRequest,
@@ -13,7 +14,8 @@ export async function updateSession(
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    process.env
+      .NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -53,25 +55,35 @@ export async function updateSession(
   );
 
   /*
-   * Verifikasi identity.
-   *
-   * Jangan memakai getSession()
-   * untuk authorization.
+   * Verifikasi identity sekaligus
+   * membantu refresh cookie session.
    */
-  const { data } =
+  const {
+    data,
+    error,
+  } =
     await supabase.auth.getClaims();
 
   const isAuthenticated =
+    !error &&
     Boolean(data?.claims);
 
   const pathname =
     request.nextUrl.pathname;
 
   /*
-   * Student area wajib login.
+   * Area yang wajib login.
+   */
+  const isProtectedRoute =
+    pathname.startsWith("/student") ||
+    pathname.startsWith("/merchant") ||
+    pathname.startsWith("/admin");
+
+  /*
+   * Guest membuka protected route.
    */
   if (
-    pathname.startsWith("/student") &&
+    isProtectedRoute &&
     !isAuthenticated
   ) {
     const loginUrl =

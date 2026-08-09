@@ -3,17 +3,22 @@ import type { ReactNode } from "react";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { GlobalHeader } from "@/components/layout/global-header";
 
+import { requireRole } from "@/features/auth/server/require-role";
+
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: AdminLayoutProps) {
+  const profile =
+    await requireRole("admin");
+
   return (
     <div className="min-h-screen bg-[#F5F7FB]">
       <GlobalHeader
-        userName="Administrator"
+        userName={profile.name}
         userRole="School Admin"
       />
 
