@@ -21,9 +21,23 @@ import {
 } from "@/features/auth/schemas/auth-schema";
 
 import { createClient } from "@/lib/supabase/client";
+import { apiRequest } from "@/lib/api/client";
 
 interface LoginFormProps {
   redirectTo?: string;
+}
+
+type UserRole =
+  | "student"
+  | "merchant"
+  | "admin";
+
+interface CurrentUser {
+  id: string;
+  name: string;
+  phone: string | null;
+  avatar_url: string | null;
+  role: UserRole;
 }
 
 export function LoginForm({
@@ -60,7 +74,14 @@ export function LoginForm({
 
     const supabase = createClient();
 
-    const { error } =
+    /*
+     * Step 1:
+     * Login ke Supabase Auth.
+     */
+    const {
+      data,
+      error,
+    } =
       await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -74,24 +95,116 @@ export function LoginForm({
       return;
     }
 
-    /*
-     * Hanya izinkan redirect internal.
-     * Contoh:
-     *
-     * /student/dashboard
-     * /student/checkout
-     *
-     * Ini mencegah redirect ke URL eksternal
-     * yang berasal dari query parameter.
-     */
-    const safeRedirectTo =
-      redirectTo.startsWith("/") &&
-      !redirectTo.startsWith("//")
-        ? redirectTo
-        : "/student/dashboard";
+    const accessToken =
+      data.session?.access_token;
 
-    router.replace(safeRedirectTo);
-    router.refresh();
+    if (!accessToken) {
+      setAuthError(
+        "Session login tidak tersedia.",
+      );
+
+      return;
+    }
+
+    try {
+      /*
+       * Step 2:
+       * Kirim access token Supabase
+       * ke Laravel.
+       *
+       * Laravel akan:
+       * - verifikasi token
+       * - mencari profile
+       * - mengembalikan role user
+       */
+      const user =
+        await apiRequest<CurrentUser>(
+          "/me",
+          {
+            method: "GET",
+            accessToken,
+          },
+        );
+
+      /*
+       * Hanya izinkan internal redirect.
+       */
+      const safeRedirectTo =
+        redirectTo.startsWith("/") &&
+          !redirectTo.startsWith("//")
+          ? redirectTo
+          : null;
+
+      /*
+       * Kalau redirect tujuan sesuai
+       * dengan role user, pertahankan.
+       *
+       * Contoh:
+       * student login dari checkout
+       * → kembali ke /student/checkout
+       */
+      if (
+        safeRedirectTo &&
+        safeRedirectTo.startsWith(
+          `/${user.role}/`,
+        )
+      ) {
+        router.replace(
+          safeRedirectTo,
+        );
+
+        router.refresh();
+
+        return;
+      }
+
+      /*
+       * Kalau tidak ada redirect khusus,
+       * arahkan berdasarkan role.
+       */
+      switch (user.role) {
+        case "student":
+          router.replace(
+            "/student/dashboard",
+          );
+          break;
+
+        case "merchant":
+          router.replace(
+            "/merchant/dashboard",
+          );
+          break;
+
+        case "admin":
+          router.replace(
+            "/admin/dashboard",
+          );
+          break;
+
+        default:
+          setAuthError(
+            "Role akun tidak dikenali.",
+          );
+
+          return;
+      }
+
+      router.refresh();
+    } catch {
+      /*
+       * Supabase login berhasil,
+       * tetapi Laravel menolak token /
+       * profile belum tersedia.
+       *
+       * Logout kembali supaya tidak
+       * meninggalkan session setengah jadi.
+       */
+      await supabase.auth.signOut();
+
+      setAuthError(
+        "Login berhasil, tetapi profil akun tidak dapat dimuat.",
+      );
+    }
   }
 
   return (
