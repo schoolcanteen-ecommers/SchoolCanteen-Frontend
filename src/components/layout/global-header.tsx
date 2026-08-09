@@ -4,26 +4,26 @@ import Link from "next/link";
 import {
   Bell,
   CircleHelp,
-  LogOut,
   Settings,
   UserRound,
   WalletCards,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-import { CartHeaderButton } from "@/features/cart/components/cart-header-button";
-
 import { Button } from "@/components/ui/button";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import { LogoutMenuItem } from "@/features/auth/components/logout-menu-item";
+import { CartHeaderButton } from "@/features/cart/components/cart-header-button";
 
 interface GlobalHeaderProps {
   userName?: string;
@@ -76,7 +76,9 @@ export function GlobalHeader({
           className="flex min-w-0 shrink-0 items-center gap-2.5"
         >
           <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground sm:size-10">
-            <span className="text-xs font-bold sm:text-sm">SS</span>
+            <span className="text-xs font-bold sm:text-sm">
+              SS
+            </span>
           </div>
 
           <div className="min-w-0">
@@ -114,11 +116,14 @@ export function GlobalHeader({
                   Saldo
                 </p>
 
-                <p className="mt-1 text-xs font-semibold">{walletBalance}</p>
+                <p className="mt-1 text-xs font-semibold">
+                  {walletBalance}
+                </p>
               </div>
             </Link>
           )}
 
+          {/* Cart */}
           {showCart && <CartHeaderButton />}
 
           {/* Guest Authentication */}
@@ -150,8 +155,11 @@ export function GlobalHeader({
               </Link>
             </div>
           )}
+
+          {/* Logged-in User Actions */}
           {showUserActions && (
             <>
+              {/* Help */}
               <Button
                 type="button"
                 variant="ghost"
@@ -193,48 +201,61 @@ export function GlobalHeader({
                       {userName}
                     </p>
 
-                    <p className="text-xs text-muted-foreground">{userRole}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {userRole}
+                    </p>
                   </div>
 
                   <Avatar className="size-9">
-                    <AvatarFallback>{initials}</AvatarFallback>
+                    <AvatarFallback>
+                      {initials}
+                    </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col">
-                      <span>{userName}</span>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56"
+                >
+                  {/* User Information */}
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col">
+                        <span>{userName}</span>
 
-                      <span className="text-xs font-normal text-muted-foreground">
-                        {userRole}
-                      </span>
-                    </div>
-                  </DropdownMenuLabel>
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem>
-                    <Link
-                      href={profileHref}
-                      className="flex w-full items-center gap-2"
-                    >
-                      <UserRound className="size-4" />
-                      Profil
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem>
-                    <Settings className="size-4" />
-                    Pengaturan
-                  </DropdownMenuItem>
+                        <span className="text-xs font-normal text-muted-foreground">
+                          {userRole}
+                        </span>
+                      </div>
+                    </DropdownMenuLabel>
+                  </DropdownMenuGroup>
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem variant="destructive">
-                    <LogOut className="size-4" />
-                    Keluar
-                  </DropdownMenuItem>
+                  {/* Account Menu */}
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <Link
+                        href={profileHref}
+                        className="flex w-full items-center gap-2"
+                      >
+                        <UserRound className="size-4" />
+                        Profil
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem>
+                      <Settings className="size-4" />
+                      Pengaturan
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+
+                  <DropdownMenuSeparator />
+
+                  {/* Authentication */}
+                  <DropdownMenuGroup>
+                    <LogoutMenuItem />
+                  </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
