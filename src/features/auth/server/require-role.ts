@@ -3,10 +3,7 @@ import { redirect } from "next/navigation";
 import { apiRequest } from "@/lib/api/client";
 import { createClient } from "@/lib/supabase/server";
 
-export type UserRole =
-  | "student"
-  | "merchant"
-  | "admin";
+export type UserRole = "student" | "merchant" | "admin";
 
 export interface CurrentProfile {
   id: string;
@@ -16,9 +13,7 @@ export interface CurrentProfile {
   role: UserRole;
 }
 
-function getDashboardByRole(
-  role: UserRole,
-): string {
+function getDashboardByRole(role: UserRole): string {
   switch (role) {
     case "student":
       return "/student/dashboard";
@@ -34,33 +29,19 @@ function getDashboardByRole(
 export async function requireRole(
   requiredRole: UserRole,
 ): Promise<CurrentProfile> {
-  const supabase =
-    await createClient();
+  const supabase = await createClient();
 
   /*
    * STEP 1
    * Pastikan session Supabase valid.
    */
-  const {
-    data: claimsData,
-    error: claimsError,
-  } =
+  const { data: claimsData, error: claimsError } =
     await supabase.auth.getClaims();
 
-  if (
-    claimsError ||
-    !claimsData?.claims
-  ) {
-    const target =
-      getDashboardByRole(
-        requiredRole,
-      );
+  if (claimsError || !claimsData?.claims) {
+    const target = getDashboardByRole(requiredRole);
 
-    redirect(
-      `/login?redirect=${encodeURIComponent(
-        target,
-      )}`,
-    );
+    redirect(`/login?redirect=${encodeURIComponent(target)}`);
   }
 
   /*
@@ -70,26 +51,14 @@ export async function requireRole(
    * Token hanya digunakan untuk
    * dikirim ke Laravel.
    */
-  const {
-    data: sessionData,
-  } =
-    await supabase.auth.getSession();
+  const { data: sessionData } = await supabase.auth.getSession();
 
-  const accessToken =
-    sessionData.session
-      ?.access_token;
+  const accessToken = sessionData.session?.access_token;
 
   if (!accessToken) {
-    const target =
-      getDashboardByRole(
-        requiredRole,
-      );
+    const target = getDashboardByRole(requiredRole);
 
-    redirect(
-      `/login?redirect=${encodeURIComponent(
-        target,
-      )}`,
-    );
+    redirect(`/login?redirect=${encodeURIComponent(target)}`);
   }
 
   /*
@@ -97,20 +66,14 @@ export async function requireRole(
    * Laravel menjadi sumber profile
    * dan role sebenarnya.
    */
-  let profile:
-    | CurrentProfile
-    | null = null;
+  let profile: CurrentProfile | null = null;
 
   try {
-    profile =
-      await apiRequest<CurrentProfile>(
-        "/me",
-        {
-          method: "GET",
-          accessToken,
-          cache: "no-store",
-        },
-      );
+    profile = await apiRequest<CurrentProfile>("/me", {
+      method: "GET",
+      accessToken,
+      cache: "no-store",
+    });
   } catch {
     /*
      * Session Supabase masih valid,
@@ -119,23 +82,15 @@ export async function requireRole(
      *
      * Fail closed melalui error page.
      */
-    throw new Error(
-      "Profil pengguna tidak dapat diverifikasi oleh backend.",
-    );
+    throw new Error("Profil pengguna tidak dapat diverifikasi oleh backend.");
   }
 
   /*
    * STEP 4
    * Role authorization.
    */
-  if (
-    profile.role !== requiredRole
-  ) {
-    redirect(
-      getDashboardByRole(
-        profile.role,
-      ),
-    );
+  if (profile.role !== requiredRole) {
+    redirect(getDashboardByRole(profile.role));
   }
 
   return profile;
