@@ -107,16 +107,7 @@ export function LoginForm({
     }
 
     try {
-      /*
-       * Step 2:
-       * Kirim access token Supabase
-       * ke Laravel.
-       *
-       * Laravel akan:
-       * - verifikasi token
-       * - mencari profile
-       * - mengembalikan role user
-       */
+      
       const user =
         await apiRequest<CurrentUser>(
           "/me",
@@ -126,23 +117,14 @@ export function LoginForm({
           },
         );
 
-      /*
-       * Hanya izinkan internal redirect.
-       */
+      
       const safeRedirectTo =
         redirectTo.startsWith("/") &&
           !redirectTo.startsWith("//")
           ? redirectTo
           : null;
 
-      /*
-       * Kalau redirect tujuan sesuai
-       * dengan role user, pertahankan.
-       *
-       * Contoh:
-       * student login dari checkout
-       * → kembali ke /student/checkout
-       */
+      
       if (
         safeRedirectTo &&
         safeRedirectTo.startsWith(
@@ -158,10 +140,7 @@ export function LoginForm({
         return;
       }
 
-      /*
-       * Kalau tidak ada redirect khusus,
-       * arahkan berdasarkan role.
-       */
+      
       switch (user.role) {
         case "student":
           router.replace(
@@ -191,14 +170,7 @@ export function LoginForm({
 
       router.refresh();
     } catch {
-      /*
-       * Supabase login berhasil,
-       * tetapi Laravel menolak token /
-       * profile belum tersedia.
-       *
-       * Logout kembali supaya tidak
-       * meninggalkan session setengah jadi.
-       */
+      
       await supabase.auth.signOut();
 
       setAuthError(
@@ -212,7 +184,7 @@ export function LoginForm({
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-5"
     >
-      {/* Email */}
+      {}
       <div className="space-y-2">
         <label
           htmlFor="email"
@@ -241,7 +213,7 @@ export function LoginForm({
         )}
       </div>
 
-      {/* Password */}
+      {}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-4">
           <label
@@ -305,7 +277,7 @@ export function LoginForm({
         )}
       </div>
 
-      {/* Authentication Error */}
+      {}
       {authError && (
         <div
           role="alert"
@@ -317,7 +289,7 @@ export function LoginForm({
         </div>
       )}
 
-      {/* Submit */}
+      {}
       <Button
         type="submit"
         size="lg"
@@ -329,7 +301,7 @@ export function LoginForm({
           : "Masuk"}
       </Button>
 
-      {/* Register */}
+      {}
       <p className="text-center text-sm text-muted-foreground">
         Belum punya akun?{" "}
         <Link

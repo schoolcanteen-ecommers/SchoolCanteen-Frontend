@@ -18,14 +18,7 @@ interface ApiRequestOptions
   extends Omit<RequestInit, "body"> {
   body?: unknown;
 
-  /**
-   * Access token user.
-   *
-   * Untuk sekarang optional karena
-   * kita belum menetapkan apakah token
-   * diperoleh langsung dari Supabase
-   * atau melalui backend Laravel.
-   */
+  
   accessToken?: string;
 }
 

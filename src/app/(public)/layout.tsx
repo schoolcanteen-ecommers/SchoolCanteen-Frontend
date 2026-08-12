@@ -63,10 +63,7 @@ export default async function PublicLayout({
     | CurrentUser
     | null = null;
 
-  /*
-   * Cek apakah ada user
-   * yang sedang login.
-   */
+  
   const {
     data: claimsData,
     error: claimsError,
@@ -107,15 +104,7 @@ export default async function PublicLayout({
   const isLoggedIn =
     currentUser !== null;
 
-  /*
-   * Public catalog dipakai guest
-   * dan student.
-   *
-   * Kalau student login,
-   * gunakan navigation student
-   * walaupun sedang berada
-   * di route public /kantin.
-   */
+  
   const navigationSource:
     | "public"
     | "student" =
@@ -123,10 +112,7 @@ export default async function PublicLayout({
       ? "student"
       : "public";
 
-  /*
-   * Logo / brand juga harus kembali
-   * ke dashboard milik user jika login.
-   */
+  
   const brandHref =
     currentUser
       ? getHomeByRole(

@@ -25,7 +25,7 @@ export default async function LoginPage({
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
-      {/* Branding */}
+      {}
       <section className="relative hidden overflow-hidden bg-primary p-10 text-primary-foreground lg:flex lg:flex-col">
         <div className="absolute -right-32 -top-32 size-96 rounded-full bg-white/10" />
 
@@ -39,7 +39,7 @@ export default async function LoginPage({
 
           <div>
             <p className="font-semibold">
-              SakuSekolah
+              SchoolCanteen
             </p>
 
             <p className="text-xs text-primary-foreground/70">
@@ -70,7 +70,7 @@ export default async function LoginPage({
         </div>
       </section>
 
-      {/* Login */}
+      {}
       <section className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
         <div className="w-full max-w-md">
           <Link

@@ -41,11 +41,10 @@ export function MerchantCard({
       )}
     >
       <div className="flex flex-col sm:flex-row">
-        {/* Merchant Image */}
+        {}
         <div className="relative flex aspect-[16/8] w-full shrink-0 items-center justify-center overflow-hidden bg-muted sm:aspect-auto sm:w-44">
           {merchant.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+                       <img
               src={merchant.imageUrl}
               alt={merchant.name}
               className="size-full object-cover"
@@ -55,7 +54,7 @@ export function MerchantCard({
           )}
         </div>
 
-        {/* Content */}
+        {}
         <div className="flex min-w-0 flex-1 flex-col justify-center p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">

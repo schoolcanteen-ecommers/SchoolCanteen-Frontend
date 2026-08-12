@@ -111,10 +111,7 @@ export function RegisterForm({
       return;
     }
 
-    /*
-     * Jika email confirmation dimatikan,
-     * Supabase dapat langsung memberikan session.
-     */
+    
     if (data.session) {
       router.replace(
         safeRedirectTo,
@@ -125,10 +122,7 @@ export function RegisterForm({
       return;
     }
 
-    /*
-     * Jika email confirmation aktif,
-     * tunggu user melakukan verifikasi.
-     */
+    
     setEmailSent(true);
   }
 
@@ -178,7 +172,7 @@ export function RegisterForm({
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-5"
     >
-      {/* Nama */}
+
       <div className="space-y-2">
         <label
           htmlFor="name"
@@ -207,7 +201,7 @@ export function RegisterForm({
         )}
       </div>
 
-      {/* Email */}
+      {}
       <div className="space-y-2">
         <label
           htmlFor="email"
@@ -236,7 +230,7 @@ export function RegisterForm({
         )}
       </div>
 
-      {/* Password */}
+      {}
       <div className="space-y-2">
         <label
           htmlFor="password"
@@ -291,7 +285,7 @@ export function RegisterForm({
         )}
       </div>
 
-      {/* Confirm Password */}
+      {}
       <div className="space-y-2">
         <label
           htmlFor="confirmPassword"
@@ -351,7 +345,7 @@ export function RegisterForm({
         )}
       </div>
 
-      {/* Supabase Error */}
+      {}
       {authError && (
         <div
           role="alert"

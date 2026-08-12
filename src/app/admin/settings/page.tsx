@@ -5,7 +5,7 @@ export default function AdminSettingsPage() {
     <div className="p-6 lg:p-8">
       <PageHeader
         title="Settings"
-        description="Kelola konfigurasi sistem SakuSekolah."
+        description="Kelola konfigurasi sistem SchoolCanteen."
       />
     </div>
   );

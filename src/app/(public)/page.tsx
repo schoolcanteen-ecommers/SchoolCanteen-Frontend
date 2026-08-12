@@ -25,9 +25,7 @@ import {
 
 import { products } from "@/mocks/products";
 
-/* =========================================================
- * STATIC LANDING CONTENT
- * ======================================================= */
+
 
 const benefits = [
   {
@@ -98,16 +96,14 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* =====================================================
-       * HERO
-       * =================================================== */}
+      {}
       <section className="relative overflow-hidden border-b bg-background">
-        {/* Decorative Background */}
+        {}
         <div className="pointer-events-none absolute -right-28 -top-40 size-[420px] rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-44 -left-40 size-[420px] rounded-full bg-primary/5 blur-3xl" />
 
         <div className="relative mx-auto grid min-h-[620px] max-w-[1440px] items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
-          {/* Hero Copy */}
+          {}
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
               <Sparkles className="size-3.5 text-primary" />
@@ -173,11 +169,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Hero Visual */}
+          {}
           <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
             <div className="rounded-[32px] border bg-muted/30 p-3 shadow-xl shadow-primary/5">
               <div className="overflow-hidden rounded-[26px] border bg-background">
-                {/* Fake application header */}
+                {}
                 <div className="flex items-center justify-between border-b px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
@@ -200,7 +196,7 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Fake app content */}
+                {}
                 <div className="space-y-5 p-5">
                   <div className="rounded-2xl bg-primary p-5 text-primary-foreground">
                     <p className="text-xs font-medium text-primary-foreground/75">
@@ -249,7 +245,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Floating Card */}
+            {}
             <div className="absolute -bottom-6 -left-3 hidden rounded-2xl border bg-background p-4 shadow-lg sm:block lg:-left-8">
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
@@ -271,9 +267,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-       * STATISTICS
-       * =================================================== */}
+      {}
       <section className="border-b bg-background">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x px-4 py-8 sm:px-6 lg:grid-cols-4 lg:px-8">
           <div className="px-4 text-center">
@@ -318,9 +312,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-       * COMMERCE SERVICES
-       * =================================================== */}
+      {}
       <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="max-w-2xl">
           <p className="text-sm font-medium text-primary">
@@ -341,7 +333,7 @@ export default function HomePage() {
         </div>
 
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          {/* Canteen */}
+          {}
           <Link
             href="/kantin"
             className="group relative min-h-[330px] overflow-hidden rounded-3xl border bg-background p-6 transition-all hover:-translate-y-1 hover:shadow-xl sm:p-8"
@@ -378,7 +370,7 @@ export default function HomePage() {
             </div>
           </Link>
 
-          {/* Cooperative */}
+          {}
           <Link
             href="/koperasi"
             className="group relative min-h-[330px] overflow-hidden rounded-3xl border bg-background p-6 transition-all hover:-translate-y-1 hover:shadow-xl sm:p-8"
@@ -417,9 +409,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-       * FEATURED PRODUCTS
-       * =================================================== */}
+      {}
       {featuredProducts.length > 0 && (
         <section className="border-y bg-muted/30">
           <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
@@ -467,9 +457,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* =====================================================
-       * BENEFITS
-       * =================================================== */}
+      {}
       <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
           <div>
@@ -517,9 +505,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-       * HOW IT WORKS
-       * =================================================== */}
+      {}
       <section className="border-y bg-background">
         <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="mx-auto max-w-2xl text-center">
@@ -556,9 +542,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-       * TRUST
-       * =================================================== */}
+      {}
       <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="grid gap-5 md:grid-cols-3">
           <div className="rounded-2xl border bg-background p-6">
@@ -606,9 +590,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-       * FINAL CTA
-       * =================================================== */}
+      {}
       <section className="px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
         <div className="mx-auto max-w-[1440px] overflow-hidden rounded-[32px] bg-primary px-6 py-12 text-primary-foreground sm:px-10 lg:px-14 lg:py-16">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">

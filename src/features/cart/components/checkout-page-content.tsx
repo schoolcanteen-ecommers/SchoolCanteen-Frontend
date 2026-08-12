@@ -167,13 +167,7 @@ export function CheckoutPageContent() {
       total,
     };
 
-    /*
-     * Belum membuat order palsu.
-     *
-     * Payload ini nanti dikirim ke
-     * backend/order service setelah
-     * authentication + API aktif.
-     */
+    
     console.log(
       "Checkout payload:",
       checkoutPayload,
@@ -228,7 +222,7 @@ export function CheckoutPageContent() {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {/* Header */}
+      {}
       <div>
         <Link
           href="/keranjang"
@@ -251,7 +245,7 @@ export function CheckoutPageContent() {
       </div>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-        {/* Orders */}
+        {}
         <div className="space-y-6">
           {groups.map((group) => {
             const merchant =
@@ -273,7 +267,7 @@ export function CheckoutPageContent() {
                 key={group.merchantId}
                 className="overflow-hidden rounded-2xl border bg-background"
               >
-                {/* Merchant */}
+                {}
                 <div className="flex items-center gap-3 border-b p-5">
                   <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
                     <MerchantIcon className="size-5 text-primary" />
@@ -290,7 +284,7 @@ export function CheckoutPageContent() {
                   </div>
                 </div>
 
-                {/* Products */}
+                {}
                 <div className="divide-y">
                   {group.items.map(
                     ({
@@ -303,8 +297,7 @@ export function CheckoutPageContent() {
                       >
                         <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
                           {product.imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                                                       <img
                               src={
                                 product.imageUrl
                               }
@@ -342,7 +335,7 @@ export function CheckoutPageContent() {
                   )}
                 </div>
 
-                {/* Pickup */}
+                {}
                 <div className="border-t bg-muted/20 p-5">
                   <div className="flex items-center gap-2">
                     <Clock3 className="size-4 text-primary" />
@@ -427,9 +420,9 @@ export function CheckoutPageContent() {
           })}
         </div>
 
-        {/* Summary */}
+        {}
         <aside className="space-y-5 lg:sticky lg:top-24">
-          {/* Wallet */}
+          {}
           <div className="rounded-2xl border bg-background p-5">
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -476,7 +469,7 @@ export function CheckoutPageContent() {
             )}
           </div>
 
-          {/* Payment Summary */}
+          {}
           <div className="rounded-2xl border bg-background p-5">
             <h2 className="text-lg font-semibold">
               Ringkasan Pembayaran

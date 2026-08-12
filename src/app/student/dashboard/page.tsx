@@ -1,7 +1,7 @@
 export default function StudentDashboardPage() {
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      {/* Welcome */}
+      {}
       <section>
         <p className="text-sm text-muted-foreground">
           Selamat datang,
@@ -16,7 +16,7 @@ export default function StudentDashboardPage() {
         </p>
       </section>
 
-      {/* Main Service */}
+      {}
       <section className="mt-8 grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border bg-background p-6">
           <p className="text-sm text-muted-foreground">
@@ -47,7 +47,7 @@ export default function StudentDashboardPage() {
         </div>
       </section>
 
-      {/* Dashboard Content */}
+      {}
       <section className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="rounded-2xl border bg-background p-6">
           <h2 className="font-semibold">
@@ -69,7 +69,7 @@ export default function StudentDashboardPage() {
           </p>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Saldo SakuSekolah
+            Saldo SchoolCanteen
           </p>
         </div>
       </section>

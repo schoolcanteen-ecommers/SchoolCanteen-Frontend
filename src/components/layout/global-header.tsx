@@ -70,7 +70,7 @@ export function GlobalHeader({
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="flex h-16 w-full items-center gap-2 px-4 sm:gap-4 sm:px-5 lg:gap-6 lg:px-6">
-        {/* Brand */}
+        {}
         <Link
           href={brandHref}
           className="flex min-w-0 shrink-0 items-center gap-2.5"
@@ -83,7 +83,7 @@ export function GlobalHeader({
 
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold leading-tight">
-              SakuSekolah
+              SchoolCanteen
             </p>
 
             <p className="hidden truncate text-xs text-muted-foreground sm:block">
@@ -92,7 +92,7 @@ export function GlobalHeader({
           </div>
         </Link>
 
-        {/* Navigation */}
+        {}
         {navigation ? (
           <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
             {navigation}
@@ -101,9 +101,9 @@ export function GlobalHeader({
           <div className="flex-1" />
         )}
 
-        {/* Header Actions */}
+        {}
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-          {/* Student Wallet */}
+          {}
           {showWallet && (
             <Link
               href="/student/wallet"
@@ -123,10 +123,10 @@ export function GlobalHeader({
             </Link>
           )}
 
-          {/* Cart */}
+          {}
           {showCart && <CartHeaderButton />}
 
-          {/* Guest Authentication */}
+          {}
           {showAuthActions && (
             <div className="flex items-center gap-2">
               <Button
@@ -146,7 +146,7 @@ export function GlobalHeader({
                 Daftar
               </Button>
 
-              {/* Mobile */}
+              {}
               <Link
                 href="/login"
                 className="inline-flex h-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition-colors hover:bg-muted sm:hidden"
@@ -156,10 +156,10 @@ export function GlobalHeader({
             </div>
           )}
 
-          {/* Logged-in User Actions */}
+          {}
           {showUserActions && (
             <>
-              {/* Help */}
+              {}
               <Button
                 type="button"
                 variant="ghost"
@@ -170,7 +170,7 @@ export function GlobalHeader({
                 <CircleHelp className="size-5" />
               </Button>
 
-              {/* Notification */}
+              {}
               <Button
                 type="button"
                 variant="ghost"
@@ -185,7 +185,7 @@ export function GlobalHeader({
 
               <div className="mx-1 hidden h-7 w-px bg-border sm:block" />
 
-              {/* Profile */}
+              {}
               <DropdownMenu>
                 <DropdownMenuTrigger
                   render={
@@ -217,7 +217,7 @@ export function GlobalHeader({
                   align="end"
                   className="w-56"
                 >
-                  {/* User Information */}
+                  {}
                   <DropdownMenuGroup>
                     <DropdownMenuLabel>
                       <div className="flex flex-col">
@@ -232,7 +232,7 @@ export function GlobalHeader({
 
                   <DropdownMenuSeparator />
 
-                  {/* Account Menu */}
+                  {}
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
                       <Link
@@ -252,7 +252,7 @@ export function GlobalHeader({
 
                   <DropdownMenuSeparator />
 
-                  {/* Authentication */}
+                  {}
                   <DropdownMenuGroup>
                     <LogoutMenuItem />
                   </DropdownMenuGroup>

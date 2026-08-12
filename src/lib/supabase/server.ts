@@ -25,13 +25,7 @@ export async function createClient() {
               },
             );
           } catch {
-            /*
-             * Server Component tidak selalu
-             * diperbolehkan menulis cookie.
-             *
-             * Session refresh ditangani
-             * oleh proxy.
-             */
+            
           }
         },
       },

@@ -25,7 +25,7 @@ export default async function RegisterPage({
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
-      {/* Branding */}
+      {}
       <section className="relative hidden overflow-hidden bg-primary p-10 text-primary-foreground lg:flex lg:flex-col">
         <div className="absolute -right-32 -top-32 size-96 rounded-full bg-white/10" />
 
@@ -39,7 +39,7 @@ export default async function RegisterPage({
 
           <div>
             <p className="font-semibold">
-              SakuSekolah
+              SchoolCanteen
             </p>
 
             <p className="text-xs text-primary-foreground/70">
@@ -50,7 +50,7 @@ export default async function RegisterPage({
 
         <div className="relative my-auto max-w-xl">
           <p className="text-sm font-medium text-primary-foreground/70">
-            Mulai menggunakan SakuSekolah
+            Mulai menggunakan SchoolCanteen
           </p>
 
           <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight xl:text-5xl">
@@ -77,7 +77,7 @@ export default async function RegisterPage({
         </div>
       </section>
 
-      {/* Register Form */}
+      {}
       <section className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
         <div className="w-full max-w-md">
           <Link
@@ -94,7 +94,7 @@ export default async function RegisterPage({
             </p>
 
             <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Daftar SakuSekolah
+              Daftar SchoolCanteen
             </h1>
 
             <p className="mt-3 text-sm leading-6 text-muted-foreground">

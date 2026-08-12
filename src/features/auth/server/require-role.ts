@@ -31,10 +31,7 @@ export async function requireRole(
 ): Promise<CurrentProfile> {
   const supabase = await createClient();
 
-  /*
-   * STEP 1
-   * Pastikan session Supabase valid.
-   */
+  
   const { data: claimsData, error: claimsError } =
     await supabase.auth.getClaims();
 
@@ -44,13 +41,7 @@ export async function requireRole(
     redirect(`/login?redirect=${encodeURIComponent(target)}`);
   }
 
-  /*
-   * STEP 2
-   * Ambil access token.
-   *
-   * Token hanya digunakan untuk
-   * dikirim ke Laravel.
-   */
+  
   const { data: sessionData } = await supabase.auth.getSession();
 
   const accessToken = sessionData.session?.access_token;
@@ -61,11 +52,7 @@ export async function requireRole(
     redirect(`/login?redirect=${encodeURIComponent(target)}`);
   }
 
-  /*
-   * STEP 3
-   * Laravel menjadi sumber profile
-   * dan role sebenarnya.
-   */
+  
   let profile: CurrentProfile | null = null;
 
   try {
@@ -75,20 +62,11 @@ export async function requireRole(
       cache: "no-store",
     });
   } catch {
-    /*
-     * Session Supabase masih valid,
-     * jadi jangan berpura-pura user
-     * logout hanya karena Laravel gagal.
-     *
-     * Fail closed melalui error page.
-     */
+    
     throw new Error("Profil pengguna tidak dapat diverifikasi oleh backend.");
   }
 
-  /*
-   * STEP 4
-   * Role authorization.
-   */
+  
   if (profile.role !== requiredRole) {
     redirect(getDashboardByRole(profile.role));
   }

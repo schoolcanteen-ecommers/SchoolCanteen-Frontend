@@ -30,16 +30,13 @@ export function ProductCard({
         className,
       )}
     >
-      {/* Product Image */}
+      {}
       <Link
         href={`/produk/${product.id}`}
         className="relative block aspect-[4/3] overflow-hidden bg-muted"
       >
         {product.imageUrl ? (
-          // Sementara menggunakan native img.
-          // Nanti ketika Cloudinary sudah aktif, kita pindahkan ke next/image.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+                                     <img
             src={product.imageUrl}
             alt={product.name}
             className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
@@ -50,7 +47,7 @@ export function ProductCard({
           </div>
         )}
 
-        {/* Availability */}
+        {}
         <div className="absolute left-3 top-3">
           {isAvailable ? (
             <span className="inline-flex items-center rounded-full bg-background/90 px-2.5 py-1 text-[11px] font-medium shadow-sm backdrop-blur">
@@ -64,7 +61,7 @@ export function ProductCard({
         </div>
       </Link>
 
-      {/* Content */}
+      {}
       <div className="p-4">
         {merchantName && (
           <p className="mb-1 truncate text-xs font-medium text-muted-foreground">

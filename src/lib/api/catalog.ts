@@ -3,11 +3,7 @@ import type { Category, Product } from "@/types/product";
 
 import { apiRequest } from "@/lib/api/client";
 
-/*
-|--------------------------------------------------------------------------
-| Backend DTO
-|--------------------------------------------------------------------------
-*/
+
 
 interface ApiMerchant {
   id: string;
@@ -65,11 +61,7 @@ interface ApiProduct {
   created_at: string | null;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Adapters
-|--------------------------------------------------------------------------
-*/
+
 
 function mapMerchant(merchant: ApiMerchant): Merchant {
   return {
@@ -111,11 +103,7 @@ function mapProduct(product: ApiProduct): Product {
   };
 }
 
-/*
-|--------------------------------------------------------------------------
-| Canteen Catalog
-|--------------------------------------------------------------------------
-*/
+
 
 export async function getCanteenCatalog() {
   const [apiMerchants, apiProducts] = await Promise.all([
@@ -132,10 +120,7 @@ export async function getCanteenCatalog() {
 
   const products = apiProducts.map(mapProduct);
 
-  /*
-   * Category diambil dari response product.
-   * Belum perlu endpoint category terpisah.
-   */
+  
   const categoryMap = new Map<string, Category>();
 
   for (const product of apiProducts) {

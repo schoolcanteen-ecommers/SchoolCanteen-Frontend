@@ -54,10 +54,7 @@ export async function updateSession(
     },
   );
 
-  /*
-   * Verifikasi identity sekaligus
-   * membantu refresh cookie session.
-   */
+  
   const {
     data,
     error,
@@ -71,17 +68,13 @@ export async function updateSession(
   const pathname =
     request.nextUrl.pathname;
 
-  /*
-   * Area yang wajib login.
-   */
+  
   const isProtectedRoute =
     pathname.startsWith("/student") ||
     pathname.startsWith("/merchant") ||
     pathname.startsWith("/admin");
 
-  /*
-   * Guest membuka protected route.
-   */
+  
   if (
     isProtectedRoute &&
     !isAuthenticated

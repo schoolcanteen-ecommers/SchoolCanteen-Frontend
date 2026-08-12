@@ -26,10 +26,7 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
-/**
- * Memastikan data dari localStorage memiliki
- * struktur CartItem yang valid.
- */
+
 function sanitizeCartItems(
   value: unknown,
 ): CartItem[] {
@@ -73,12 +70,7 @@ function sanitizeCartItems(
     }));
 }
 
-/**
- * Membaca guest cart dari localStorage.
- *
- * Lazy initializer digunakan supaya tidak perlu
- * memanggil setState dari useEffect.
- */
+
 function getInitialCart(): CartItem[] {
   if (typeof window === "undefined") {
     return [];
@@ -109,10 +101,7 @@ function getInitialCart(): CartItem[] {
   }
 }
 
-/**
- * Digunakan untuk mengetahui kapan component
- * sudah berada di browser tanpa setState di effect.
- */
+
 function subscribeToHydration() {
   return () => {};
 }
@@ -130,12 +119,7 @@ export function CartProvider({
       () => false,
     );
 
-  /**
-   * Sinkronisasi React state -> localStorage.
-   *
-   * Ini penggunaan effect yang tepat karena
-   * effect hanya memperbarui external system.
-   */
+  
   useEffect(() => {
     if (!isHydrated) {
       return;
@@ -217,10 +201,7 @@ export function CartProvider({
       productId: string,
       quantity: number,
     ) => {
-      /**
-       * Quantity <= 0 berarti
-       * item dihapus dari cart.
-       */
+      
       if (quantity <= 0) {
         setItems((currentItems) =>
           currentItems.filter(

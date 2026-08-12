@@ -1,10 +1,7 @@
 import type { Product } from "@/types/product";
 
 export const products: Product[] = [
-  // =====================================================
-  // KANTIN BU ANI
-  // =====================================================
-  {
+     {
     id: "product-nasi-ayam",
     merchantId: "merchant-kantin-1",
     categoryId: "category-makanan-berat",
@@ -53,10 +50,7 @@ export const products: Product[] = [
     isActive: true,
   },
 
-  // =====================================================
-  // KANTIN PAK BUDI
-  // =====================================================
-  {
+     {
     id: "product-bubur-ayam",
     merchantId: "merchant-kantin-2",
     categoryId: "category-sarapan",
@@ -93,10 +87,7 @@ export const products: Product[] = [
     isActive: true,
   },
 
-  // =====================================================
-  // KOPERASI
-  // =====================================================
-  {
+     {
     id: "product-buku-tulis",
     merchantId: "merchant-koperasi-1",
     categoryId: "category-buku",
