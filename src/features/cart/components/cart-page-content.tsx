@@ -3,6 +3,11 @@
 import Link from "next/link";
 
 import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
   ImageIcon,
   Minus,
   Plus,
@@ -17,15 +22,19 @@ import { useCart } from "@/features/cart/use-cart";
 
 import { formatCurrency } from "@/lib/utils";
 
-import { getMerchantById } from "@/mocks/merchants";
-import { getProductById } from "@/mocks/products";
+import {
+  getCartProduct,
+} from "@/lib/api/catalog";
+
+import type { Product } from "@/types/product";
 
 interface ResolvedCartItem {
   productId: string;
   quantity: number;
-  product: NonNullable<
-    ReturnType<typeof getProductById>
-  >;
+
+  product: Product;
+
+  merchantName: string;
 }
 
 interface MerchantCartGroup {
@@ -43,7 +52,68 @@ export function CartPageContent() {
     clearCart,
   } = useCart();
 
-  if (!isHydrated) {
+  const [
+    resolvedItems,
+    setResolvedItems,
+  ] = useState<ResolvedCartItem[]>([]);
+
+  const [
+    isResolving,
+    setIsResolving,
+  ] = useState(true);
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function resolveCartItems() {
+      if (items.length === 0) {
+        setResolvedItems([]);
+        setIsResolving(false);
+        return;
+      }
+
+
+      const results = await Promise.allSettled(
+        items.map(async (item) => {
+          const data = await getCartProduct(
+            item.productId,
+          );
+
+          return {
+            ...item,
+            product: data.product,
+            merchantName: data.merchant.name,
+          };
+        }),
+      );
+
+      if (cancelled) {
+        return;
+      }
+
+      const validItems = results.flatMap(
+        (result) =>
+          result.status === "fulfilled"
+            ? [result.value]
+            : [],
+      );
+
+      setResolvedItems(validItems);
+      setIsResolving(false);
+    }
+
+    void resolveCartItems();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [items, isHydrated]);
+
+  if (!isHydrated || isResolving) {
     return (
       <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
         <div className="animate-pulse space-y-4">
@@ -63,32 +133,11 @@ export function CartPageContent() {
     );
   }
 
-  const resolvedItems: ResolvedCartItem[] =
-    items.flatMap((item) => {
-      const product =
-        getProductById(item.productId);
-
-      if (!product) {
-        return [];
-      }
-
-      return [
-        {
-          ...item,
-          product,
-        },
-      ];
-    });
 
   const groups = resolvedItems.reduce<
     MerchantCartGroup[]
   >((currentGroups, item) => {
-    const merchant = getMerchantById(
-      item.product.merchantId,
-    );
-
     const merchantId =
-      merchant?.id ??
       item.product.merchantId;
 
     const existingGroup =
@@ -106,8 +155,7 @@ export function CartPageContent() {
     currentGroups.push({
       merchantId,
       merchantName:
-        merchant?.name ??
-        "Merchant",
+        item.merchantName,
       items: [item],
     });
 
@@ -118,7 +166,7 @@ export function CartPageContent() {
     (total, item) =>
       total +
       item.product.price *
-        item.quantity,
+      item.quantity,
     0,
   );
 
@@ -323,7 +371,7 @@ export function CartPageContent() {
                                     updateQuantity(
                                       product.id,
                                       quantity -
-                                        1,
+                                      1,
                                     )
                                   }
                                 >
@@ -348,7 +396,7 @@ export function CartPageContent() {
                                     updateQuantity(
                                       product.id,
                                       quantity +
-                                        1,
+                                      1,
                                     )
                                   }
                                 >
@@ -427,15 +475,15 @@ export function CartPageContent() {
             size="lg"
             className="mt-6 w-full"
             render={
-              <Link href="/login?redirect=/student/checkout" />
+              <Link href="/student/checkout" />
             }
           >
             Lanjut Checkout
           </Button>
 
           <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-            Kamu akan diminta masuk
-            sebelum melanjutkan pembayaran.
+            Lanjutkan untuk memilih waktu
+            pengambilan dan pembayaran.
           </p>
 
           <div className="mt-5 border-t pt-5">

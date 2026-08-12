@@ -15,13 +15,9 @@ import { AddToCartButton } from "@/features/cart/components/add-to-cart-button";
 
 import { formatCurrency } from "@/lib/utils";
 
-import { getCategoryById } from "@/mocks/categories";
-import { getMerchantById } from "@/mocks/merchants";
-
 import {
-  getProductById,
-  getProductsByMerchantId,
-} from "@/mocks/products";
+  getProductDetail,
+} from "@/lib/api/catalog";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -34,32 +30,21 @@ export default async function ProductDetailPage({
 }: ProductDetailPageProps) {
   const { id } = await params;
 
-  const product =
-    getProductById(id);
+  let detail;
 
-  if (!product) {
+  try {
+    detail =
+      await getProductDetail(id);
+  } catch {
     notFound();
   }
 
-  const merchant =
-    getMerchantById(
-      product.merchantId,
-    );
-
-  const category =
-    getCategoryById(
-      product.categoryId,
-    );
-
-  const relatedProducts =
-    getProductsByMerchantId(
-      product.merchantId,
-    )
-      .filter(
-        (item) =>
-          item.id !== product.id,
-      )
-      .slice(0, 4);
+  const {
+    product,
+    merchant,
+    category,
+    relatedProducts,
+  } = detail;
 
   const isAvailable =
     product.isActive &&
@@ -230,42 +215,42 @@ export default async function ProductDetailPage({
       {/* Related Products */}
       {relatedProducts.length >
         0 && (
-        <section className="border-t bg-background">
-          <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-            <div className="mb-6">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Produk lainnya
-              </p>
+          <section className="border-t bg-background">
+            <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+              <div className="mb-6">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Produk lainnya
+                </p>
 
-              <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-                Pilihan dari{" "}
-                {merchant?.name ??
-                  "merchant ini"}
-              </h2>
-            </div>
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+                  Pilihan dari{" "}
+                  {merchant?.name ??
+                    "merchant ini"}
+                </h2>
+              </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {relatedProducts.map(
-                (
-                  relatedProduct,
-                ) => (
-                  <ProductCard
-                    key={
-                      relatedProduct.id
-                    }
-                    product={
-                      relatedProduct
-                    }
-                    merchantName={
-                      merchant?.name
-                    }
-                  />
-                ),
-              )}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {relatedProducts.map(
+                  (
+                    relatedProduct,
+                  ) => (
+                    <ProductCard
+                      key={
+                        relatedProduct.id
+                      }
+                      product={
+                        relatedProduct
+                      }
+                      merchantName={
+                        merchant?.name
+                      }
+                    />
+                  ),
+                )}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
     </div>
   );
 }

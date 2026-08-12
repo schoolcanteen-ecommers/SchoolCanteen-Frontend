@@ -5,44 +5,15 @@ import {
 import { CommerceProductBrowser } from "@/components/commerce/commerce-product-browser";
 
 import {
-  categories,
-} from "@/mocks/categories";
+  getCooperativeCatalog,
+} from "@/lib/api/catalog";
 
-import {
-  getCooperativeMerchants,
-} from "@/mocks/merchants";
-
-import {
-  getProductsByMerchantId,
-} from "@/mocks/products";
-
-export default function CooperativePage() {
-  const merchants =
-    getCooperativeMerchants();
-
-  const products =
-    merchants.flatMap(
-      (merchant) =>
-        getProductsByMerchantId(
-          merchant.id,
-        ),
-    );
-
-  const merchantIds =
-    new Set(
-      merchants.map(
-        (merchant) =>
-          merchant.id,
-      ),
-    );
-
-  const cooperativeCategories =
-    categories.filter(
-      (category) =>
-        merchantIds.has(
-          category.merchantId,
-        ),
-    );
+export default async function CooperativePage() {
+  const {
+    merchants,
+    products,
+    categories,
+  } = await getCooperativeCatalog();
 
   return (
     <div>
@@ -57,15 +28,13 @@ export default function CooperativePage() {
               </div>
 
               <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                Kebutuhan sekolah jadi
-                lebih mudah.
+                Kebutuhan sekolah jadi lebih mudah.
               </h1>
 
               <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-                Temukan alat tulis, buku,
-                dan perlengkapan sekolah
-                melalui koperasi tanpa harus
-                antre.
+                Temukan alat tulis, buku, dan
+                perlengkapan sekolah melalui
+                koperasi tanpa harus antre.
               </p>
             </div>
 
@@ -99,9 +68,7 @@ export default function CooperativePage() {
         <CommerceProductBrowser
           merchants={merchants}
           products={products}
-          categories={
-            cooperativeCategories
-          }
+          categories={categories}
           searchPlaceholder="Cari buku, alat tulis, atau perlengkapan..."
           emptyTitle="Produk tidak ditemukan"
           emptyDescription="Coba gunakan kata kunci atau kategori produk yang berbeda."

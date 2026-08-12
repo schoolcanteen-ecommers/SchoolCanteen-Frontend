@@ -5,44 +5,15 @@ import {
 import { CommerceProductBrowser } from "@/components/commerce/commerce-product-browser";
 
 import {
-  categories,
-} from "@/mocks/categories";
+  getCanteenCatalog,
+} from "@/lib/api/catalog";
 
-import {
-  getCanteenMerchants,
-} from "@/mocks/merchants";
-
-import {
-  getProductsByMerchantId,
-} from "@/mocks/products";
-
-export default function CanteenPage() {
-  const merchants =
-    getCanteenMerchants();
-
-  const products =
-    merchants.flatMap(
-      (merchant) =>
-        getProductsByMerchantId(
-          merchant.id,
-        ),
-    );
-
-  const merchantIds =
-    new Set(
-      merchants.map(
-        (merchant) =>
-          merchant.id,
-      ),
-    );
-
-  const canteenCategories =
-    categories.filter(
-      (category) =>
-        merchantIds.has(
-          category.merchantId,
-        ),
-    );
+export default async function CanteenPage() {
+  const {
+    merchants,
+    products,
+    categories,
+  } = await getCanteenCatalog();
 
   return (
     <div>
@@ -98,9 +69,7 @@ export default function CanteenPage() {
         <CommerceProductBrowser
           merchants={merchants}
           products={products}
-          categories={
-            canteenCategories
-          }
+          categories={categories}
           searchPlaceholder="Cari makanan, minuman, atau kantin..."
           emptyTitle="Menu tidak ditemukan"
           emptyDescription="Coba gunakan kata kunci atau kategori makanan yang berbeda."
