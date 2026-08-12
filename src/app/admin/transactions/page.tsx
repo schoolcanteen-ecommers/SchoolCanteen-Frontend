@@ -6,7 +6,7 @@ export default function AdminTransactionsPage() {
       </h1>
 
       <p className="mt-1 text-sm text-muted-foreground">
-        Pantau seluruh transaksi SchoolCanteen.
+        Pantau seluruh transaksi SakuSekolah.
       </p>
     </div>
   );

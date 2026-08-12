@@ -19,7 +19,7 @@ export function MerchantSidebar() {
         collapsed ? "w-[76px]" : "w-[252px]"
       )}
     >
-
+      {/* Collapse Button */}
       <button
         type="button"
         onClick={() => setCollapsed((prev) => !prev)}
@@ -33,7 +33,7 @@ export function MerchantSidebar() {
         )}
       </button>
 
-
+      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-5">
         <div className="space-y-6">
           {merchantNavigation.map((group) => (

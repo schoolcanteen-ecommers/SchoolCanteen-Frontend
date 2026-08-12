@@ -1,25 +1,29 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+
 import {
   Bell,
   CircleHelp,
-  LogOut,
   Settings,
-  ShoppingCart,
   UserRound,
   WalletCards,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import { LogoutMenuItem } from "@/features/auth/components/logout-menu-item";
+import { CartHeaderButton } from "@/features/cart/components/cart-header-button";
 
 interface GlobalHeaderProps {
   userName?: string;
@@ -34,6 +38,9 @@ interface GlobalHeaderProps {
   walletBalance?: string;
 
   showCart?: boolean;
+
+  showUserActions?: boolean;
+  showAuthActions?: boolean;
 }
 
 export function GlobalHeader({
@@ -49,6 +56,9 @@ export function GlobalHeader({
   walletBalance = "Rp0",
 
   showCart = false,
+
+  showUserActions = true,
+  showAuthActions = false,
 }: GlobalHeaderProps) {
   const initials = userName
     .split(" ")
@@ -59,18 +69,21 @@ export function GlobalHeader({
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center gap-2 px-3 sm:gap-4 sm:px-6 lg:gap-6 lg:px-8">
+      <div className="flex h-16 w-full items-center gap-2 px-4 sm:gap-4 sm:px-5 lg:gap-6 lg:px-6">
+        {/* Brand */}
         <Link
           href={brandHref}
           className="flex min-w-0 shrink-0 items-center gap-2.5"
         >
           <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground sm:size-10">
-            <span className="text-xs font-bold sm:text-sm">SC</span>
+            <span className="text-xs font-bold sm:text-sm">
+              SS
+            </span>
           </div>
 
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold leading-tight">
-              SchoolCanteen
+              SakuSekolah
             </p>
 
             <p className="hidden truncate text-xs text-muted-foreground sm:block">
@@ -79,15 +92,18 @@ export function GlobalHeader({
           </div>
         </Link>
 
-        {navigation && (
+        {/* Navigation */}
+        {navigation ? (
           <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
             {navigation}
           </div>
+        ) : (
+          <div className="flex-1" />
         )}
 
-        {!navigation && <div className="flex-1" />}
-
+        {/* Header Actions */}
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          {/* Student Wallet */}
           {showWallet && (
             <Link
               href="/student/wallet"
@@ -100,104 +116,150 @@ export function GlobalHeader({
                   Saldo
                 </p>
 
-                <p className="mt-1 text-xs font-semibold">{walletBalance}</p>
-              </div>
-            </Link>
-          )}
-
-          {showCart && (
-            <Link
-              href="/keranjang"
-              className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
-              aria-label="Keranjang"
-            >
-              <ShoppingCart className="size-5" />
-            </Link>
-          )}
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Bantuan"
-            className="hidden sm:inline-flex"
-          >
-            <CircleHelp className="size-5" />
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Notifikasi"
-            className="relative"
-          >
-            <Bell className="size-5" />
-
-            <span className="absolute right-2 top-2 size-2 rounded-full bg-destructive ring-2 ring-background" />
-          </Button>
-
-          <div className="mx-1 hidden h-7 w-px bg-border sm:block" />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="h-auto gap-3 px-2 py-1.5"
-                />
-              }
-            >
-              <div className="hidden text-right lg:block">
-                <p className="max-w-40 truncate text-sm font-medium">
-                  {userName}
+                <p className="mt-1 text-xs font-semibold">
+                  {walletBalance}
                 </p>
-
-                <p className="text-xs text-muted-foreground">{userRole}</p>
               </div>
+            </Link>
+          )}
 
-              <Avatar className="size-9">
-                <AvatarFallback>{initials}</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
+          {/* Cart */}
+          {showCart && <CartHeaderButton />}
 
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                <div className="flex flex-col">
-                  <span>{userName}</span>
+          {/* Guest Authentication */}
+          {showAuthActions && (
+            <div className="flex items-center gap-2">
+              <Button
+                nativeButton={false}
+                variant="ghost"
+                className="hidden sm:inline-flex"
+                render={<Link href="/login" />}
+              >
+                Masuk
+              </Button>
 
-                  <span className="text-xs font-normal text-muted-foreground">
-                    {userRole}
-                  </span>
-                </div>
-              </DropdownMenuLabel>
+              <Button
+                nativeButton={false}
+                className="hidden sm:inline-flex"
+                render={<Link href="/register" />}
+              >
+                Daftar
+              </Button>
 
-              <DropdownMenuSeparator />
+              {/* Mobile */}
+              <Link
+                href="/login"
+                className="inline-flex h-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition-colors hover:bg-muted sm:hidden"
+              >
+                Masuk
+              </Link>
+            </div>
+          )}
 
-              <DropdownMenuItem>
-                <Link
-                  href={profileHref}
-                  className="flex w-full items-center gap-2"
+          {/* Logged-in User Actions */}
+          {showUserActions && (
+            <>
+              {/* Help */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Bantuan"
+                className="hidden sm:inline-flex"
+              >
+                <CircleHelp className="size-5" />
+              </Button>
+
+              {/* Notification */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Notifikasi"
+                className="relative"
+              >
+                <Bell className="size-5" />
+
+                <span className="absolute right-2 top-2 size-2 rounded-full bg-destructive ring-2 ring-background" />
+              </Button>
+
+              <div className="mx-1 hidden h-7 w-px bg-border sm:block" />
+
+              {/* Profile */}
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="h-auto gap-3 px-2 py-1.5"
+                    />
+                  }
                 >
-                  <UserRound className="size-4" />
-                  Profil
-                </Link>
-              </DropdownMenuItem>
+                  <div className="hidden text-right lg:block">
+                    <p className="max-w-40 truncate text-sm font-medium">
+                      {userName}
+                    </p>
 
-              <DropdownMenuItem>
-                <Settings className="size-4" />
-                Pengaturan
-              </DropdownMenuItem>
+                    <p className="text-xs text-muted-foreground">
+                      {userRole}
+                    </p>
+                  </div>
 
-              <DropdownMenuSeparator />
+                  <Avatar className="size-9">
+                    <AvatarFallback>
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
 
-              <DropdownMenuItem variant="destructive">
-                <LogOut className="size-4" />
-                Keluar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56"
+                >
+                  {/* User Information */}
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col">
+                        <span>{userName}</span>
+
+                        <span className="text-xs font-normal text-muted-foreground">
+                          {userRole}
+                        </span>
+                      </div>
+                    </DropdownMenuLabel>
+                  </DropdownMenuGroup>
+
+                  <DropdownMenuSeparator />
+
+                  {/* Account Menu */}
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <Link
+                        href={profileHref}
+                        className="flex w-full items-center gap-2"
+                      >
+                        <UserRound className="size-4" />
+                        Profil
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem>
+                      <Settings className="size-4" />
+                      Pengaturan
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+
+                  <DropdownMenuSeparator />
+
+                  {/* Authentication */}
+                  <DropdownMenuGroup>
+                    <LogoutMenuItem />
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
         </div>
       </div>
     </header>
