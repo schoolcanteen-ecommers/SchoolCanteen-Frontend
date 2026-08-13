@@ -1,74 +1,121 @@
 import { redirect } from "next/navigation";
 
-import { apiRequest } from "@/lib/api/client";
+import { getCurrentProfile } from "@/features/auth/services/profile-service";
+import { getRoleHomeRoute } from "@/features/auth/utils/role-route";
+
 import { createClient } from "@/lib/supabase/server";
 
-export type UserRole = "student" | "merchant" | "admin";
-
-export interface CurrentProfile {
-  id: string;
-  name: string;
-  phone: string | null;
-  avatar_url: string | null;
-  role: UserRole;
-}
-
-function getDashboardByRole(role: UserRole): string {
-  switch (role) {
-    case "student":
-      return "/student/dashboard";
-
-    case "merchant":
-      return "/merchant/dashboard";
-
-    case "admin":
-      return "/admin/dashboard";
-  }
-}
+import type {
+  UserProfile,
+  UserRole,
+} from "@/types/profile";
 
 export async function requireRole(
   requiredRole: UserRole,
-): Promise<CurrentProfile> {
-  const supabase = await createClient();
+): Promise<UserProfile> {
+  const supabase =
+    await createClient();
 
-  
-  const { data: claimsData, error: claimsError } =
+  /*
+   * STEP 1
+   *
+   * Verifikasi bahwa user memang
+   * memiliki session Supabase valid.
+   */
+  const {
+    data: claimsData,
+    error: claimsError,
+  } =
     await supabase.auth.getClaims();
 
-  if (claimsError || !claimsData?.claims) {
-    const target = getDashboardByRole(requiredRole);
+  if (
+    claimsError ||
+    !claimsData?.claims
+  ) {
+    const target =
+      getRoleHomeRoute(
+        requiredRole,
+      );
 
-    redirect(`/login?redirect=${encodeURIComponent(target)}`);
+    redirect(
+      `/login?redirect=${encodeURIComponent(
+        target,
+      )}`,
+    );
   }
 
-  
-  const { data: sessionData } = await supabase.auth.getSession();
+  /*
+   * STEP 2
+   *
+   * Ambil access token untuk
+   * dikirim ke Laravel.
+   *
+   * Claims di atas sudah dipakai
+   * untuk verifikasi auth.
+   */
+  const {
+    data: sessionData,
+  } =
+    await supabase.auth.getSession();
 
-  const accessToken = sessionData.session?.access_token;
+  const accessToken =
+    sessionData.session
+      ?.access_token;
 
   if (!accessToken) {
-    const target = getDashboardByRole(requiredRole);
+    const target =
+      getRoleHomeRoute(
+        requiredRole,
+      );
 
-    redirect(`/login?redirect=${encodeURIComponent(target)}`);
+    redirect(
+      `/login?redirect=${encodeURIComponent(
+        target,
+      )}`,
+    );
   }
 
-  
-  let profile: CurrentProfile | null = null;
+  /*
+   * STEP 3
+   *
+   * Laravel adalah source of truth
+   * untuk profile dan role.
+   */
+  let profile: UserProfile;
 
   try {
-    profile = await apiRequest<CurrentProfile>("/me", {
-      method: "GET",
-      accessToken,
-      cache: "no-store",
-    });
+    profile =
+      await getCurrentProfile(
+        accessToken,
+      );
   } catch {
-    
-    throw new Error("Profil pengguna tidak dapat diverifikasi oleh backend.");
+    /*
+     * Session Supabase valid,
+     * tetapi Laravel gagal
+     * memverifikasi profile.
+     *
+     * Jangan redirect seolah-olah
+     * user logout.
+     */
+    throw new Error(
+      "Profil pengguna tidak dapat diverifikasi oleh backend.",
+    );
   }
 
-  
-  if (profile.role !== requiredRole) {
-    redirect(getDashboardByRole(profile.role));
+  /*
+   * STEP 4
+   *
+   * Authorization berdasarkan
+   * role dari Laravel.
+   */
+  if (
+    profile.role !== requiredRole
+  ) {
+    redirect(
+      getRoleHomeRoute(
+        profile.role,
+      ),
+    );
   }
 
   return profile;

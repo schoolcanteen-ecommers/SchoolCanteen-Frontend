@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import type {
+  ReactNode,
+} from "react";
 
 import { GlobalHeader } from "@/components/layout/global-header";
 import { StudentBottomNav } from "@/components/layout/student-bottom-nav";

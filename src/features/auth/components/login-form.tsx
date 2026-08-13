@@ -20,24 +20,13 @@ import {
   type LoginFormValues,
 } from "@/features/auth/schemas/auth-schema";
 
+import { getCurrentProfile } from "@/features/auth/services/profile-service";
+import { getRedirectForRole } from "@/features/auth/utils/role-route";
+
 import { createClient } from "@/lib/supabase/client";
-import { apiRequest } from "@/lib/api/client";
 
 interface LoginFormProps {
   redirectTo?: string;
-}
-
-type UserRole =
-  | "student"
-  | "merchant"
-  | "admin";
-
-interface CurrentUser {
-  id: string;
-  name: string;
-  phone: string | null;
-  avatar_url: string | null;
-  role: UserRole;
 }
 
 export function LoginForm({
@@ -75,8 +64,8 @@ export function LoginForm({
     const supabase = createClient();
 
     /*
-     * Step 1:
-     * Login ke Supabase Auth.
+     * STEP 1
+     * Login menggunakan Supabase Auth.
      */
     const {
       data,
@@ -87,7 +76,10 @@ export function LoginForm({
         password: values.password,
       });
 
-    if (error) {
+    if (
+      error ||
+      !data.session
+    ) {
       setAuthError(
         "Email atau password tidak valid.",
       );
@@ -95,82 +87,66 @@ export function LoginForm({
       return;
     }
 
+    /*
+     * Access token dari Supabase
+     * nantinya diverifikasi Laravel.
+     */
     const accessToken =
-      data.session?.access_token;
-
-    if (!accessToken) {
-      setAuthError(
-        "Session login tidak tersedia.",
-      );
-
-      return;
-    }
+      data.session.access_token;
 
     try {
-      
-      const user =
-        await apiRequest<CurrentUser>(
-          "/me",
-          {
-            method: "GET",
-            accessToken,
-          },
+      /*
+       * STEP 2
+       * Ambil profile user dari Laravel:
+       *
+       * GET /api/v1/me
+       *
+       * Laravel menentukan:
+       * - profile
+       * - role
+       *
+       * Frontend tidak menentukan role sendiri.
+       */
+      const profile =
+        await getCurrentProfile(
+          accessToken,
         );
 
-      
-      const safeRedirectTo =
-        redirectTo.startsWith("/") &&
-          !redirectTo.startsWith("//")
-          ? redirectTo
-          : null;
-
-      
-      if (
-        safeRedirectTo &&
-        safeRedirectTo.startsWith(
-          `/${user.role}/`,
-        )
-      ) {
-        router.replace(
-          safeRedirectTo,
+      /*
+       * STEP 3
+       * Tentukan redirect berdasarkan
+       * role user.
+       *
+       * Contoh student:
+       *
+       * /login?redirect=/student/checkout
+       *
+       * akan kembali ke:
+       *
+       * /student/checkout
+       *
+       * Tetapi merchant/admin tidak boleh
+       * diarahkan ke route student.
+       */
+      const targetRoute =
+        getRedirectForRole(
+          profile.role,
+          redirectTo,
         );
 
-        router.refresh();
-
-        return;
-      }
-
-      
-      switch (user.role) {
-        case "student":
-          router.replace(
-            "/student/dashboard",
-          );
-          break;
-
-        case "merchant":
-          router.replace(
-            "/merchant/dashboard",
-          );
-          break;
-
-        case "admin":
-          router.replace(
-            "/admin/dashboard",
-          );
-          break;
-
-        default:
-          setAuthError(
-            "Role akun tidak dikenali.",
-          );
-
-          return;
-      }
-
+      router.replace(targetRoute);
       router.refresh();
     } catch {
-      
+      /*
+       * Supabase login berhasil tetapi:
+       *
+       * - Laravel menolak token
+       * - profile belum tersedia
+       * - endpoint /me gagal
+       *
+       * Session Supabase dibersihkan agar
+       * tidak meninggalkan login setengah jadi.
+       */
       await supabase.auth.signOut();
 
       setAuthError(
@@ -184,7 +160,7 @@ export function LoginForm({
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-5"
     >
-      {}
+      {/* Email */}
       <div className="space-y-2">
         <label
           htmlFor="email"
@@ -213,7 +189,7 @@ export function LoginForm({
         )}
       </div>
 
-      {}
+      {/* Password */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-4">
           <label
@@ -277,7 +253,7 @@ export function LoginForm({
         )}
       </div>
 
-      {}
+      {/* Authentication Error */}
       {authError && (
         <div
           role="alert"
@@ -289,7 +265,7 @@ export function LoginForm({
         </div>
       )}
 
-      {}
+      {/* Submit */}
       <Button
         type="submit"
         size="lg"
@@ -301,7 +277,7 @@ export function LoginForm({
           : "Masuk"}
       </Button>
 
-      {}
+      {/* Register */}
       <p className="text-center text-sm text-muted-foreground">
         Belum punya akun?{" "}
         <Link

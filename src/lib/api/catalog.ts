@@ -1,9 +1,16 @@
 import type { Merchant } from "@/types/merchant";
-import type { Category, Product } from "@/types/product";
+import type {
+  Category,
+  Product,
+} from "@/types/product";
 
 import { apiRequest } from "@/lib/api/client";
 
-
+/*
+|--------------------------------------------------------------------------
+| Backend DTO
+|--------------------------------------------------------------------------
+*/
 
 interface ApiMerchant {
   id: string;
@@ -61,170 +68,274 @@ interface ApiProduct {
   created_at: string | null;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Adapters
+|--------------------------------------------------------------------------
+*/
 
-
-function mapMerchant(merchant: ApiMerchant): Merchant {
+function mapMerchant(
+  merchant: ApiMerchant,
+): Merchant {
   return {
     id: merchant.id,
 
-    ownerId: merchant.owner_user_id,
+    ownerId:
+      merchant.owner_user_id,
 
-    name: merchant.name,
+    name:
+      merchant.name,
 
-    type: merchant.type === "canteen" ? "CANTEEN" : "COOPERATIVE",
+    type:
+      merchant.type === "canteen"
+        ? "CANTEEN"
+        : "COOPERATIVE",
 
-    description: merchant.description,
+    description:
+      merchant.description,
 
-    imageUrl: merchant.logo_url,
+    imageUrl:
+      merchant.logo_url,
 
-    status: merchant.is_active ? "ACTIVE" : "INACTIVE",
+    status:
+      merchant.is_active
+        ? "ACTIVE"
+        : "INACTIVE",
   };
 }
 
-function mapProduct(product: ApiProduct): Product {
+function mapProduct(
+  product: ApiProduct,
+): Product {
   return {
-    id: product.id,
+    id:
+      product.id,
 
-    merchantId: product.merchant.id,
+    merchantId:
+      product.merchant.id,
 
-    categoryId: product.category?.id ?? "",
+    categoryId:
+      product.category?.id ?? "",
 
-    name: product.name,
+    name:
+      product.name,
 
-    description: product.description,
+    description:
+      product.description,
 
-    price: product.price,
+    price:
+      product.price,
 
-    stock: product.stock,
+    stock:
+      product.stock,
 
-    imageUrl: product.image_url,
+    imageUrl:
+      product.image_url,
 
-    isActive: product.is_active,
+    isActive:
+      product.is_active,
   };
 }
 
+function buildCategories(
+  products: ApiProduct[],
+): Category[] {
+  const categoryMap =
+    new Map<string, Category>();
 
+  for (const product of products) {
+    if (!product.category) {
+      continue;
+    }
+
+    categoryMap.set(
+      product.category.id,
+      {
+        id:
+          product.category.id,
+
+        merchantId:
+          product.merchant.id,
+
+        name:
+          product.category.name,
+      },
+    );
+  }
+
+  return Array.from(
+    categoryMap.values(),
+  );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Canteen Catalog
+|--------------------------------------------------------------------------
+*/
 
 export async function getCanteenCatalog() {
-  const [apiMerchants, apiProducts] = await Promise.all([
-    apiRequest<ApiMerchant[]>("/merchants?type=canteen", {
-      cache: "no-store",
-    }),
+  const [
+    apiMerchants,
+    apiProducts,
+  ] = await Promise.all([
+    apiRequest<ApiMerchant[]>(
+      "/merchants?type=canteen",
+      {
+        cache: "no-store",
+      },
+    ),
 
-    apiRequest<ApiProduct[]>("/products?merchant_type=canteen", {
-      cache: "no-store",
-    }),
+    apiRequest<ApiProduct[]>(
+      "/products?merchant_type=canteen",
+      {
+        cache: "no-store",
+      },
+    ),
   ]);
 
-  const merchants = apiMerchants.map(mapMerchant);
-
-  const products = apiProducts.map(mapProduct);
-
-  
-  const categoryMap = new Map<string, Category>();
-
-  for (const product of apiProducts) {
-    if (!product.category) {
-      continue;
-    }
-
-    categoryMap.set(product.category.id, {
-      id: product.category.id,
-
-      merchantId: product.merchant.id,
-
-      name: product.category.name,
-    });
-  }
-
-  const categories = Array.from(categoryMap.values());
-
   return {
-    merchants,
-    products,
-    categories,
+    merchants:
+      apiMerchants.map(
+        mapMerchant,
+      ),
+
+    products:
+      apiProducts.map(
+        mapProduct,
+      ),
+
+    categories:
+      buildCategories(
+        apiProducts,
+      ),
   };
 }
+
+/*
+|--------------------------------------------------------------------------
+| Cooperative Catalog
+|--------------------------------------------------------------------------
+*/
 
 export async function getCooperativeCatalog() {
-  const [apiMerchants, apiProducts] = await Promise.all([
-    apiRequest<ApiMerchant[]>("/merchants?type=cooperative", {
-      cache: "no-store",
-    }),
+  const [
+    apiMerchants,
+    apiProducts,
+  ] = await Promise.all([
+    apiRequest<ApiMerchant[]>(
+      "/merchants?type=cooperative",
+      {
+        cache: "no-store",
+      },
+    ),
 
-    apiRequest<ApiProduct[]>("/products?merchant_type=cooperative", {
-      cache: "no-store",
-    }),
+    apiRequest<ApiProduct[]>(
+      "/products?merchant_type=cooperative",
+      {
+        cache: "no-store",
+      },
+    ),
   ]);
 
-  const merchants = apiMerchants.map(mapMerchant);
-
-  const products = apiProducts.map(mapProduct);
-
-  const categoryMap = new Map<string, Category>();
-
-  for (const product of apiProducts) {
-    if (!product.category) {
-      continue;
-    }
-
-    categoryMap.set(product.category.id, {
-      id: product.category.id,
-      merchantId: product.merchant.id,
-      name: product.category.name,
-    });
-  }
-
-  const categories = Array.from(categoryMap.values());
-
   return {
-    merchants,
-    products,
-    categories,
+    merchants:
+      apiMerchants.map(
+        mapMerchant,
+      ),
+
+    products:
+      apiProducts.map(
+        mapProduct,
+      ),
+
+    categories:
+      buildCategories(
+        apiProducts,
+      ),
   };
 }
 
-export async function getProductDetail(productId: string) {
-  const apiProduct = await apiRequest<ApiProduct>(
-    `/products/${encodeURIComponent(productId)}`,
-    {
-      cache: "no-store",
-    },
-  );
+/*
+|--------------------------------------------------------------------------
+| Product Detail
+|--------------------------------------------------------------------------
+*/
 
-  const product = mapProduct(apiProduct);
+export async function getProductDetail(
+  productId: string,
+) {
+  const apiProduct =
+    await apiRequest<ApiProduct>(
+      `/products/${encodeURIComponent(
+        productId,
+      )}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+  const product =
+    mapProduct(apiProduct);
 
   const merchant: Merchant = {
-    id: apiProduct.merchant.id,
-    ownerId: "",
-    name: apiProduct.merchant.name,
+    id:
+      apiProduct.merchant.id,
 
-    type: apiProduct.merchant.type === "canteen" ? "CANTEEN" : "COOPERATIVE",
+    ownerId:
+      "",
 
-    description: null,
-    imageUrl: null,
-    status: "ACTIVE",
+    name:
+      apiProduct.merchant.name,
+
+    type:
+      apiProduct.merchant.type ===
+      "canteen"
+        ? "CANTEEN"
+        : "COOPERATIVE",
+
+    description:
+      null,
+
+    imageUrl:
+      null,
+
+    status:
+      "ACTIVE",
   };
 
-  const category: Category | null = apiProduct.category
-    ? {
-        id: apiProduct.category.id,
-        merchantId: apiProduct.merchant.id,
-        name: apiProduct.category.name,
-      }
-    : null;
+  const category: Category | null =
+    apiProduct.category
+      ? {
+          id:
+            apiProduct.category.id,
 
-  const relatedApiProducts = await apiRequest<ApiProduct[]>(
-    `/products?merchant_id=${encodeURIComponent(apiProduct.merchant.id)}`,
-    {
-      cache: "no-store",
-    },
-  );
+          merchantId:
+            apiProduct.merchant.id,
 
-  const relatedProducts = relatedApiProducts
-    .map(mapProduct)
-    .filter((item) => item.id !== product.id)
-    .slice(0, 4);
+          name:
+            apiProduct.category.name,
+        }
+      : null;
+
+  const relatedApiProducts =
+    await apiRequest<ApiProduct[]>(
+      `/products?merchant_id=${encodeURIComponent(
+        apiProduct.merchant.id,
+      )}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+  const relatedProducts =
+    relatedApiProducts
+      .map(mapProduct)
+      .filter(
+        (item) =>
+          item.id !== product.id,
+      )
+      .slice(0, 4);
 
   return {
     product,
@@ -234,22 +345,50 @@ export async function getProductDetail(productId: string) {
   };
 }
 
-export async function getCartProduct(productId: string) {
-  const apiProduct = await apiRequest<ApiProduct>(
-    `/products/${encodeURIComponent(productId)}`,
-    {
-      cache: "no-store",
-    },
-  );
+/*
+|--------------------------------------------------------------------------
+| Cart Product Resolver
+|--------------------------------------------------------------------------
+*/
+
+export async function getCartProduct(
+  productId: string,
+): Promise<{
+  product: Product;
+  merchant: Pick<
+    Merchant,
+    "id" | "name" | "type"
+  >;
+}> {
+  const apiProduct =
+    await apiRequest<ApiProduct>(
+      `/products/${encodeURIComponent(
+        productId,
+      )}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+  const merchantType: Merchant["type"] =
+    apiProduct.merchant.type ===
+    "canteen"
+      ? "CANTEEN"
+      : "COOPERATIVE";
 
   return {
-    product: mapProduct(apiProduct),
+    product:
+      mapProduct(apiProduct),
 
     merchant: {
-      id: apiProduct.merchant.id,
-      name: apiProduct.merchant.name,
+      id:
+        apiProduct.merchant.id,
 
-      type: apiProduct.merchant.type === "canteen" ? "CANTEEN" : "COOPERATIVE",
+      name:
+        apiProduct.merchant.name,
+
+      type:
+        merchantType,
     },
   };
 }

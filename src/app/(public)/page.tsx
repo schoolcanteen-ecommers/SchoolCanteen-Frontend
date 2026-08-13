@@ -17,15 +17,10 @@ import {
 import { ProductCard } from "@/components/commerce/product-card";
 import { Button } from "@/components/ui/button";
 
-import {
-  getCanteenMerchants,
-  getCooperativeMerchants,
-  getMerchantById,
-} from "@/mocks/merchants";
-
-import { products } from "@/mocks/products";
-
-
+import { getCanteenCatalog, getCooperativeCatalog } from "@/lib/api/catalog";
+/* =========================================================
+ * STATIC LANDING CONTENT
+ * ======================================================= */
 
 const benefits = [
   {
@@ -81,29 +76,48 @@ const steps = [
   },
 ];
 
-export default function HomePage() {
-  const canteenMerchants = getCanteenMerchants();
-  const cooperativeMerchants = getCooperativeMerchants();
+export default async function HomePage() {
+  const [canteenCatalog, cooperativeCatalog] = await Promise.all([
+    getCanteenCatalog(),
+    getCooperativeCatalog(),
+  ]);
 
-  const activeProducts = products.filter(
-    (product) =>
-      product.isActive &&
-      product.stock > 0,
+  const canteenMerchants = canteenCatalog.merchants;
+
+  const cooperativeMerchants = cooperativeCatalog.merchants;
+
+  const allMerchants = [
+    ...canteenCatalog.merchants,
+    ...cooperativeCatalog.merchants,
+  ];
+
+  const allProducts = [
+    ...canteenCatalog.products,
+    ...cooperativeCatalog.products,
+  ];
+
+  const activeProducts = allProducts.filter(
+    (product) => product.isActive && product.stock > 0,
   );
 
-  const featuredProducts =
-    activeProducts.slice(0, 4);
+  const featuredProducts = activeProducts.slice(0, 4);
+
+  const merchantMap = new Map(
+    allMerchants.map((merchant) => [merchant.id, merchant]),
+  );
 
   return (
     <div>
-      {}
+      {/* =====================================================
+       * HERO
+       * =================================================== */}
       <section className="relative overflow-hidden border-b bg-background">
-        {}
+        {/* Decorative Background */}
         <div className="pointer-events-none absolute -right-28 -top-40 size-[420px] rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-44 -left-40 size-[420px] rounded-full bg-primary/5 blur-3xl" />
 
         <div className="relative mx-auto grid min-h-[620px] max-w-[1440px] items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
-          {}
+          {/* Hero Copy */}
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
               <Sparkles className="size-3.5 text-primary" />
@@ -112,16 +126,12 @@ export default function HomePage() {
 
             <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
               Belanja di sekolah
-              <span className="block text-primary">
-                tanpa ribet.
-              </span>
+              <span className="block text-primary">tanpa ribet.</span>
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-              Pesan makanan dari kantin, beli
-              kebutuhan sekolah dari koperasi,
-              dan kelola semuanya dalam satu
-              pengalaman digital yang lebih
+              Pesan makanan dari kantin, beli kebutuhan sekolah dari koperasi,
+              dan kelola semuanya dalam satu pengalaman digital yang lebih
               praktis.
             </p>
 
@@ -129,9 +139,7 @@ export default function HomePage() {
               <Button
                 nativeButton={false}
                 size="lg"
-                render={
-                  <Link href="/kantin" />
-                }
+                render={<Link href="/kantin" />}
               >
                 <UtensilsCrossed className="size-4" />
                 Jelajahi Kantin
@@ -142,9 +150,7 @@ export default function HomePage() {
                 nativeButton={false}
                 variant="outline"
                 size="lg"
-                render={
-                  <Link href="/koperasi" />
-                }
+                render={<Link href="/koperasi" />}
               >
                 <ShoppingBag className="size-4" />
                 Lihat Koperasi
@@ -169,11 +175,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          {}
+          {/* Hero Visual */}
           <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
             <div className="rounded-[32px] border bg-muted/30 p-3 shadow-xl shadow-primary/5">
               <div className="overflow-hidden rounded-[26px] border bg-background">
-                {}
+                {/* Fake application header */}
                 <div className="flex items-center justify-between border-b px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
@@ -181,13 +187,9 @@ export default function HomePage() {
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold">
-                        School Commerce
-                      </p>
+                      <p className="text-sm font-semibold">School Commerce</p>
 
-                      <p className="text-xs text-muted-foreground">
-                        Hari ini
-                      </p>
+                      <p className="text-xs text-muted-foreground">Hari ini</p>
                     </div>
                   </div>
 
@@ -196,7 +198,7 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {}
+                {/* Fake app content */}
                 <div className="space-y-5 p-5">
                   <div className="rounded-2xl bg-primary p-5 text-primary-foreground">
                     <p className="text-xs font-medium text-primary-foreground/75">
@@ -204,8 +206,7 @@ export default function HomePage() {
                     </p>
 
                     <p className="mt-2 text-xl font-semibold">
-                      Pesan dulu,
-                      ambil nanti.
+                      Pesan dulu, ambil nanti.
                     </p>
 
                     <div className="mt-5 h-9 rounded-xl bg-white/15" />
@@ -213,9 +214,7 @@ export default function HomePage() {
 
                   <div>
                     <div className="mb-3 flex items-center justify-between">
-                      <p className="text-sm font-semibold">
-                        Pilihan hari ini
-                      </p>
+                      <p className="text-sm font-semibold">Pilihan hari ini</p>
 
                       <span className="text-xs font-medium text-primary">
                         Lihat semua
@@ -223,29 +222,27 @@ export default function HomePage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      {activeProducts
-                        .slice(0, 4)
-                        .map((product) => (
-                          <div
-                            key={product.id}
-                            className="rounded-2xl border p-3"
-                          >
-                            <div className="aspect-[4/3] rounded-xl bg-muted" />
+                      {activeProducts.slice(0, 4).map((product) => (
+                        <div
+                          key={product.id}
+                          className="rounded-2xl border p-3"
+                        >
+                          <div className="aspect-[4/3] rounded-xl bg-muted" />
 
-                            <p className="mt-3 truncate text-xs font-semibold">
-                              {product.name}
-                            </p>
+                          <p className="mt-3 truncate text-xs font-semibold">
+                            {product.name}
+                          </p>
 
-                            <div className="mt-2 h-2 w-14 rounded-full bg-primary/20" />
-                          </div>
-                        ))}
+                          <div className="mt-2 h-2 w-14 rounded-full bg-primary/20" />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {}
+            {/* Floating Card */}
             <div className="absolute -bottom-6 -left-3 hidden rounded-2xl border bg-background p-4 shadow-lg sm:block lg:-left-8">
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
@@ -253,13 +250,9 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-muted-foreground">
-                    Waktu antre
-                  </p>
+                  <p className="text-xs text-muted-foreground">Waktu antre</p>
 
-                  <p className="text-sm font-semibold">
-                    Lebih efisien
-                  </p>
+                  <p className="text-sm font-semibold">Lebih efisien</p>
                 </div>
               </div>
             </div>
@@ -267,7 +260,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {}
+      {/* =====================================================
+       * STATISTICS
+       * =================================================== */}
       <section className="border-b bg-background">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x px-4 py-8 sm:px-6 lg:grid-cols-4 lg:px-8">
           <div className="px-4 text-center">
@@ -275,9 +270,7 @@ export default function HomePage() {
               {canteenMerchants.length}
             </p>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Kantin Aktif
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Kantin Aktif</p>
           </div>
 
           <div className="px-4 text-center">
@@ -285,9 +278,7 @@ export default function HomePage() {
               {cooperativeMerchants.length}
             </p>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Koperasi
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Koperasi</p>
           </div>
 
           <div className="border-t px-4 pt-6 text-center lg:border-t-0 lg:pt-0">
@@ -301,9 +292,7 @@ export default function HomePage() {
           </div>
 
           <div className="border-t px-4 pt-6 text-center lg:border-t-0 lg:pt-0">
-            <p className="text-3xl font-semibold tracking-tight">
-              1
-            </p>
+            <p className="text-3xl font-semibold tracking-tight">1</p>
 
             <p className="mt-1 text-sm text-muted-foreground">
               Ekosistem Sekolah
@@ -312,28 +301,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {}
+      {/* =====================================================
+       * COMMERCE SERVICES
+       * =================================================== */}
       <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="max-w-2xl">
-          <p className="text-sm font-medium text-primary">
-            Belanja di sekolah
-          </p>
+          <p className="text-sm font-medium text-primary">Belanja di sekolah</p>
 
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Semua kebutuhan dalam
-            satu platform.
+            Semua kebutuhan dalam satu platform.
           </h2>
 
           <p className="mt-4 text-muted-foreground">
-            Tidak hanya makanan. School commerce
-            menghubungkan siswa dengan layanan
-            jual-beli yang tersedia di lingkungan
-            sekolah.
+            Tidak hanya makanan. School commerce menghubungkan siswa dengan
+            layanan jual-beli yang tersedia di lingkungan sekolah.
           </p>
         </div>
 
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          {}
+          {/* Canteen */}
           <Link
             href="/kantin"
             className="group relative min-h-[330px] overflow-hidden rounded-3xl border bg-background p-6 transition-all hover:-translate-y-1 hover:shadow-xl sm:p-8"
@@ -351,26 +337,23 @@ export default function HomePage() {
                 </p>
 
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Pesan makanan sebelum
-                  bel istirahat berbunyi.
+                  Pesan makanan sebelum bel istirahat berbunyi.
                 </h3>
 
                 <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground">
-                  Temukan menu dari berbagai
-                  kantin dan siapkan pesanan
-                  sebelum waktu istirahat.
+                  Temukan menu dari berbagai kantin dan siapkan pesanan sebelum
+                  waktu istirahat.
                 </p>
 
                 <div className="mt-6 flex items-center gap-2 text-sm font-semibold">
                   Jelajahi Kantin
-
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
             </div>
           </Link>
 
-          {}
+          {/* Cooperative */}
           <Link
             href="/koperasi"
             className="group relative min-h-[330px] overflow-hidden rounded-3xl border bg-background p-6 transition-all hover:-translate-y-1 hover:shadow-xl sm:p-8"
@@ -388,19 +371,16 @@ export default function HomePage() {
                 </p>
 
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Kebutuhan sekolah tanpa
-                  harus antre.
+                  Kebutuhan sekolah tanpa harus antre.
                 </h3>
 
                 <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground">
-                  Buku, alat tulis, dan berbagai
-                  perlengkapan sekolah tersedia
+                  Buku, alat tulis, dan berbagai perlengkapan sekolah tersedia
                   dari koperasi.
                 </p>
 
                 <div className="mt-6 flex items-center gap-2 text-sm font-semibold">
                   Lihat Koperasi
-
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
@@ -409,7 +389,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {}
+      {/* =====================================================
+       * FEATURED PRODUCTS
+       * =================================================== */}
       {featuredProducts.length > 0 && (
         <section className="border-y bg-muted/30">
           <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
@@ -434,47 +416,37 @@ export default function HomePage() {
             </div>
 
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {featuredProducts.map(
-                (product) => {
-                  const merchant =
-                    getMerchantById(
-                      product.merchantId,
-                    );
+              {featuredProducts.map((product) => {
+                const merchant = merchantMap.get(product.merchantId);
 
-                  return (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      merchantName={
-                        merchant?.name
-                      }
-                    />
-                  );
-                },
-              )}
+                return (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    merchantName={merchant?.name}
+                  />
+                );
+              })}
             </div>
           </div>
         </section>
       )}
 
-      {}
+      {/* =====================================================
+       * BENEFITS
+       * =================================================== */}
       <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
           <div>
-            <p className="text-sm font-medium text-primary">
-              Kenapa digital?
-            </p>
+            <p className="text-sm font-medium text-primary">Kenapa digital?</p>
 
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Dibuat untuk aktivitas
-              sekolah yang lebih efisien.
+              Dibuat untuk aktivitas sekolah yang lebih efisien.
             </h2>
 
             <p className="mt-4 max-w-lg leading-7 text-muted-foreground">
-              Sistem commerce sekolah membantu
-              mengurangi proses manual dalam
-              pemesanan, pembayaran, hingga
-              pengambilan barang.
+              Sistem commerce sekolah membantu mengurangi proses manual dalam
+              pemesanan, pembayaran, hingga pengambilan barang.
             </p>
           </div>
 
@@ -491,9 +463,7 @@ export default function HomePage() {
                     <Icon className="size-5 text-primary" />
                   </div>
 
-                  <h3 className="mt-5 font-semibold">
-                    {benefit.title}
-                  </h3>
+                  <h3 className="mt-5 font-semibold">{benefit.title}</h3>
 
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {benefit.description}
@@ -505,17 +475,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {}
+      {/* =====================================================
+       * HOW IT WORKS
+       * =================================================== */}
       <section className="border-y bg-background">
         <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-medium text-primary">
-              Cara kerja
-            </p>
+            <p className="text-sm font-medium text-primary">Cara kerja</p>
 
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Dari pilih sampai pickup,
-              tetap sederhana.
+              Dari pilih sampai pickup, tetap sederhana.
             </h2>
           </div>
 
@@ -529,9 +498,7 @@ export default function HomePage() {
                   {step.number}
                 </p>
 
-                <h3 className="mt-8 text-lg font-semibold">
-                  {step.title}
-                </h3>
+                <h3 className="mt-8 text-lg font-semibold">{step.title}</h3>
 
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {step.description}
@@ -542,55 +509,49 @@ export default function HomePage() {
         </div>
       </section>
 
-      {}
+      {/* =====================================================
+       * TRUST
+       * =================================================== */}
       <section className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="grid gap-5 md:grid-cols-3">
           <div className="rounded-2xl border bg-background p-6">
             <ShieldCheck className="size-6 text-primary" />
 
-            <h3 className="mt-5 font-semibold">
-              Transaksi Terstruktur
-            </h3>
+            <h3 className="mt-5 font-semibold">Transaksi Terstruktur</h3>
 
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Status transaksi dirancang agar
-              proses pembayaran dan pesanan dapat
-              dipantau dengan jelas.
+              Status transaksi dirancang agar proses pembayaran dan pesanan
+              dapat dipantau dengan jelas.
             </p>
           </div>
 
           <div className="rounded-2xl border bg-background p-6">
             <QrCode className="size-6 text-primary" />
 
-            <h3 className="mt-5 font-semibold">
-              Smart Pickup
-            </h3>
+            <h3 className="mt-5 font-semibold">Smart Pickup</h3>
 
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Proses pengambilan dapat
-              diverifikasi menggunakan kode
-              pickup untuk mencegah pesanan
-              diambil dua kali.
+              Proses pengambilan dapat diverifikasi menggunakan kode pickup
+              untuk mencegah pesanan diambil dua kali.
             </p>
           </div>
 
           <div className="rounded-2xl border bg-background p-6">
             <Store className="size-6 text-primary" />
 
-            <h3 className="mt-5 font-semibold">
-              Merchant Terpusat
-            </h3>
+            <h3 className="mt-5 font-semibold">Merchant Terpusat</h3>
 
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Kantin dan koperasi dapat
-              mengelola aktivitas perdagangan
-              melalui sistem yang sama.
+              Kantin dan koperasi dapat mengelola aktivitas perdagangan melalui
+              sistem yang sama.
             </p>
           </div>
         </div>
       </section>
 
-      {}
+      {/* =====================================================
+       * FINAL CTA
+       * =================================================== */}
       <section className="px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
         <div className="mx-auto max-w-[1440px] overflow-hidden rounded-[32px] bg-primary px-6 py-12 text-primary-foreground sm:px-10 lg:px-14 lg:py-16">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
@@ -600,15 +561,12 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Tidak perlu tunggu antrean
-                untuk mulai memilih.
+                Tidak perlu tunggu antrean untuk mulai memilih.
               </h2>
 
               <p className="mt-4 leading-7 text-primary-foreground/75">
-                Lihat menu kantin atau kebutuhan
-                koperasi sekarang. Login baru
-                diperlukan ketika kamu siap
-                checkout.
+                Lihat menu kantin atau kebutuhan koperasi sekarang. Login baru
+                diperlukan ketika kamu siap checkout.
               </p>
             </div>
 
@@ -617,9 +575,7 @@ export default function HomePage() {
                 nativeButton={false}
                 size="lg"
                 variant="secondary"
-                render={
-                  <Link href="/kantin" />
-                }
+                render={<Link href="/kantin" />}
               >
                 Lihat Kantin
                 <ArrowRight className="size-4" />
@@ -630,9 +586,7 @@ export default function HomePage() {
                 size="lg"
                 variant="outline"
                 className="border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                render={
-                  <Link href="/koperasi" />
-                }
+                render={<Link href="/koperasi" />}
               >
                 Koperasi
               </Button>

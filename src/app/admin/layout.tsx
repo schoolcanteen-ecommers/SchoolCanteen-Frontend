@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import type {
+  ReactNode,
+} from "react";
 
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { GlobalHeader } from "@/components/layout/global-header";
@@ -20,6 +22,7 @@ export default async function AdminLayout({
       <GlobalHeader
         userName={profile.name}
         userRole="School Admin"
+        brandHref="/admin/dashboard"
       />
 
       <div className="flex min-h-[calc(100vh-4rem)]">

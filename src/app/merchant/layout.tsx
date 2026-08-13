@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import type {
+  ReactNode,
+} from "react";
 
 import { GlobalHeader } from "@/components/layout/global-header";
 import { MerchantSidebar } from "@/components/layout/merchant-sidebar";
@@ -20,12 +22,13 @@ export default async function MerchantLayout({
       <GlobalHeader
         userName={profile.name}
         userRole="Merchant"
+        brandHref="/merchant/dashboard"
       />
 
       <div className="flex min-h-[calc(100vh-4rem)]">
         <MerchantSidebar />
 
-        <main className="flex-1">
+        <main className="min-w-0 flex-1">
           {children}
         </main>
       </div>

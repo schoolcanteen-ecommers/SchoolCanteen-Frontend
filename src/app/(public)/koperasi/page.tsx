@@ -13,7 +13,8 @@ export default async function CooperativePage() {
     merchants,
     products,
     categories,
-  } = await getCooperativeCatalog();
+  } =
+    await getCooperativeCatalog();
 
   return (
     <div>
