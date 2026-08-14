@@ -210,7 +210,7 @@ export function AdminFinanceOverview({
 
   return (
     <>
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Dana Tertahan"
@@ -250,7 +250,7 @@ export function AdminFinanceOverview({
       </section>
 
       <div className="mt-8 grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-        {/* Fund Flow */}
+        {}
         <section>
           <div>
             <h2 className="text-lg font-semibold">
@@ -421,7 +421,7 @@ export function AdminFinanceOverview({
           )}
         </section>
 
-        {/* Withdrawals */}
+        {}
         <aside>
           <div>
             <h2 className="text-lg font-semibold">

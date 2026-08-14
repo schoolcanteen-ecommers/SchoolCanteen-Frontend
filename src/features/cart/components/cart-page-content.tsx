@@ -194,7 +194,7 @@ export function CartPageContent() {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {/* Header */}
+      {}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-2 text-sm font-medium text-primary">
@@ -223,14 +223,14 @@ export function CartPageContent() {
       </div>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Cart Items */}
+        {}
         <div className="space-y-6">
           {groups.map((group) => (
             <section
               key={group.merchantId}
               className="overflow-hidden rounded-2xl border bg-background"
             >
-              {/* Merchant Header */}
+              {}
               <div className="border-b px-4 py-4 sm:px-5">
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Merchant
@@ -239,7 +239,7 @@ export function CartPageContent() {
                 <h2 className="mt-1 font-semibold">{group.merchantName}</h2>
               </div>
 
-              {/* Items */}
+              {}
               <div className="divide-y">
                 {group.items.map(({ product, quantity }) => {
                   const itemSubtotal = product.price * quantity;
@@ -250,7 +250,7 @@ export function CartPageContent() {
 
                   return (
                     <article key={product.id} className="flex gap-4 p-4 sm:p-5">
-                      {/* Image */}
+                      {}
                       <Link
                         href={`/produk/${product.id}`}
                         className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted sm:size-28"
@@ -267,7 +267,7 @@ export function CartPageContent() {
                         )}
                       </Link>
 
-                      {/* Content */}
+                      {}
                       <div className="flex min-w-0 flex-1 flex-col">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
@@ -296,7 +296,7 @@ export function CartPageContent() {
                         </div>
 
                         <div className="mt-auto flex flex-col gap-3 pt-4 sm:flex-row sm:items-end sm:justify-between">
-                          {/* Quantity */}
+                          {}
                           <div>
                             <p className="mb-1.5 text-xs text-muted-foreground">
                               Jumlah
@@ -335,7 +335,7 @@ export function CartPageContent() {
                             </div>
                           </div>
 
-                          {/* Subtotal */}
+                          {}
                           <div className="sm:text-right">
                             <p className="text-xs text-muted-foreground">
                               Subtotal
@@ -355,7 +355,7 @@ export function CartPageContent() {
           ))}
         </div>
 
-        {/* Summary */}
+        {}
         <aside className="rounded-2xl border bg-background p-5 lg:sticky lg:top-24">
           <h2 className="text-lg font-semibold">Ringkasan Pesanan</h2>
 

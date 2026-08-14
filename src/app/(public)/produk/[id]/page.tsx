@@ -71,7 +71,7 @@ export default async function ProductDetailPage({
 
   return (
     <div>
-      {/* Back Navigation */}
+      {}
       <section className="border-b bg-background">
         <div className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 lg:px-8">
           <Link
@@ -85,10 +85,10 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {/* Product Detail */}
+      {}
       <section className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          {/* Product Image */}
+          {}
           <div className="overflow-hidden rounded-3xl border bg-muted">
             <div className="flex aspect-square items-center justify-center sm:aspect-[4/3] lg:aspect-square">
               {product.imageUrl ? (
@@ -114,7 +114,7 @@ export default async function ProductDetailPage({
             </div>
           </div>
 
-          {/* Product Information */}
+          {}
           <div className="flex flex-col">
             <div className="mb-4 flex flex-wrap items-center gap-2">
               {merchant && (
@@ -150,7 +150,7 @@ export default async function ProductDetailPage({
               </p>
             )}
 
-            {/* Meta */}
+            {}
             <div className="mt-7 grid gap-3 sm:grid-cols-2">
               <div className="flex items-center gap-3 rounded-2xl border bg-background p-4">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted">
@@ -187,7 +187,7 @@ export default async function ProductDetailPage({
               </div>
             </div>
 
-            {/* Add To Cart */}
+            {}
             <div className="mt-8 border-t pt-8">
               <AddToCartButton
                 productId={
@@ -212,7 +212,7 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {/* Related Products */}
+      {}
       {relatedProducts.length >
         0 && (
           <section className="border-t bg-background">

@@ -88,7 +88,7 @@ export function AdminCooperativeInventoryList({
                 className="p-4 sm:p-5"
               >
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                  {/* Product */}
+                  {}
                   <div className="flex min-w-0 flex-1 items-center gap-4">
                     <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
                       {product.imageUrl ? (
@@ -122,7 +122,7 @@ export function AdminCooperativeInventoryList({
                     </div>
                   </div>
 
-                  {/* Inventory */}
+                  {}
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:min-w-[420px]">
                     <div className="rounded-xl bg-muted/40 p-3">
                       <p className="text-xs text-muted-foreground">

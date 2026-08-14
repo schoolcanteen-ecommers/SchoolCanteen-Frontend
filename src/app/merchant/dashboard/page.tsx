@@ -23,13 +23,13 @@ import { merchantDashboard } from "@/mocks/dashboard";
 export default function MerchantDashboardPage() {
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {/* Header */}
+      {}
       <PageHeader
         title="Dashboard Merchant"
         description="Pantau pesanan, produksi, pickup, dan aktivitas merchant hari ini."
       />
 
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Pesanan Baru"
@@ -62,7 +62,7 @@ export default function MerchantDashboardPage() {
         />
       </section>
 
-      {/* Quick Access */}
+      {}
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -75,7 +75,7 @@ export default function MerchantDashboardPage() {
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {/* Orders */}
+          {}
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <ClipboardList className="size-5 text-primary" />
@@ -102,7 +102,7 @@ export default function MerchantDashboardPage() {
             </Button>
           </div>
 
-          {/* Production */}
+          {}
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <CookingPot className="size-5 text-primary" />
@@ -129,7 +129,7 @@ export default function MerchantDashboardPage() {
             </Button>
           </div>
 
-          {/* Pickup */}
+          {}
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <QrCode className="size-5 text-primary" />
@@ -156,7 +156,7 @@ export default function MerchantDashboardPage() {
             </Button>
           </div>
 
-          {/* Products */}
+          {}
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <Package className="size-5 text-primary" />
@@ -185,7 +185,7 @@ export default function MerchantDashboardPage() {
         </div>
       </section>
 
-      {/* Today Operational Summary */}
+      {}
       <section className="mt-8 rounded-2xl border bg-background">
         <div className="border-b px-5 py-4 sm:px-6">
           <h2 className="font-semibold">
@@ -198,7 +198,7 @@ export default function MerchantDashboardPage() {
         </div>
 
         <div className="grid divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {/* Total Orders */}
+          {}
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock3 className="size-4" />
@@ -215,7 +215,7 @@ export default function MerchantDashboardPage() {
             </p>
           </div>
 
-          {/* Completed */}
+          {}
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CheckCircle2 className="size-4" />
@@ -232,7 +232,7 @@ export default function MerchantDashboardPage() {
             </p>
           </div>
 
-          {/* Active */}
+          {}
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CookingPot className="size-4" />

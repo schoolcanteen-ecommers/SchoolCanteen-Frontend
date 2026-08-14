@@ -114,7 +114,7 @@ export function LoginForm({
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-5"
     >
-      {/* Email */}
+      {}
       <div className="space-y-2">
         <label
           htmlFor="email"
@@ -143,7 +143,7 @@ export function LoginForm({
         )}
       </div>
 
-      {/* Password */}
+      {}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-4">
           <label
@@ -207,7 +207,7 @@ export function LoginForm({
         )}
       </div>
 
-      {/* Authentication Error */}
+      {}
       {authError && (
         <div
           role="alert"
@@ -219,7 +219,7 @@ export function LoginForm({
         </div>
       )}
 
-      {/* Submit */}
+      {}
       <Button
         type="submit"
         size="lg"
@@ -231,7 +231,7 @@ export function LoginForm({
           : "Masuk"}
       </Button>
 
-      {/* Register */}
+      {}
       <p className="text-center text-sm text-muted-foreground">
         Belum punya akun?{" "}
         <Link

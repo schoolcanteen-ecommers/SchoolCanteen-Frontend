@@ -80,7 +80,7 @@ export function AdminCooperativeProductList({
             key={merchant.id}
             className="overflow-hidden rounded-2xl border bg-background"
           >
-            {/* Cooperative Header */}
+            {}
             <div className="flex flex-col gap-4 border-b p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <div className="flex min-w-0 items-center gap-4">
                 <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
@@ -120,7 +120,7 @@ export function AdminCooperativeProductList({
               </div>
             </div>
 
-            {/* Products */}
+            {}
             {merchantProducts.length > 0 ? (
               <div className="divide-y">
                 {merchantProducts.map(

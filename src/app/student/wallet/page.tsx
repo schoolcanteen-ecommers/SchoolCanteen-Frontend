@@ -100,13 +100,13 @@ export default function StudentWalletPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {/* Header */}
+      {}
       <PageHeader
         title="Saku Wallet"
         description="Pantau saldo dan riwayat transaksi SchoolCanteen."
       />
 
-      {/* Wallet Balance */}
+      {}
       <section className="mt-8 overflow-hidden rounded-2xl border bg-background">
         <div className="p-6 sm:p-8">
           <div className="flex items-start justify-between gap-4">
@@ -137,7 +137,7 @@ export default function StudentWalletPage() {
         </div>
       </section>
 
-      {/* Summary */}
+      {}
       <section className="mt-6 grid gap-4 sm:grid-cols-2">
         <StatCard
           title="Total Top Up"
@@ -158,7 +158,7 @@ export default function StudentWalletPage() {
         />
       </section>
 
-      {/* Transaction History */}
+      {}
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -209,12 +209,12 @@ export default function StudentWalletPage() {
                       }
                       className="flex items-center gap-4 p-4 sm:p-5"
                     >
-                      {/* Icon */}
+                      {}
                       <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted">
                         <TransactionIcon className="size-5 text-foreground" />
                       </div>
 
-                      {/* Information */}
+                      {}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
                           <p className="font-medium">
@@ -242,7 +242,7 @@ export default function StudentWalletPage() {
                         )}
                       </div>
 
-                      {/* Amount */}
+                      {}
                       <div className="shrink-0 text-right">
                         <p
                           className={

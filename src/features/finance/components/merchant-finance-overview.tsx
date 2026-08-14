@@ -197,7 +197,7 @@ export function MerchantFinanceOverview({
 
   return (
     <>
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Saldo Tersedia"
@@ -228,7 +228,7 @@ export function MerchantFinanceOverview({
       </section>
 
       <div className="mt-8 grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-        {/* Financial Activity */}
+        {}
         <section>
           <div>
             <h2 className="text-lg font-semibold">
@@ -371,7 +371,7 @@ export function MerchantFinanceOverview({
           )}
         </section>
 
-        {/* Withdrawal */}
+        {}
         <aside>
           <div>
             <h2 className="text-lg font-semibold">

@@ -43,7 +43,7 @@ export function MerchantProductList({
 
   return (
     <>
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Total Produk"
@@ -67,7 +67,7 @@ export function MerchantProductList({
         />
       </section>
 
-      {/* Product List */}
+      {}
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -97,7 +97,7 @@ export function MerchantProductList({
                   key={product.id}
                   className="overflow-hidden rounded-2xl border bg-background"
                 >
-                  {/* Product Image */}
+                  {}
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                     {product.imageUrl ? (
                      
@@ -112,7 +112,7 @@ export function MerchantProductList({
                       </div>
                     )}
 
-                    {/* Status */}
+                    {}
                     <div className="absolute left-3 top-3">
                       <span
                         className={cn(
@@ -129,7 +129,7 @@ export function MerchantProductList({
                       </span>
                     </div>
 
-                    {/* Availability */}
+                    {}
                     <div className="absolute right-3 top-3">
                       <span
                         className={cn(
@@ -147,7 +147,7 @@ export function MerchantProductList({
                     </div>
                   </div>
 
-                  {/* Product Content */}
+                  {}
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
@@ -175,7 +175,7 @@ export function MerchantProductList({
                       </p>
                     )}
 
-                    {/* Price */}
+                    {}
                     <div className="mt-5 border-t pt-4">
                       <p className="text-xs text-muted-foreground">
                         Harga
@@ -188,7 +188,7 @@ export function MerchantProductList({
                       </p>
                     </div>
 
-                    {/* Inventory */}
+                    {}
                     <div className="mt-4 grid grid-cols-2 gap-3">
                       <div className="rounded-xl bg-muted/40 p-3">
                         <p className="text-xs text-muted-foreground">

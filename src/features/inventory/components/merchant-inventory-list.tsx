@@ -57,7 +57,7 @@ export function MerchantInventoryList({
 
   return (
     <>
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Total Stok"
@@ -85,7 +85,7 @@ export function MerchantInventoryList({
         />
       </section>
 
-      {/* Inventory */}
+      {}
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -131,7 +131,7 @@ export function MerchantInventoryList({
                       className="p-4 sm:p-5"
                     >
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                        {/* Product */}
+                        {}
                         <div className="flex min-w-0 flex-1 items-start gap-4">
                           <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted sm:size-20">
                             {product.imageUrl ? (
@@ -187,9 +187,9 @@ export function MerchantInventoryList({
                           </div>
                         </div>
 
-                        {/* Stock Information */}
+                        {}
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:min-w-[420px]">
-                          {/* Current Stock */}
+                          {}
                           <div className="rounded-xl bg-muted/40 p-3">
                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                               <Package className="size-3.5" />
@@ -211,7 +211,7 @@ export function MerchantInventoryList({
                             </p>
                           </div>
 
-                          {/* Stock Status */}
+                          {}
                           <div className="rounded-xl bg-muted/40 p-3">
                             <p className="text-xs text-muted-foreground">
                               Status Stok
@@ -238,7 +238,7 @@ export function MerchantInventoryList({
                             </p>
                           </div>
 
-                          {/* Availability */}
+                          {}
                           <div className="col-span-2 rounded-xl bg-muted/40 p-3 sm:col-span-1">
                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                               <PackageCheck className="size-3.5" />

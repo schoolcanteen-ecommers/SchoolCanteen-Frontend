@@ -291,8 +291,8 @@ export function CheckoutPageContent() {
             body: {
               merchant_id: group.merchantId,
 
-              // Pickup slot sementara dilewati sampai endpoint
-              // pickup slot dari backend tersedia.
+             
+             
               pickup_slot_id: null,
 
               items: group.items.map(({ product, quantity }) => ({

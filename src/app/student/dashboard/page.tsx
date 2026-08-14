@@ -20,13 +20,13 @@ import { formatCurrency } from "@/lib/utils";
 export default function StudentDashboardPage() {
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {/* Header */}
+      {}
       <PageHeader
         title="Dashboard Siswa"
         description="Akses kantin, koperasi, pesanan, dan wallet kamu dari satu tempat."
       />
 
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Pesanan Aktif"
@@ -52,7 +52,7 @@ export default function StudentDashboardPage() {
         />
       </section>
 
-      {/* Main Services */}
+      {}
       <section className="mt-8">
         <div className="mb-4">
           <h2 className="text-lg font-semibold">
@@ -65,7 +65,7 @@ export default function StudentDashboardPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {/* Canteen */}
+          {}
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <Store className="size-5 text-primary" />
@@ -94,7 +94,7 @@ export default function StudentDashboardPage() {
             </Button>
           </div>
 
-          {/* Cooperative */}
+          {}
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <ShoppingBag className="size-5 text-primary" />
@@ -126,9 +126,9 @@ export default function StudentDashboardPage() {
         </div>
       </section>
 
-      {/* Quick Access */}
+      {}
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
-        {/* Orders */}
+        {}
         <div className="flex flex-col justify-between rounded-2xl border bg-background p-6 sm:flex-row sm:items-center">
           <div>
             <p className="text-sm text-muted-foreground">
@@ -158,7 +158,7 @@ export default function StudentDashboardPage() {
           </Button>
         </div>
 
-        {/* Wallet */}
+        {}
         <div className="flex flex-col justify-between rounded-2xl border bg-background p-6 sm:flex-row sm:items-center">
           <div>
             <p className="text-sm text-muted-foreground">

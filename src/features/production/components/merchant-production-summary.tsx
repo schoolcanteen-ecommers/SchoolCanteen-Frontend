@@ -145,7 +145,7 @@ export function MerchantProductionSummary({
 
   return (
     <>
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Pesanan Produksi"
@@ -175,7 +175,7 @@ export function MerchantProductionSummary({
         />
       </section>
 
-      {/* Production Requirement */}
+      {}
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -215,7 +215,7 @@ export function MerchantProductionSummary({
                       className="p-5 sm:p-6"
                     >
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                        {/* Product */}
+                        {}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start gap-3">
                             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -241,7 +241,7 @@ export function MerchantProductionSummary({
                             </div>
                           </div>
 
-                          {/* Pickup Breakdown */}
+                          {}
                           <div className="mt-5">
                             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                               Breakdown
@@ -285,7 +285,7 @@ export function MerchantProductionSummary({
                           </div>
                         </div>
 
-                        {/* Quantity */}
+                        {}
                         <div className="rounded-xl bg-muted/40 px-5 py-4 lg:min-w-40 lg:text-right">
                           <p className="text-xs text-muted-foreground">
                             Total Dibuat

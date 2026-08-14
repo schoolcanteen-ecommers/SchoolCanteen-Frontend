@@ -46,7 +46,7 @@ export function MerchantOrderCard({
 
   return (
     <article className="overflow-hidden rounded-2xl border bg-background">
-      {/* Header */}
+      {}
       <div className="flex flex-col gap-4 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -73,10 +73,10 @@ export function MerchantOrderCard({
         </div>
       </div>
 
-      {/* Content */}
+      {}
       <div className="p-5 sm:p-6">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px]">
-          {/* Products */}
+          {}
           <div>
             <div className="flex items-center gap-2 text-sm font-medium">
               <Package className="size-4 text-primary" />
@@ -120,7 +120,7 @@ export function MerchantOrderCard({
             </div>
           </div>
 
-          {/* Pickup */}
+          {}
           <div className="rounded-xl bg-muted/40 p-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Clock3 className="size-4 text-primary" />
@@ -151,7 +151,7 @@ export function MerchantOrderCard({
           </div>
         </div>
 
-        {/* Footer */}
+        {}
         <div className="mt-6 grid gap-4 border-t pt-4 sm:grid-cols-3">
           <div>
             <p className="text-xs text-muted-foreground">

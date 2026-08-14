@@ -71,7 +71,7 @@ export function AdminMerchantList({
 
   return (
     <section className="mt-8">
-      {/* Header + Filter */}
+      {}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold">
@@ -119,7 +119,7 @@ export function AdminMerchantList({
         </div>
       </div>
 
-      {/* Merchant List */}
+      {}
       {filteredMerchants.length > 0 ? (
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredMerchants.map(
@@ -140,7 +140,7 @@ export function AdminMerchantList({
                   key={merchant.id}
                   className="overflow-hidden rounded-2xl border bg-background"
                 >
-                  {/* Merchant Image */}
+                  {}
                   <div className="relative aspect-[16/7] overflow-hidden bg-muted">
                     {merchant.imageUrl ? (
                      
@@ -187,7 +187,7 @@ export function AdminMerchantList({
                     </div>
                   </div>
 
-                  {/* Merchant Content */}
+                  {}
                   <div className="p-5">
                     <div className="flex items-start gap-3">
                       <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">

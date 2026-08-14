@@ -53,7 +53,7 @@ export default async function AdminMerchantsPage() {
         description="Pantau merchant kantin dan koperasi yang tersedia di SchoolCanteen."
       />
 
-      {/* Statistics */}
+      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Merchant Aktif"

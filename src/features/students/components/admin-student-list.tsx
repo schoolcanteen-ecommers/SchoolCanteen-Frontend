@@ -61,7 +61,7 @@ export function AdminStudentList({ students }: AdminStudentListProps) {
 
       {filteredStudents.length > 0 ? (
         <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
-          {/* Desktop Header */}
+          {}
           <div className="hidden grid-cols-[minmax(220px,1.5fr)_140px_170px_minmax(220px,1fr)_170px] gap-4 border-b bg-muted/30 px-5 py-3 text-xs font-medium text-muted-foreground lg:grid">
             <span>Siswa</span>
             <span>NIS</span>
@@ -82,7 +82,7 @@ export function AdminStudentList({ students }: AdminStudentListProps) {
 
               return (
                 <article key={user.id} className="p-5">
-                  {/* Desktop */}
+                  {}
                   <div className="hidden grid-cols-[minmax(220px,1.5fr)_140px_170px_minmax(220px,1fr)_170px] items-center gap-4 lg:grid">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-sm font-semibold text-primary">
@@ -120,7 +120,7 @@ export function AdminStudentList({ students }: AdminStudentListProps) {
                     </p>
                   </div>
 
-                  {/* Mobile / Tablet */}
+                  {}
                   <div className="lg:hidden">
                     <div className="flex items-start gap-3">
                       <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-sm font-semibold text-primary">
