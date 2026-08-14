@@ -26,7 +26,6 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
-
 function sanitizeCartItems(
   value: unknown,
 ): CartItem[] {
@@ -70,7 +69,6 @@ function sanitizeCartItems(
     }));
 }
 
-
 function getInitialCart(): CartItem[] {
   if (typeof window === "undefined") {
     return [];
@@ -101,7 +99,6 @@ function getInitialCart(): CartItem[] {
   }
 }
 
-
 function subscribeToHydration() {
   return () => {};
 }
@@ -119,8 +116,7 @@ export function CartProvider({
       () => false,
     );
 
-  
-  useEffect(() => {
+    useEffect(() => {
     if (!isHydrated) {
       return;
     }
@@ -201,8 +197,7 @@ export function CartProvider({
       productId: string,
       quantity: number,
     ) => {
-      
-      if (quantity <= 0) {
+            if (quantity <= 0) {
         setItems((currentItems) =>
           currentItems.filter(
             (item) =>

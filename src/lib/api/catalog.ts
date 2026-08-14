@@ -6,11 +6,6 @@ import type {
 
 import { apiRequest } from "@/lib/api/client";
 
-/*
-|--------------------------------------------------------------------------
-| Backend DTO
-|--------------------------------------------------------------------------
-*/
 
 interface ApiMerchant {
   id: string;
@@ -68,11 +63,6 @@ interface ApiProduct {
   created_at: string | null;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Adapters
-|--------------------------------------------------------------------------
-*/
 
 function mapMerchant(
   merchant: ApiMerchant,
@@ -168,11 +158,6 @@ function buildCategories(
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| Canteen Catalog
-|--------------------------------------------------------------------------
-*/
 
 export async function getCanteenCatalog() {
   const [
@@ -212,11 +197,6 @@ export async function getCanteenCatalog() {
   };
 }
 
-/*
-|--------------------------------------------------------------------------
-| Cooperative Catalog
-|--------------------------------------------------------------------------
-*/
 
 export async function getCooperativeCatalog() {
   const [
@@ -256,11 +236,6 @@ export async function getCooperativeCatalog() {
   };
 }
 
-/*
-|--------------------------------------------------------------------------
-| Product Detail
-|--------------------------------------------------------------------------
-*/
 
 export async function getProductDetail(
   productId: string,
@@ -345,11 +320,6 @@ export async function getProductDetail(
   };
 }
 
-/*
-|--------------------------------------------------------------------------
-| Cart Product Resolver
-|--------------------------------------------------------------------------
-*/
 
 export async function getCartProduct(
   productId: string,

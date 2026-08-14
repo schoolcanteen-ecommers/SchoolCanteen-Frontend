@@ -256,7 +256,7 @@ export function CartPageContent() {
                         className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted sm:size-28"
                       >
                         {product.imageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
+                         
                           <img
                             src={product.imageUrl}
                             alt={product.name}

@@ -18,9 +18,6 @@ import { ProductCard } from "@/components/commerce/product-card";
 import { Button } from "@/components/ui/button";
 
 import { getCanteenCatalog, getCooperativeCatalog } from "@/lib/api/catalog";
-/* =========================================================
- * STATIC LANDING CONTENT
- * ======================================================= */
 
 const benefits = [
   {

@@ -44,8 +44,7 @@ export function CommerceProductBrowser({
   const [selectedCategory, setSelectedCategory] =
     useState("ALL");
 
-  
-  const categoryNames = useMemo(() => {
+    const categoryNames = useMemo(() => {
     return Array.from(
       new Set(
         categories.map(
@@ -134,8 +133,7 @@ export function CommerceProductBrowser({
     categoryNameById,
   ]);
 
-  
-  const visibleMerchants = useMemo(
+    const visibleMerchants = useMemo(
     () =>
       merchants.filter(
         (merchant) =>
@@ -162,7 +160,7 @@ export function CommerceProductBrowser({
 
   return (
     <div>
-      {}
+      {/* Search */}
       <div className="relative max-w-xl">
         <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
 
@@ -193,7 +191,7 @@ export function CommerceProductBrowser({
         )}
       </div>
 
-      {}
+      {/* Category Filter */}
       {categoryNames.length > 0 && (
         <div className="mt-5 flex gap-2 overflow-x-auto pb-2">
           <CategoryChip
@@ -233,7 +231,7 @@ export function CommerceProductBrowser({
         </div>
       )}
 
-      {}
+      {/* Result Info */}
       <div className="mt-6 flex items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
           Menampilkan{" "}
@@ -259,7 +257,7 @@ export function CommerceProductBrowser({
         )}
       </div>
 
-      {}
+      {/* Listing */}
       <div className="mt-6">
         {visibleMerchants.length >
         0 ? (

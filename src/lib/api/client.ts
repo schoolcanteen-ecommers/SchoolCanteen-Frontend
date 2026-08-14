@@ -18,8 +18,7 @@ interface ApiRequestOptions
   extends Omit<RequestInit, "body"> {
   body?: unknown;
 
-  
-  accessToken?: string;
+    accessToken?: string;
 }
 
 export async function apiRequest<T>(

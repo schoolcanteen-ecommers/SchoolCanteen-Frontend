@@ -19,10 +19,7 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import type {
-  NavigationGroup,
-  NavigationItem,
-} from "@/types/navigation";
+import type { NavigationGroup, NavigationItem } from "@/types/navigation";
 
 export const publicNavigation: NavigationItem[] = [
   {
@@ -236,6 +233,11 @@ export const adminNavigation: NavigationGroup[] = [
         title: "Transactions",
         href: "/admin/transactions",
         icon: WalletCards,
+      },
+      {
+        title: "Finance",
+        href: "/admin/finance",
+        icon: DollarSign,
       },
       {
         title: "Reports",

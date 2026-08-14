@@ -27,11 +27,7 @@ export async function authenticatedServerApiRequest<T>(
 
       accessToken,
 
-      /*
-       * Data authenticated bersifat
-       * user-specific.
-       */
-      cache:
+            cache:
         options.cache ??
         "no-store",
     },

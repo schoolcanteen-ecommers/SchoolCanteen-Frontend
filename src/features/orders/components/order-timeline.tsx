@@ -30,11 +30,7 @@ const orderFlow: OrderStatus[] = [
 export function OrderTimeline({
   status,
 }: OrderTimelineProps) {
-  /*
-   * CANCELLED adalah branch terpisah
-   * dari normal order lifecycle.
-   */
-  if (status === "CANCELLED") {
+    if (status === "CANCELLED") {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
         <div className="flex items-start gap-3">

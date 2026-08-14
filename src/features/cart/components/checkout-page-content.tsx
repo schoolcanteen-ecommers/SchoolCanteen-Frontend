@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useMemo, useState } from "react";
 
 import {
   CheckCircle2,
   ChevronLeft,
-  Clock3,
   ImageIcon,
   ShoppingBag,
   Store,
@@ -21,16 +21,14 @@ import { PageHeader } from "@/components/shared/page-header";
 
 import { useCart } from "@/features/cart/use-cart";
 
+import { authenticatedApiRequest } from "@/lib/api/authenticated-client";
 import { getCartProduct } from "@/lib/api/catalog";
 
 import { formatCurrency } from "@/lib/utils";
 
-import { pickupSlots } from "@/mocks/pickup-slots";
-import { studentWallet } from "@/mocks/wallet";
-
 import type { CheckoutMerchantGroup } from "@/types/checkout";
-import type { Product } from "@/types/product";
 import type { Merchant } from "@/types/merchant";
+import type { Product } from "@/types/product";
 
 interface ResolvedCheckoutItem {
   productId: string;
@@ -45,33 +43,64 @@ interface ResolvedCheckoutMerchantGroup extends CheckoutMerchantGroup {
   merchantType: Merchant["type"];
 }
 
+interface StudentWalletResponse {
+  id: string;
+  balance: number;
+  is_active: boolean;
+  updated_at: string;
+}
+
+interface CreateOrderResponse {
+  order_id: string;
+  order_code: string;
+  status: string;
+
+  merchant: {
+    id: string;
+    name: string;
+  };
+
+  pickup_slot_id: string | null;
+
+  items: Array<{
+    product_id: string;
+    product_name: string;
+    unit_price: number;
+    quantity: number;
+    subtotal: number;
+  }>;
+
+  total_amount: number;
+  remaining_balance: number;
+
+  pickup: {
+    token: string;
+    code: string;
+    status: string;
+  };
+
+  notes: string | null;
+  created_at: string;
+}
+
 export function CheckoutPageContent() {
+  const router = useRouter();
+
   const { items, isHydrated, removeItem } = useCart();
 
   const [resolvedItems, setResolvedItems] = useState<ResolvedCheckoutItem[]>(
     [],
   );
 
+  const [wallet, setWallet] = useState<StudentWalletResponse | null>(null);
+
   const [isResolving, setIsResolving] = useState(true);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [selectedPickupSlots, setSelectedPickupSlots] = useState<
-    Record<string, string>
-  >({});
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  /*
-   * Resolve product ID dari cart
-   * menggunakan backend API.
-   *
-   * Cart hanya menyimpan:
-   * {
-   *   productId,
-   *   quantity
-   * }
-   *
-   * Nama, harga, stok, merchant,
-   * dan data lainnya tetap berasal
-   * dari backend.
-   */
   useEffect(() => {
     if (!isHydrated) {
       return;
@@ -110,17 +139,9 @@ export function CheckoutPageContent() {
       results.forEach((result, index) => {
         if (result.status === "fulfilled") {
           validItems.push(result.value);
-
           return;
         }
 
-        /*
-         * Product yang sudah tidak
-         * tersedia di backend dibuang
-         * dari cart supaya cart state,
-         * checkout, badge, dan
-         * localStorage tetap sinkron.
-         */
         const invalidItem = items[index];
 
         if (invalidItem) {
@@ -139,9 +160,57 @@ export function CheckoutPageContent() {
     };
   }, [items, isHydrated, removeItem]);
 
-  /*
-   * Group product berdasarkan merchant.
-   */
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadWallet() {
+      setIsLoadingWallet(true);
+      setWalletError(null);
+
+      try {
+        const data =
+          await authenticatedApiRequest<StudentWalletResponse>(
+            "/student/wallet",
+            {
+              cache: "no-store",
+            },
+          );
+
+        if (cancelled) {
+          return;
+        }
+
+        setWallet(data);
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setWallet(null);
+
+        setWalletError(
+          error instanceof Error
+            ? error.message
+            : "Wallet gagal dimuat.",
+        );
+      } finally {
+        if (!cancelled) {
+          setIsLoadingWallet(false);
+        }
+      }
+    }
+
+    void loadWallet();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isHydrated]);
+
   const groups = useMemo<ResolvedCheckoutMerchantGroup[]>(() => {
     const result: ResolvedCheckoutMerchantGroup[] = [];
 
@@ -182,78 +251,85 @@ export function CheckoutPageContent() {
     return result;
   }, [resolvedItems]);
 
-  /*
-   * Total checkout dihitung dari
-   * harga produk terbaru yang
-   * diperoleh dari backend.
-   */
   const total = useMemo(
     () => groups.reduce((sum, group) => sum + group.subtotal, 0),
     [groups],
   );
 
-  /*
-   * Wallet masih MOCK.
-   *
-   * Jangan diganti ke endpoint
-   * buatan sendiri sampai backend
-   * memberikan contract wallet
-   * sebenarnya.
-   */
-  const hasEnoughBalance = studentWallet.balance >= total;
+  const walletBalance = wallet?.balance ?? 0;
 
-  const allPickupSlotsSelected =
-    groups.length > 0 &&
-    groups.every((group) => Boolean(selectedPickupSlots[group.merchantId]));
+  const hasEnoughBalance =
+    wallet !== null &&
+    wallet.is_active &&
+    walletBalance >= total;
 
   const canSubmit =
-    groups.length > 0 && hasEnoughBalance && allPickupSlotsSelected;
+    groups.length > 0 &&
+    !isLoadingWallet &&
+    wallet !== null &&
+    wallet.is_active &&
+    hasEnoughBalance &&
+    !isSubmitting;
 
-  function selectPickupSlot(merchantId: string, slotId: string) {
-    setSelectedPickupSlots((current) => ({
-      ...current,
-      [merchantId]: slotId,
-    }));
-  }
-
-  function handleSubmitOrder() {
+  async function handleSubmitOrder() {
     if (!canSubmit) {
       return;
     }
 
-    const checkoutPayload = {
-      merchants: groups.map((group) => ({
-        merchantId: group.merchantId,
+    setCheckoutError(null);
+    setIsSubmitting(true);
 
-        pickupSlotId: selectedPickupSlots[group.merchantId],
+    const successfulProductIds: string[] = [];
 
-        items: group.items.map(({ product, quantity }) => ({
-          productId: product.id,
-          quantity,
-        })),
+    try {
+      for (const group of groups) {
+        await authenticatedApiRequest<CreateOrderResponse>(
+          "/student/orders",
+          {
+            method: "POST",
 
-        subtotal: group.subtotal,
-      })),
+            body: {
+              merchant_id: group.merchantId,
 
-      total,
-    };
+              // Pickup slot sementara dilewati sampai endpoint
+              // pickup slot dari backend tersedia.
+              pickup_slot_id: null,
 
-    /*
-     * Order API belum memiliki
-     * contract final.
-     *
-     * Jangan membuat order palsu.
-     */
-    console.log("Checkout payload:", checkoutPayload);
+              items: group.items.map(({ product, quantity }) => ({
+                product_id: product.id,
+                quantity,
+              })),
+
+              notes: null,
+            },
+          },
+        );
+
+        successfulProductIds.push(
+          ...group.items.map(({ product }) => product.id),
+        );
+      }
+
+      successfulProductIds.forEach((productId) => {
+        removeItem(productId);
+      });
+
+      router.push("/student/orders");
+    } catch (error) {
+      successfulProductIds.forEach((productId) => {
+        removeItem(productId);
+      });
+
+      setCheckoutError(
+        error instanceof Error
+          ? error.message
+          : "Pesanan gagal dibuat. Silakan coba lagi.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
-  /*
-   * Loading:
-   *
-   * 1. localStorage belum hydrated
-   * 2. product backend sedang
-   *    di-resolve.
-   */
   if (!isHydrated || isResolving) {
     return (
       <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
@@ -272,9 +348,6 @@ export function CheckoutPageContent() {
     );
   }
 
-  /*
-   * Empty cart.
-   */
   if (resolvedItems.length === 0) {
     return (
       <div className="mx-auto flex min-h-[70vh] w-full max-w-[1200px] items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -294,7 +367,6 @@ export function CheckoutPageContent() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {/* Back Navigation */}
       <Link
         href="/keranjang"
         className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -303,16 +375,14 @@ export function CheckoutPageContent() {
         Kembali ke Keranjang
       </Link>
 
-      {/* Header */}
       <div className="mt-5">
         <PageHeader
           title="Checkout"
-          description="Periksa kembali pesanan, tentukan waktu pengambilan, dan pastikan saldo wallet mencukupi."
+          description="Periksa kembali pesanan dan pastikan saldo wallet mencukupi sebelum melakukan pembayaran."
         />
       </div>
 
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Orders */}
         <div className="space-y-6">
           {groups.map((group) => {
             const isCanteen = group.merchantType === "CANTEEN";
@@ -324,7 +394,6 @@ export function CheckoutPageContent() {
                 key={group.merchantId}
                 className="overflow-hidden rounded-2xl border bg-background"
               >
-                {/* Merchant Header */}
                 <div className="flex items-center justify-between gap-4 border-b px-5 py-4 sm:px-6">
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -351,17 +420,14 @@ export function CheckoutPageContent() {
                   </div>
                 </div>
 
-                {/* Product List */}
                 <div className="divide-y">
                   {group.items.map(({ product, quantity }) => (
                     <article
                       key={product.id}
                       className="flex gap-4 px-5 py-4 sm:px-6"
                     >
-                      {/* Product Image */}
                       <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
                         {product.imageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={product.imageUrl}
                             alt={product.name}
@@ -372,7 +438,6 @@ export function CheckoutPageContent() {
                         )}
                       </div>
 
-                      {/* Product Information */}
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{product.name}</p>
 
@@ -385,7 +450,6 @@ export function CheckoutPageContent() {
                         </p>
                       </div>
 
-                      {/* Product Subtotal */}
                       <p className="hidden shrink-0 font-semibold sm:block">
                         {formatCurrency(product.price * quantity)}
                       </p>
@@ -393,70 +457,18 @@ export function CheckoutPageContent() {
                   ))}
                 </div>
 
-                {/* Pickup Section */}
-                <div className="border-t bg-muted/20 px-5 py-5 sm:px-6">
-                  <div className="flex items-start gap-3">
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <Clock3 className="size-4 text-primary" />
-                    </div>
-
-                    <div>
-                      <h3 className="text-sm font-semibold">
-                        Waktu Pengambilan
-                      </h3>
-
-                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                        Pilih waktu pengambilan pesanan dari merchant ini.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                    {pickupSlots.map((slot) => {
-                      const selected =
-                        selectedPickupSlots[group.merchantId] === slot.id;
-
-                      return (
-                        <button
-                          key={slot.id}
-                          type="button"
-                          onClick={() =>
-                            selectPickupSlot(group.merchantId, slot.id)
-                          }
-                          className={`relative rounded-xl border p-3 text-left transition-colors ${
-                            selected
-                              ? "border-primary bg-primary/5"
-                              : "bg-background hover:border-primary/40"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-sm font-medium">
-                                {slot.label}
-                              </p>
-
-                              <p className="mt-1 text-xs text-muted-foreground">
-                                {slot.time}
-                              </p>
-                            </div>
-
-                            {selected && (
-                              <CheckCircle2 className="size-4 shrink-0 text-primary" />
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div className="border-t bg-muted/20 px-5 py-4 sm:px-6">
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    Waktu pengambilan akan tersedia setelah integrasi pickup
+                    slot selesai.
+                  </p>
                 </div>
               </section>
             );
           })}
         </div>
 
-        {/* Checkout Summary */}
         <aside className="space-y-4 lg:sticky lg:top-24">
-          {/* Wallet */}
           <section className="rounded-2xl border bg-background p-5">
             <div className="flex items-center gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -467,17 +479,37 @@ export function CheckoutPageContent() {
                 <p className="text-xs text-muted-foreground">Saldo Wallet</p>
 
                 <p className="mt-0.5 text-xl font-semibold">
-                  {formatCurrency(studentWallet.balance)}
+                  {isLoadingWallet
+                    ? "Memuat..."
+                    : wallet
+                      ? formatCurrency(wallet.balance)
+                      : "-"}
                 </p>
               </div>
             </div>
 
-            {hasEnoughBalance ? (
+            {walletError ? (
+              <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
+                <p className="text-sm font-medium text-destructive">
+                  Wallet gagal dimuat
+                </p>
+
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  {walletError}
+                </p>
+              </div>
+            ) : wallet && !wallet.is_active ? (
+              <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
+                <p className="text-sm font-medium text-destructive">
+                  Wallet tidak aktif
+                </p>
+              </div>
+            ) : hasEnoughBalance ? (
               <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2.5 text-xs font-medium text-emerald-700">
                 <CheckCircle2 className="size-4 shrink-0" />
                 Saldo mencukupi untuk pembayaran
               </div>
-            ) : (
+            ) : wallet ? (
               <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
                 <p className="text-sm font-medium text-destructive">
                   Saldo tidak mencukupi
@@ -486,7 +518,7 @@ export function CheckoutPageContent() {
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
                   Kamu membutuhkan tambahan saldo sebesar{" "}
                   <span className="font-medium text-foreground">
-                    {formatCurrency(total - studentWallet.balance)}
+                    {formatCurrency(Math.max(total - wallet.balance, 0))}
                   </span>
                   .
                 </p>
@@ -501,10 +533,9 @@ export function CheckoutPageContent() {
                   Buka Wallet
                 </Button>
               </div>
-            )}
+            ) : null}
           </section>
 
-          {/* Payment Summary */}
           <section className="rounded-2xl border bg-background p-5">
             <h2 className="text-lg font-semibold">Ringkasan Pembayaran</h2>
 
@@ -538,6 +569,18 @@ export function CheckoutPageContent() {
               </div>
             </div>
 
+            {checkoutError ? (
+              <div className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
+                <p className="text-sm font-medium text-destructive">
+                  Checkout gagal
+                </p>
+
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  {checkoutError}
+                </p>
+              </div>
+            ) : null}
+
             <Button
               type="button"
               size="lg"
@@ -545,23 +588,13 @@ export function CheckoutPageContent() {
               disabled={!canSubmit}
               onClick={handleSubmitOrder}
             >
-              Bayar dengan Wallet
+              {isSubmitting ? "Memproses Pesanan..." : "Bayar dengan Wallet"}
             </Button>
 
-            {!allPickupSlotsSelected ? (
-              <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-                Pilih waktu pengambilan untuk setiap merchant sebelum
-                melanjutkan.
-              </p>
-            ) : !hasEnoughBalance ? (
-              <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-                Saldo wallet belum mencukupi untuk pembayaran.
-              </p>
-            ) : (
-              <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-                Periksa kembali pesanan sebelum melakukan pembayaran.
-              </p>
-            )}
+            <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
+              Total pembayaran akan diverifikasi kembali oleh server saat
+              pesanan dibuat.
+            </p>
           </section>
         </aside>
       </div>

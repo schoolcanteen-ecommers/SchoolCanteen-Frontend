@@ -63,11 +63,7 @@ export function LoginForm({
 
     const supabase = createClient();
 
-    /*
-     * STEP 1
-     * Login menggunakan Supabase Auth.
-     */
-    const {
+        const {
       data,
       error,
     } =
@@ -87,48 +83,16 @@ export function LoginForm({
       return;
     }
 
-    /*
-     * Access token dari Supabase
-     * nantinya diverifikasi Laravel.
-     */
-    const accessToken =
+        const accessToken =
       data.session.access_token;
 
     try {
-      /*
-       * STEP 2
-       * Ambil profile user dari Laravel:
-       *
-       * GET /api/v1/me
-       *
-       * Laravel menentukan:
-       * - profile
-       * - role
-       *
-       * Frontend tidak menentukan role sendiri.
-       */
-      const profile =
+            const profile =
         await getCurrentProfile(
           accessToken,
         );
 
-      /*
-       * STEP 3
-       * Tentukan redirect berdasarkan
-       * role user.
-       *
-       * Contoh student:
-       *
-       * /login?redirect=/student/checkout
-       *
-       * akan kembali ke:
-       *
-       * /student/checkout
-       *
-       * Tetapi merchant/admin tidak boleh
-       * diarahkan ke route student.
-       */
-      const targetRoute =
+            const targetRoute =
         getRedirectForRole(
           profile.role,
           redirectTo,
@@ -137,17 +101,7 @@ export function LoginForm({
       router.replace(targetRoute);
       router.refresh();
     } catch {
-      /*
-       * Supabase login berhasil tetapi:
-       *
-       * - Laravel menolak token
-       * - profile belum tersedia
-       * - endpoint /me gagal
-       *
-       * Session Supabase dibersihkan agar
-       * tidak meninggalkan login setengah jadi.
-       */
-      await supabase.auth.signOut();
+            await supabase.auth.signOut();
 
       setAuthError(
         "Login berhasil, tetapi profil akun tidak dapat dimuat.",

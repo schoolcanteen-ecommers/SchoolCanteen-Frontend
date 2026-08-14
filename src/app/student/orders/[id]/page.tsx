@@ -26,8 +26,20 @@ import {
 } from "@/components/ui/button";
 
 import {
+  requireRole,
+} from "@/features/auth/server/require-role";
+
+import {
   OrderTimeline,
 } from "@/features/orders/components/order-timeline";
+
+import {
+  ApiError,
+} from "@/lib/api/error";
+
+import {
+  getStudentOrderDetail,
+} from "@/lib/api/student-orders";
 
 import {
   PAYMENT_STATUS_LABEL,
@@ -37,10 +49,6 @@ import {
 import {
   formatCurrency,
 } from "@/lib/utils";
-
-import {
-  studentOrders,
-} from "@/mocks/orders";
 
 interface StudentOrderDetailPageProps {
   params: Promise<{
@@ -53,15 +61,26 @@ export default async function StudentOrderDetailPage({
 }: StudentOrderDetailPageProps) {
   const { id } = await params;
 
-  const orderData =
-    studentOrders.find(
-      ({ order }) =>
-        order.id === id,
-    );
+  const profile =
+    await requireRole("student");
 
-  if (!orderData) {
-    notFound();
-  }
+  const orderData =
+    await getStudentOrderDetail(
+      id,
+      profile.id,
+    ).catch((error) => {
+      if (
+        error instanceof ApiError &&
+        (
+          error.status === 404 ||
+          error.status === 403
+        )
+      ) {
+        notFound();
+      }
+
+      throw error;
+    });
 
   const {
     order,
@@ -75,6 +94,7 @@ export default async function StudentOrderDetailPage({
       {
         dateStyle: "long",
         timeStyle: "short",
+        timeZone: "Asia/Jakarta",
       },
     ).format(
       new Date(order.createdAt),
@@ -82,7 +102,6 @@ export default async function StudentOrderDetailPage({
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {/* Back */}
       <Button
         nativeButton={false}
         variant="ghost"
@@ -99,7 +118,6 @@ export default async function StudentOrderDetailPage({
         Kembali ke Pesanan
       </Button>
 
-      {/* Header */}
       <PageHeader
         title={order.orderCode}
         description={`Dibuat ${formattedDate}`}
@@ -111,9 +129,7 @@ export default async function StudentOrderDetailPage({
       />
 
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Main Content */}
         <div className="space-y-6">
-          {/* Merchant */}
           <section className="rounded-2xl border bg-background p-5 sm:p-6">
             <div className="flex items-center gap-3">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -132,7 +148,6 @@ export default async function StudentOrderDetailPage({
             </div>
           </section>
 
-          {/* Order Items */}
           <section className="overflow-hidden rounded-2xl border bg-background">
             <div className="flex items-center gap-2 border-b px-5 py-4 sm:px-6">
               <Package className="size-4 text-primary" />
@@ -190,7 +205,6 @@ export default async function StudentOrderDetailPage({
             </div>
           </section>
 
-          {/* Pickup Information */}
           <section className="rounded-2xl border bg-background p-5 sm:p-6">
             <h2 className="font-semibold">
               Informasi Pengambilan
@@ -226,9 +240,7 @@ export default async function StudentOrderDetailPage({
           </section>
         </div>
 
-        {/* Sidebar */}
         <aside className="space-y-6 lg:sticky lg:top-24">
-          {/* Tracking */}
           <section className="rounded-2xl border bg-background p-5 sm:p-6">
             <h2 className="font-semibold">
               Status Pesanan
@@ -246,7 +258,6 @@ export default async function StudentOrderDetailPage({
             </div>
           </section>
 
-          {/* Payment */}
           <section className="rounded-2xl border bg-background p-5">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">

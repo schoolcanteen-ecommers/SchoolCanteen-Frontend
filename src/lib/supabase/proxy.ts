@@ -54,8 +54,7 @@ export async function updateSession(
     },
   );
 
-  
-  const {
+    const {
     data,
     error,
   } =
@@ -68,14 +67,12 @@ export async function updateSession(
   const pathname =
     request.nextUrl.pathname;
 
-  
-  const isProtectedRoute =
+    const isProtectedRoute =
     pathname.startsWith("/student") ||
     pathname.startsWith("/merchant") ||
     pathname.startsWith("/admin");
 
-  
-  if (
+    if (
     isProtectedRoute &&
     !isAuthenticated
   ) {

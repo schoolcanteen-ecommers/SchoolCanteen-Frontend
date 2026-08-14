@@ -1,13 +1,22 @@
+import { PageHeader } from "@/components/shared/page-header";
+
+import { MerchantPickupBoard } from "@/features/pickup/components/merchant-pickup-board";
+
+import { merchantOrders } from "@/mocks/orders";
+import { merchantPickups } from "@/mocks/pickup";
+
 export default function MerchantPickupPage() {
   return (
-    <div className="p-6 lg:p-8">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Pickup Verification
-      </h1>
+    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <PageHeader
+        title="Pickup Verification"
+        description="Verifikasi pengambilan pesanan yang sudah siap diserahkan kepada siswa."
+      />
 
-      <p className="mt-1 text-sm text-muted-foreground">
-        Verifikasi pengambilan pesanan siswa.
-      </p>
+      <MerchantPickupBoard
+        orders={merchantOrders}
+        pickups={merchantPickups}
+      />
     </div>
   );
 }

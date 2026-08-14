@@ -63,8 +63,7 @@ export default async function PublicLayout({
     | CurrentUser
     | null = null;
 
-  
-  const {
+    const {
     data: claimsData,
     error: claimsError,
   } =
@@ -104,16 +103,14 @@ export default async function PublicLayout({
   const isLoggedIn =
     currentUser !== null;
 
-  
-  const navigationSource:
+    const navigationSource:
     | "public"
     | "student" =
     currentUser?.role === "student"
       ? "student"
       : "public";
 
-  
-  const brandHref =
+    const brandHref =
     currentUser
       ? getHomeByRole(
           currentUser.role,
