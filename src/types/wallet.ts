@@ -1,7 +1,12 @@
 export type WalletTransactionType =
   | "TOP_UP"
   | "PAYMENT"
-  | "REFUND";
+  | "REFUND"
+  | "ADJUSTMENT";
+
+export type WalletTransactionDirection =
+  | "CREDIT"
+  | "DEBIT";
 
 export type WalletTransactionStatus =
   | "PENDING"
@@ -19,9 +24,12 @@ export interface WalletTransaction {
   walletId: string;
 
   type: WalletTransactionType;
+  direction: WalletTransactionDirection;
 
   amount: number;
   status: WalletTransactionStatus;
+
+  description?: string | null;
 
   referenceId?: string | null;
 

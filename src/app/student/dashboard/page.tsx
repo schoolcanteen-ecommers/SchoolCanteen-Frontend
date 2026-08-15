@@ -13,11 +13,15 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 
 import { studentDashboard } from "@/mocks/dashboard";
-import { studentWallet } from "@/mocks/wallet";
+import {
+  getStudentWallet,
+} from "@/lib/api/student-wallet";
 
 import { formatCurrency } from "@/lib/utils";
 
-export default function StudentDashboardPage() {
+export default async function StudentDashboardPage() {
+  const wallet =
+    await getStudentWallet();
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       {}
@@ -45,7 +49,7 @@ export default function StudentDashboardPage() {
         <StatCard
           title="Saldo Wallet"
           value={formatCurrency(
-            studentWallet.balance,
+            wallet.balance,
           )}
           description="Saldo yang tersedia"
           icon={WalletCards}
@@ -167,7 +171,7 @@ export default function StudentDashboardPage() {
 
             <p className="mt-1 text-2xl font-semibold">
               {formatCurrency(
-                studentWallet.balance,
+                wallet.balance,
               )}
             </p>
 

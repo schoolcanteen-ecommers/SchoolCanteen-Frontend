@@ -45,3 +45,19 @@ export interface OrderItem {
 
   subtotal: number;
 }
+
+export interface MerchantOrderView {
+  id: string;
+  orderCode: string;
+
+  userId: string;
+
+  status: OrderStatus;
+
+  totalPrice: number;
+
+  pickupCode?: string | null;
+  pickupTime?: string | null;
+
+  createdAt: string;
+}

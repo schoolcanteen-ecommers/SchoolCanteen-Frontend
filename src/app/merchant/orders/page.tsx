@@ -1,10 +1,17 @@
 import { PageHeader } from "@/components/shared/page-header";
 
+import { requireRole } from "@/features/auth/server/require-role";
+
 import { MerchantOrderList } from "@/features/orders/components/merchant-order-list";
 
-import { merchantOrders } from "@/mocks/orders";
+import { getMerchantOrders } from "@/lib/api/merchant-orders";
 
-export default function MerchantOrdersPage() {
+export default async function MerchantOrdersPage() {
+  await requireRole("merchant");
+
+  const orders =
+    await getMerchantOrders();
+
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <PageHeader
@@ -13,7 +20,7 @@ export default function MerchantOrdersPage() {
       />
 
       <MerchantOrderList
-        orders={merchantOrders}
+        orders={orders}
       />
     </div>
   );

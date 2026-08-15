@@ -1,20 +1,30 @@
 import {
   ArrowDownToLine,
   ArrowUpRight,
+  CheckCircle2,
   CircleDollarSign,
   Clock3,
-  CreditCard,
   History,
   Landmark,
   WalletCards,
 } from "lucide-react";
 
-import { StatCard } from "@/components/dashboard/stat-card";
-import { EmptyState } from "@/components/shared/empty-state";
+import {
+  StatCard,
+} from "@/components/dashboard/stat-card";
 
 import {
-  PAYMENT_STATUS_LABEL,
-} from "@/lib/constants";
+  EmptyState,
+} from "@/components/shared/empty-state";
+
+import {
+  MerchantWithdrawalForm,
+} from "@/features/finance/components/merchant-withdrawal-form";
+
+import type {
+  MerchantWalletData,
+  MerchantWalletTransactionData,
+} from "@/lib/api/merchant-finance";
 
 import {
   cn,
@@ -22,34 +32,38 @@ import {
 } from "@/lib/utils";
 
 import type {
-  Order,
-  OrderItem,
-  PaymentStatus,
-} from "@/types/order";
-
-import type {
+  MerchantPaymentAccount,
   WithdrawalMethod,
   WithdrawalRequest,
   WithdrawalStatus,
 } from "@/types/withdrawal";
 
 interface MerchantFinanceOverviewProps {
-  orders: Array<{
-    order: Order;
-    customerName: string;
-    items: OrderItem[];
-  }>;
+  wallet:
+    MerchantWalletData;
 
-  withdrawals: WithdrawalRequest[];
+  transactions:
+    MerchantWalletTransactionData[];
+
+  withdrawals:
+    WithdrawalRequest[];
+
+  paymentAccounts:
+    MerchantPaymentAccount[];
 }
 
 const WITHDRAWAL_METHOD_LABEL: Record<
   WithdrawalMethod,
   string
 > = {
-  CASH_ADMIN: "Cash melalui Admin",
-  E_WALLET: "E-Wallet",
-  BANK_TRANSFER: "Transfer Bank",
+  CASH_ADMIN:
+    "Cash melalui Admin",
+
+  E_WALLET:
+    "E-Wallet",
+
+  BANK_TRANSFER:
+    "Transfer Bank",
 };
 
 const WITHDRAWAL_STATUS_LABEL: Record<
@@ -93,108 +107,32 @@ function getWithdrawalStatusClassName(
   }
 }
 
-function getPaymentAmountClassName(
-  status: PaymentStatus,
+function humanizeTransactionType(
+  type: string,
 ) {
-  if (status === "RELEASED") {
-    return "text-emerald-700";
-  }
-
-  if (status === "REFUNDED") {
-    return "text-destructive";
-  }
-
-  if (status === "HELD") {
-    return "text-amber-700";
-  }
-
-  return "text-foreground";
-}
-
-function getPaymentPrefix(
-  status: PaymentStatus,
-) {
-  if (status === "RELEASED") {
-    return "+";
-  }
-
-  if (status === "REFUNDED") {
-    return "-";
-  }
-
-  return "";
+  return type
+    .replace(
+      /_/g,
+      " ",
+    )
+    .split(" ")
+    .filter(Boolean)
+    .map(
+      (word) =>
+        word
+          .charAt(0)
+          .toUpperCase() +
+        word.slice(1),
+    )
+    .join(" ");
 }
 
 export function MerchantFinanceOverview({
-  orders,
+  wallet,
+  transactions,
   withdrawals,
+  paymentAccounts,
 }: MerchantFinanceOverviewProps) {
-    const pendingBalance =
-    orders
-      .filter(
-        ({ order }) =>
-          order.paymentStatus ===
-          "HELD",
-      )
-      .reduce(
-        (total, { order }) =>
-          total +
-          order.totalPrice,
-        0,
-      );
-
-    const releasedIncome =
-    orders
-      .filter(
-        ({ order }) =>
-          order.paymentStatus ===
-          "RELEASED",
-      )
-      .reduce(
-        (total, { order }) =>
-          total +
-          order.totalPrice,
-        0,
-      );
-
-    const completedWithdrawals =
-    withdrawals
-      .filter(
-        (withdrawal) =>
-          withdrawal.status ===
-          "COMPLETED",
-      )
-      .reduce(
-        (total, withdrawal) =>
-          total +
-          withdrawal.amount,
-        0,
-      );
-
-  const availableBalance =
-    Math.max(
-      releasedIncome -
-        completedWithdrawals,
-      0,
-    );
-
-    const financeActivities =
-    orders
-      .filter(
-        ({ order }) =>
-          order.paymentStatus !==
-          "UNPAID",
-      )
-      .sort(
-        (a, b) =>
-          new Date(
-            b.order.createdAt,
-          ).getTime() -
-          new Date(
-            a.order.createdAt,
-          ).getTime(),
-      );
-
   return (
     <>
       {}
@@ -202,7 +140,7 @@ export function MerchantFinanceOverview({
         <StatCard
           title="Saldo Tersedia"
           value={formatCurrency(
-            availableBalance,
+            wallet.availableBalance,
           )}
           description="Dana yang dapat dicairkan"
           icon={WalletCards}
@@ -211,18 +149,18 @@ export function MerchantFinanceOverview({
         <StatCard
           title="Dana Tertahan"
           value={formatCurrency(
-            pendingBalance,
+            wallet.pendingBalance,
           )}
-          description="Dana dari pesanan aktif"
+          description="Dana yang masih berada dalam escrow"
           icon={Clock3}
         />
 
         <StatCard
-          title="Total Pendapatan"
+          title="Total Saldo"
           value={formatCurrency(
-            releasedIncome,
+            wallet.totalBalance,
           )}
-          description="Dana yang sudah diteruskan"
+          description="Saldo pending dan tersedia"
           icon={CircleDollarSign}
         />
       </section>
@@ -236,105 +174,101 @@ export function MerchantFinanceOverview({
             </h2>
 
             <p className="mt-1 text-sm text-muted-foreground">
-              Pergerakan dana berdasarkan
-              pembayaran pesanan merchant.
+              Pergerakan dana pada
+              wallet merchant.
             </p>
           </div>
 
-          {financeActivities.length >
+          {transactions.length >
           0 ? (
             <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
               <div className="divide-y">
-                {financeActivities.map(
-                  ({
-                    order,
-                    customerName,
-                  }) => {
-                    const formattedDate =
-                      new Intl.DateTimeFormat(
-                        "id-ID",
-                        {
-                          dateStyle:
-                            "medium",
+                {transactions.map(
+                  (
+                    transaction,
+                  ) => {
+                    const incoming =
+                      transaction.direction ===
+                      "CREDIT";
 
-                          timeStyle:
-                            "short",
-                        },
-                      ).format(
-                        new Date(
-                          order.createdAt,
-                        ),
-                      );
+                    const formattedDate =
+                      transaction.createdAt
+                        ? new Intl.DateTimeFormat(
+                            "id-ID",
+                            {
+                              dateStyle:
+                                "medium",
+
+                              timeStyle:
+                                "short",
+                            },
+                          ).format(
+                            new Date(
+                              transaction.createdAt,
+                            ),
+                          )
+                        : "-";
 
                     return (
                       <article
-                        key={order.id}
+                        key={
+                          transaction.id
+                        }
                         className="flex items-center gap-4 px-5 py-4 sm:px-6"
                       >
                         <div
                           className={cn(
                             "flex size-11 shrink-0 items-center justify-center rounded-xl",
 
-                            order.paymentStatus ===
-                              "RELEASED" &&
-                              "bg-emerald-50",
-
-                            order.paymentStatus ===
-                              "HELD" &&
-                              "bg-amber-50",
-
-                            order.paymentStatus ===
-                              "REFUNDED" &&
-                              "bg-red-50",
-
-                            ![
-                              "RELEASED",
-                              "HELD",
-                              "REFUNDED",
-                            ].includes(
-                              order.paymentStatus,
-                            ) &&
-                              "bg-muted",
+                            incoming
+                              ? "bg-emerald-50"
+                              : "bg-red-50",
                           )}
                         >
-                          {order.paymentStatus ===
-                          "RELEASED" ? (
+                          {incoming ? (
                             <ArrowDownToLine className="size-5 text-emerald-700" />
-                          ) : order.paymentStatus ===
-                            "REFUNDED" ? (
-                            <ArrowUpRight className="size-5 text-destructive" />
                           ) : (
-                            <CreditCard className="size-5 text-amber-700" />
+                            <ArrowUpRight className="size-5 text-red-700" />
                           )}
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <p className="font-medium">
-                              {
-                                PAYMENT_STATUS_LABEL[
-                                  order.paymentStatus
-                                ]
-                              }
-                            </p>
-
-                            <span className="text-xs text-muted-foreground">
-                              •
-                            </span>
-
-                            <span className="text-xs text-muted-foreground">
-                              {
-                                order.orderCode
-                              }
-                            </span>
-                          </div>
-
-                          <p className="mt-1 truncate text-sm text-muted-foreground">
-                            {customerName}
+                          <p className="font-medium">
+                            {transaction.description ??
+                              humanizeTransactionType(
+                                transaction.type,
+                              )}
                           </p>
 
+                          <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                            <span>
+                              {humanizeTransactionType(
+                                transaction.type,
+                              )}
+                            </span>
+
+                            {transaction.reference
+                              .type && (
+                              <>
+                                <span>
+                                  •
+                                </span>
+
+                                <span>
+                                  {
+                                    transaction
+                                      .reference
+                                      .type
+                                  }
+                                </span>
+                              </>
+                            )}
+                          </div>
+
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {formattedDate}
+                            {
+                              formattedDate
+                            }
                           </p>
                         </div>
 
@@ -342,16 +276,16 @@ export function MerchantFinanceOverview({
                           className={cn(
                             "shrink-0 font-semibold",
 
-                            getPaymentAmountClassName(
-                              order.paymentStatus,
-                            ),
+                            incoming
+                              ? "text-emerald-700"
+                              : "text-red-700",
                           )}
                         >
-                          {getPaymentPrefix(
-                            order.paymentStatus,
-                          )}
+                          {incoming
+                            ? "+"
+                            : "-"}
                           {formatCurrency(
-                            order.totalPrice,
+                            transaction.amount,
                           )}
                         </p>
                       </article>
@@ -365,114 +299,158 @@ export function MerchantFinanceOverview({
               <EmptyState
                 icon={History}
                 title="Belum ada aktivitas keuangan"
-                description="Pergerakan dana dari transaksi pesanan akan tampil di sini."
+                description="Pergerakan dana merchant akan tampil di sini."
               />
             </div>
           )}
         </section>
 
         {}
-        <aside>
-          <div>
-            <h2 className="text-lg font-semibold">
-              Riwayat Pencairan
-            </h2>
+        <aside className="space-y-6">
+          <MerchantWithdrawalForm
+            availableBalance={
+              wallet.availableBalance
+            }
+            walletIsActive={
+              wallet.isActive
+            }
+            paymentAccounts={
+              paymentAccounts
+            }
+          />
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Riwayat permintaan pencairan
-              dana merchant.
-            </p>
-          </div>
+          <section>
+            <div>
+              <h2 className="text-lg font-semibold">
+                Riwayat Pencairan
+              </h2>
 
-          {withdrawals.length > 0 ? (
-            <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
-              <div className="divide-y">
-                {withdrawals.map(
-                  (withdrawal) => {
-                    const formattedDate =
-                      new Intl.DateTimeFormat(
-                        "id-ID",
-                        {
-                          dateStyle:
-                            "medium",
-                        },
-                      ).format(
-                        new Date(
-                          withdrawal.createdAt,
-                        ),
-                      );
+              <p className="mt-1 text-sm text-muted-foreground">
+                Riwayat permintaan
+                pencairan dana
+                merchant.
+              </p>
+            </div>
 
-                    return (
-                      <article
-                        key={
-                          withdrawal.id
-                        }
-                        className="p-5"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex min-w-0 items-start gap-3">
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                              <Landmark className="size-5 text-primary" />
+            {withdrawals.length >
+            0 ? (
+              <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
+                <div className="divide-y">
+                  {withdrawals.map(
+                    (
+                      withdrawal,
+                    ) => {
+                      const formattedDate =
+                        new Intl.DateTimeFormat(
+                          "id-ID",
+                          {
+                            dateStyle:
+                              "medium",
+                          },
+                        ).format(
+                          new Date(
+                            withdrawal.createdAt,
+                          ),
+                        );
+
+                      return (
+                        <article
+                          key={
+                            withdrawal.id
+                          }
+                          className="p-5"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex min-w-0 items-start gap-3">
+                              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                                <Landmark className="size-5 text-primary" />
+                              </div>
+
+                              <div className="min-w-0">
+                                <p className="font-semibold">
+                                  {formatCurrency(
+                                    withdrawal.amount,
+                                  )}
+                                </p>
+
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                  {
+                                    WITHDRAWAL_METHOD_LABEL[
+                                      withdrawal
+                                        .method
+                                    ]
+                                  }
+                                </p>
+
+                                {withdrawal.paymentAccount && (
+                                  <p className="mt-1 truncate text-xs text-muted-foreground">
+                                    {
+                                      withdrawal
+                                        .paymentAccount
+                                        .provider
+                                    }{" "}
+                                    •{" "}
+                                    {
+                                      withdrawal
+                                        .paymentAccount
+                                        .accountNumber
+                                    }
+                                  </p>
+                                )}
+                              </div>
                             </div>
 
-                            <div className="min-w-0">
-                              <p className="font-semibold">
-                                {formatCurrency(
-                                  withdrawal.amount,
-                                )}
+                            <span
+                              className={cn(
+                                "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium",
+
+                                getWithdrawalStatusClassName(
+                                  withdrawal.status,
+                                ),
+                              )}
+                            >
+                              {
+                                WITHDRAWAL_STATUS_LABEL[
+                                  withdrawal.status
+                                ]
+                              }
+                            </span>
+                          </div>
+
+                          <div className="mt-4 flex items-center justify-between gap-4 border-t pt-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                Diajukan
                               </p>
 
-                              <p className="mt-1 text-xs text-muted-foreground">
+                              <p className="mt-1 text-sm font-medium">
                                 {
-                                  WITHDRAWAL_METHOD_LABEL[
-                                    withdrawal.method
-                                  ]
+                                  formattedDate
                                 }
                               </p>
                             </div>
-                          </div>
 
-                          <span
-                            className={cn(
-                              "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium",
-
-                              getWithdrawalStatusClassName(
-                                withdrawal.status,
-                              ),
+                            {withdrawal.status ===
+                              "COMPLETED" && (
+                              <CheckCircle2 className="size-5 text-emerald-700" />
                             )}
-                          >
-                            {
-                              WITHDRAWAL_STATUS_LABEL[
-                                withdrawal.status
-                              ]
-                            }
-                          </span>
-                        </div>
-
-                        <div className="mt-4 border-t pt-3">
-                          <p className="text-xs text-muted-foreground">
-                            Diajukan
-                          </p>
-
-                          <p className="mt-1 text-sm font-medium">
-                            {formattedDate}
-                          </p>
-                        </div>
-                      </article>
-                    );
-                  },
-                )}
+                          </div>
+                        </article>
+                      );
+                    },
+                  )}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="mt-4">
-              <EmptyState
-                icon={Landmark}
-                title="Belum ada pencairan"
-                description="Riwayat pencairan dana merchant akan tampil di sini."
-              />
-            </div>
-          )}
+            ) : (
+              <div className="mt-4">
+                <EmptyState
+                  icon={Landmark}
+                  title="Belum ada pencairan"
+                  description="Riwayat pencairan dana merchant akan tampil di sini."
+                />
+              </div>
+            )}
+          </section>
         </aside>
       </div>
     </>

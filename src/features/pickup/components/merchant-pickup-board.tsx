@@ -1,3 +1,13 @@
+"use client";
+
+import {
+  useRouter,
+} from "next/navigation";
+
+import {
+  useState,
+} from "react";
+
 import {
   CheckCircle2,
   Clock3,
@@ -8,83 +18,197 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { StatCard } from "@/components/dashboard/stat-card";
-import { StatusBadge } from "@/components/dashboard/status-badge";
-import { EmptyState } from "@/components/shared/empty-state";
+import {
+  StatCard,
+} from "@/components/dashboard/stat-card";
 
-import { formatCurrency } from "@/lib/utils";
+import {
+  StatusBadge,
+} from "@/components/dashboard/status-badge";
+
+import {
+  EmptyState,
+} from "@/components/shared/empty-state";
+
+import {
+  Button,
+} from "@/components/ui/button";
+
+import {
+  authenticatedApiRequest,
+} from "@/lib/api/authenticated-client";
 
 import type {
-  Order,
-  OrderItem,
-} from "@/types/order";
+  MerchantOrderData,
+} from "@/lib/api/merchant-orders";
 
-import type {
-  Pickup,
-} from "@/types/pickup";
+import {
+  formatCurrency,
+} from "@/lib/utils";
 
 interface MerchantPickupBoardProps {
-  orders: Array<{
-    order: Order;
-    customerName: string;
-    items: OrderItem[];
-  }>;
+  orders: MerchantOrderData[];
+}
 
-  pickups: Pickup[];
+interface VerifyPickupResult {
+  order_id: string;
+  order_code: string;
+
+  order_status: string;
+  pickup_status: string;
+
+  verified_at: string | null;
+
+  escrow: {
+    status: string;
+    amount: number;
+
+    released_at: string | null;
+  };
+
+  merchant_wallet: {
+    pending_balance: number;
+    available_balance: number;
+  };
+}
+
+interface VerificationError {
+  orderId: string;
+  message: string;
 }
 
 export function MerchantPickupBoard({
   orders,
-  pickups,
 }: MerchantPickupBoardProps) {
-    const pickupEntries = pickups.flatMap(
-    (pickup) => {
-      const orderData = orders.find(
-        ({ order }) =>
-          order.id === pickup.orderId,
-      );
+  const router =
+    useRouter();
 
-      if (!orderData) {
-        return [];
-      }
+  const [
+    verifyingOrderId,
+    setVerifyingOrderId,
+  ] =
+    useState<string | null>(
+      null,
+    );
 
-      return [
-        {
-          pickup,
-          ...orderData,
-        },
-      ];
-    },
-  );
+  const [
+    verificationError,
+    setVerificationError,
+  ] =
+    useState<VerificationError | null>(
+      null,
+    );
 
-    const waitingPickups =
+  const pickupEntries =
+    orders.flatMap(
+      (orderData) => {
+        if (!orderData.pickup) {
+          return [];
+        }
+
+        return [
+          {
+            ...orderData,
+
+            pickup:
+              orderData.pickup,
+          },
+        ];
+      },
+    );
+
+  const waitingPickups =
     pickupEntries.filter(
-      ({ pickup, order }) =>
-        pickup.status === "WAITING" &&
-        order.status === "READY",
+      ({
+        pickup,
+        order,
+      }) =>
+        pickup.status ===
+          "WAITING" &&
+        order.status ===
+          "READY",
     );
 
   const verifiedPickups =
     pickupEntries.filter(
-      ({ pickup }) =>
-        pickup.status === "VERIFIED",
+      ({
+        pickup,
+      }) =>
+        pickup.status ===
+        "VERIFIED",
     );
 
   const nearestPickupTime =
     waitingPickups
       .map(
-        ({ order }) =>
+        ({
+          order,
+        }) =>
           order.pickupTime,
       )
       .filter(
         (
           pickupTime,
         ): pickupTime is string =>
-          Boolean(pickupTime),
+          Boolean(
+            pickupTime,
+          ),
       )
-      .sort((a, b) =>
-        a.localeCompare(b),
+      .sort(
+        (a, b) =>
+          a.localeCompare(
+            b,
+          ),
       )[0] ?? "-";
+
+  async function verifyPickup(
+    orderId: string,
+    pickupCode: string,
+  ) {
+    if (
+      verifyingOrderId !==
+      null
+    ) {
+      return;
+    }
+
+    setVerificationError(
+      null,
+    );
+
+    setVerifyingOrderId(
+      orderId,
+    );
+
+    try {
+      await authenticatedApiRequest<VerifyPickupResult>(
+        "/merchant/pickups/verify",
+        {
+          method: "POST",
+
+          body: {
+            pickup_code:
+              pickupCode,
+          },
+        },
+      );
+
+      router.refresh();
+    } catch (error) {
+      setVerificationError({
+        orderId,
+
+        message:
+          error instanceof Error
+            ? error.message
+            : "Pickup gagal diverifikasi.",
+      });
+    } finally {
+      setVerifyingOrderId(
+        null,
+      );
+    }
+  }
 
   return (
     <>
@@ -92,21 +216,27 @@ export function MerchantPickupBoard({
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Menunggu Pickup"
-          value={waitingPickups.length}
+          value={
+            waitingPickups.length
+          }
           description="Pesanan siap diserahkan"
           icon={PackageCheck}
         />
 
         <StatCard
           title="Sudah Diverifikasi"
-          value={verifiedPickups.length}
+          value={
+            verifiedPickups.length
+          }
           description="Pickup yang telah diverifikasi"
           icon={CheckCircle2}
         />
 
         <StatCard
           title="Pickup Terdekat"
-          value={nearestPickupTime}
+          value={
+            nearestPickupTime
+          }
           description="Waktu pengambilan terdekat"
           icon={Clock3}
         />
@@ -126,7 +256,8 @@ export function MerchantPickupBoard({
           </p>
         </div>
 
-        {waitingPickups.length > 0 ? (
+        {waitingPickups.length >
+        0 ? (
           <div className="mt-4 space-y-4">
             {waitingPickups.map(
               ({
@@ -146,9 +277,21 @@ export function MerchantPickupBoard({
                     0,
                   );
 
+                const isVerifying =
+                  verifyingOrderId ===
+                  order.id;
+
+                const currentError =
+                  verificationError?.orderId ===
+                  order.id
+                    ? verificationError.message
+                    : null;
+
                 return (
                   <article
-                    key={pickup.id}
+                    key={
+                      order.id
+                    }
                     className="overflow-hidden rounded-2xl border bg-background"
                   >
                     {}
@@ -205,7 +348,9 @@ export function MerchantPickupBoard({
 
                         <div className="mt-4 space-y-3">
                           {items.map(
-                            (item) => (
+                            (
+                              item,
+                            ) => (
                               <div
                                 key={
                                   item.id
@@ -243,7 +388,8 @@ export function MerchantPickupBoard({
                         <div className="mt-5 flex items-end justify-between gap-4 border-t pt-4">
                           <div>
                             <p className="text-xs text-muted-foreground">
-                              Total Item
+                              Total
+                              Item
                             </p>
 
                             <p className="mt-1 font-semibold">
@@ -256,7 +402,8 @@ export function MerchantPickupBoard({
 
                           <div className="text-right">
                             <p className="text-xs text-muted-foreground">
-                              Total Pesanan
+                              Total
+                              Pesanan
                             </p>
 
                             <p className="mt-1 text-lg font-semibold">
@@ -274,13 +421,15 @@ export function MerchantPickupBoard({
                           <QrCode className="size-5 text-primary" />
 
                           <h4 className="font-semibold">
-                            Verifikasi Pickup
+                            Verifikasi
+                            Pickup
                           </h4>
                         </div>
 
                         <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                          Cocokkan kode pickup
-                          yang ditunjukkan siswa
+                          Cocokkan kode
+                          pickup yang
+                          ditunjukkan siswa
                           sebelum menyerahkan
                           pesanan.
                         </p>
@@ -300,15 +449,46 @@ export function MerchantPickupBoard({
                         </div>
 
                         <div className="mt-4 rounded-xl bg-amber-50 px-3 py-2.5 text-xs font-medium text-amber-700">
-                          Menunggu verifikasi
+                          Menunggu
+                          verifikasi
                           pengambilan
                         </div>
 
+                        {currentError && (
+                          <div className="mt-3 rounded-xl bg-red-50 px-3 py-2.5 text-xs font-medium text-red-700">
+                            {
+                              currentError
+                            }
+                          </div>
+                        )}
+
+                        <Button
+                          type="button"
+                          className="mt-4 w-full"
+                          disabled={
+                            verifyingOrderId !==
+                            null
+                          }
+                          onClick={() =>
+                            verifyPickup(
+                              order.id,
+                              pickup.pickupCode,
+                            )
+                          }
+                        >
+                          {isVerifying
+                            ? "Memverifikasi..."
+                            : "Verifikasi Pengambilan"}
+                        </Button>
+
                         <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                          Verifikasi QR dan
-                          perubahan status akan
-                          diaktifkan setelah API
-                          pickup terhubung.
+                          Setelah
+                          diverifikasi,
+                          pesanan akan
+                          diselesaikan dan
+                          dana merchant akan
+                          diteruskan oleh
+                          sistem.
                         </p>
                       </div>
                     </div>
@@ -329,7 +509,8 @@ export function MerchantPickupBoard({
       </section>
 
       {}
-      {verifiedPickups.length > 0 && (
+      {verifiedPickups.length >
+        0 && (
         <section className="mt-8">
           <div>
             <h2 className="text-lg font-semibold">
@@ -337,8 +518,9 @@ export function MerchantPickupBoard({
             </h2>
 
             <p className="mt-1 text-sm text-muted-foreground">
-              Pengambilan pesanan yang
-              sudah berhasil diverifikasi.
+              Pengambilan pesanan
+              yang sudah berhasil
+              diverifikasi.
             </p>
           </div>
 
@@ -357,6 +539,7 @@ export function MerchantPickupBoard({
                           {
                             dateStyle:
                               "medium",
+
                             timeStyle:
                               "short",
                           },
@@ -369,7 +552,9 @@ export function MerchantPickupBoard({
 
                   return (
                     <div
-                      key={pickup.id}
+                      key={
+                        order.id
+                      }
                       className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                     >
                       <div className="flex items-start gap-3">
@@ -398,7 +583,9 @@ export function MerchantPickupBoard({
                         </p>
 
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {pickedAt}
+                          {
+                            pickedAt
+                          }
                         </p>
                       </div>
                     </div>

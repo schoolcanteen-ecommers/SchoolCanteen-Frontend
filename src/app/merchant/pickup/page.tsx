@@ -1,11 +1,27 @@
-import { PageHeader } from "@/components/shared/page-header";
+import {
+  PageHeader,
+} from "@/components/shared/page-header";
 
-import { MerchantPickupBoard } from "@/features/pickup/components/merchant-pickup-board";
+import {
+  requireRole,
+} from "@/features/auth/server/require-role";
 
-import { merchantOrders } from "@/mocks/orders";
-import { merchantPickups } from "@/mocks/pickup";
+import {
+  MerchantPickupBoard,
+} from "@/features/pickup/components/merchant-pickup-board";
 
-export default function MerchantPickupPage() {
+import {
+  getMerchantOrders,
+} from "@/lib/api/merchant-orders";
+
+export default async function MerchantPickupPage() {
+  await requireRole(
+    "merchant",
+  );
+
+  const orders =
+    await getMerchantOrders();
+
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <PageHeader
@@ -14,8 +30,7 @@ export default function MerchantPickupPage() {
       />
 
       <MerchantPickupBoard
-        orders={merchantOrders}
-        pickups={merchantPickups}
+        orders={orders}
       />
     </div>
   );

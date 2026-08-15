@@ -8,15 +8,11 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { EmptyState } from "@/components/shared/empty-state";
 
 import type {
-  Order,
-  OrderItem,
-} from "@/types/order";
+  MerchantOrderData,
+} from "@/lib/api/merchant-orders";
 
 interface MerchantProductionSummaryProps {
-  orders: Array<{
-    order: Order;
-    items: OrderItem[];
-  }>;
+  orders: MerchantOrderData[];
 }
 
 export function MerchantProductionSummary({

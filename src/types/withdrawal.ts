@@ -10,6 +10,22 @@ export type WithdrawalStatus =
   | "COMPLETED"
   | "REJECTED";
 
+export interface MerchantPaymentAccount {
+  id: string;
+
+  type: string;
+  provider: string;
+
+  accountNumber: string;
+  accountName: string;
+
+  isDefault: boolean;
+  isActive: boolean;
+
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
 export interface WithdrawalRequest {
   id: string;
 
@@ -20,6 +36,13 @@ export interface WithdrawalRequest {
   method: WithdrawalMethod;
   status: WithdrawalStatus;
 
+  notes?: string | null;
+
+  paymentAccount?:
+    | MerchantPaymentAccount
+    | null;
+
   createdAt: string;
+
   completedAt?: string | null;
 }

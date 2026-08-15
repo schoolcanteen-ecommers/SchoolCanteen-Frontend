@@ -6,6 +6,10 @@ import {
 } from "react";
 
 import {
+  useRouter,
+} from "next/navigation";
+
+import {
   ClipboardList,
 } from "lucide-react";
 
@@ -14,29 +18,46 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { MerchantOrderCard } from "@/features/orders/components/merchant-order-card";
 import { OrderStatusTabs } from "@/features/orders/components/order-status-tabs";
 
+import { authenticatedApiRequest } from "@/lib/api/authenticated-client";
+
 import type {
-  Order,
-  OrderItem,
+  MerchantOrderData,
+} from "@/lib/api/merchant-orders";
+
+import type {
   OrderStatus,
 } from "@/types/order";
 
 interface MerchantOrderListProps {
-  orders: Array<{
-    order: Order;
-    customerName: string;
-    items: OrderItem[];
-  }>;
+  orders: MerchantOrderData[];
 }
 
 export function MerchantOrderList({
   orders,
 }: MerchantOrderListProps) {
+  const router =
+    useRouter();
+
   const [
     selectedStatus,
     setSelectedStatus,
   ] = useState<
     "ALL" | OrderStatus
   >("ALL");
+
+  const [
+    updatingOrderId,
+    setUpdatingOrderId,
+  ] = useState<string | null>(
+    null,
+  );
+
+  const [
+    updateError,
+    setUpdateError,
+  ] = useState<string | null>(
+    null,
+  );
 
   const filteredOrders =
     useMemo(() => {
@@ -56,16 +77,66 @@ export function MerchantOrderList({
       selectedStatus,
     ]);
 
+  async function handleAdvanceStatus(
+    orderId: string,
+    nextStatus: OrderStatus,
+  ) {
+    setUpdateError(null);
+    setUpdatingOrderId(
+      orderId,
+    );
+
+    try {
+      await authenticatedApiRequest(
+        `/merchant/orders/${orderId}/status`,
+        {
+          method: "PATCH",
+
+          body: {
+            status:
+              nextStatus.toLowerCase(),
+          },
+        },
+      );
+
+      router.refresh();
+    } catch (error) {
+      setUpdateError(
+        error instanceof Error
+          ? error.message
+          : "Status pesanan gagal diperbarui.",
+      );
+    } finally {
+      setUpdatingOrderId(
+        null,
+      );
+    }
+  }
+
   return (
     <>
       <div className="mt-7">
         <OrderStatusTabs
-          value={selectedStatus}
+          value={
+            selectedStatus
+          }
           onChange={
             setSelectedStatus
           }
         />
       </div>
+
+      {updateError ? (
+        <div className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+          <p className="text-sm font-medium text-destructive">
+            Status pesanan gagal diperbarui
+          </p>
+
+          <p className="mt-1 text-sm text-muted-foreground">
+            {updateError}
+          </p>
+        </div>
+      ) : null}
 
       {filteredOrders.length >
       0 ? (
@@ -83,6 +154,13 @@ export function MerchantOrderList({
                   customerName
                 }
                 items={items}
+                isUpdating={
+                  updatingOrderId ===
+                  order.id
+                }
+                onAdvanceStatus={
+                  handleAdvanceStatus
+                }
               />
             ),
           )}

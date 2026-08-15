@@ -9,23 +9,25 @@ import {
 } from "lucide-react";
 
 import { StatCard } from "@/components/dashboard/stat-card";
+
 import { EmptyState } from "@/components/shared/empty-state";
+
 import { PageHeader } from "@/components/shared/page-header";
 
-import {
-  studentWallet,
-  studentWalletTransactions,
-} from "@/mocks/wallet";
+import { requireRole } from "@/features/auth/server/require-role";
 
-import { formatCurrency } from "@/lib/utils";
+import { getStudentWalletOverview } from "@/lib/api/student-wallet";
+
+import { cn, formatCurrency } from "@/lib/utils";
+
+import { StudentTopUpCard } from "@/features/wallet/components/student-topup-card";
 
 import type {
   WalletTransaction,
+  WalletTransactionStatus,
 } from "@/types/wallet";
 
-function getTransactionLabel(
-  transaction: WalletTransaction,
-) {
+function getTransactionLabel(transaction: WalletTransaction) {
   switch (transaction.type) {
     case "TOP_UP":
       return "Top Up Saldo";
@@ -35,12 +37,12 @@ function getTransactionLabel(
 
     case "REFUND":
       return "Pengembalian Dana";
+
+    case "ADJUSTMENT":
+      return "Penyesuaian Saldo";
   }
 }
-
-function getTransactionIcon(
-  transaction: WalletTransaction,
-) {
+function getTransactionIcon(transaction: WalletTransaction) {
   switch (transaction.type) {
     case "TOP_UP":
       return ArrowDownLeft;
@@ -50,62 +52,65 @@ function getTransactionIcon(
 
     case "REFUND":
       return RotateCcw;
+
+    case "ADJUSTMENT":
+      return CircleDollarSign;
   }
 }
 
-function isIncomingTransaction(
-  transaction: WalletTransaction,
-) {
-  return (
-    transaction.type === "TOP_UP" ||
-    transaction.type === "REFUND"
-  );
+function isIncomingTransaction(transaction: WalletTransaction) {
+  return transaction.direction === "CREDIT";
 }
 
-export default function StudentWalletPage() {
-  const successfulTransactions =
-    studentWalletTransactions.filter(
-      (transaction) =>
-        transaction.status ===
-        "SUCCESS",
-    );
+function getTransactionStatusLabel(status: WalletTransactionStatus) {
+  switch (status) {
+    case "PENDING":
+      return "Menunggu";
 
-  const totalTopUp =
-    successfulTransactions
-      .filter(
-        (transaction) =>
-          transaction.type ===
-          "TOP_UP",
-      )
-      .reduce(
-        (total, transaction) =>
-          total +
-          transaction.amount,
-        0,
-      );
+    case "SUCCESS":
+      return "Berhasil";
 
-  const totalPayment =
-    successfulTransactions
-      .filter(
-        (transaction) =>
-          transaction.type ===
-          "PAYMENT",
-      )
-      .reduce(
-        (total, transaction) =>
-          total +
-          transaction.amount,
-        0,
-      );
+    case "FAILED":
+      return "Gagal";
+  }
+}
+
+function getTransactionStatusClassName(status: WalletTransactionStatus) {
+  switch (status) {
+    case "PENDING":
+      return "bg-amber-50 text-amber-700";
+
+    case "SUCCESS":
+      return "bg-emerald-50 text-emerald-700";
+
+    case "FAILED":
+      return "bg-red-50 text-red-700";
+  }
+}
+
+export default async function StudentWalletPage() {
+  await requireRole("student");
+
+  const { wallet, transactions } = await getStudentWalletOverview();
+
+  const successfulTransactions = transactions.filter(
+    (transaction) => transaction.status === "SUCCESS",
+  );
+
+  const totalTopUp = successfulTransactions
+    .filter((transaction) => transaction.type === "TOP_UP")
+    .reduce((total, transaction) => total + transaction.amount, 0);
+
+  const totalPayment = successfulTransactions
+    .filter((transaction) => transaction.type === "PAYMENT")
+    .reduce((total, transaction) => total + transaction.amount, 0);
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {}
       <PageHeader
         title="Saku Wallet"
         description="Pantau saldo dan riwayat transaksi SchoolCanteen."
       />
-
       {}
       <section className="mt-8 overflow-hidden rounded-2xl border bg-background">
         <div className="p-6 sm:p-8">
@@ -113,19 +118,15 @@ export default function StudentWalletPage() {
             <div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <WalletCards className="size-4" />
-
                 Saldo Tersedia
               </div>
 
               <p className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                {formatCurrency(
-                  studentWallet.balance,
-                )}
+                {formatCurrency(wallet.balance)}
               </p>
 
               <p className="mt-2 text-sm text-muted-foreground">
-                Saldo dapat digunakan untuk
-                transaksi di kantin dan koperasi
+                Saldo dapat digunakan untuk transaksi di kantin dan koperasi
                 sekolah.
               </p>
             </div>
@@ -137,22 +138,20 @@ export default function StudentWalletPage() {
         </div>
       </section>
 
+      <StudentTopUpCard walletIsActive={wallet.isActive} />
+
       {}
       <section className="mt-6 grid gap-4 sm:grid-cols-2">
         <StatCard
           title="Total Top Up"
-          value={formatCurrency(
-            totalTopUp,
-          )}
+          value={formatCurrency(totalTopUp)}
           description="Total saldo berhasil ditambahkan"
           icon={ArrowDownLeft}
         />
 
         <StatCard
           title="Total Pembayaran"
-          value={formatCurrency(
-            totalPayment,
-          )}
+          value={formatCurrency(totalPayment)}
           description="Total pembayaran pesanan"
           icon={CreditCard}
         />
@@ -161,108 +160,77 @@ export default function StudentWalletPage() {
       {}
       <section className="mt-8">
         <div>
-          <h2 className="text-lg font-semibold">
-            Riwayat Transaksi
-          </h2>
+          <h2 className="text-lg font-semibold">Riwayat Transaksi</h2>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Aktivitas saldo terbaru pada
-            wallet kamu.
+            Aktivitas saldo terbaru pada wallet kamu.
           </p>
         </div>
 
-        {studentWalletTransactions.length >
-        0 ? (
+        {transactions.length > 0 ? (
           <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
             <div className="divide-y">
-              {studentWalletTransactions.map(
-                (transaction) => {
-                  const TransactionIcon =
-                    getTransactionIcon(
-                      transaction,
-                    );
+              {transactions.map((transaction) => {
+                const TransactionIcon = getTransactionIcon(transaction);
 
-                  const incoming =
-                    isIncomingTransaction(
-                      transaction,
-                    );
+                const incoming = isIncomingTransaction(transaction);
 
-                  const formattedDate =
-                    new Intl.DateTimeFormat(
-                      "id-ID",
-                      {
-                        dateStyle:
-                          "medium",
-                        timeStyle:
-                          "short",
-                      },
-                    ).format(
-                      new Date(
-                        transaction.createdAt,
-                      ),
-                    );
+                const formattedDate = new Intl.DateTimeFormat("id-ID", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).format(new Date(transaction.createdAt));
 
-                  return (
-                    <div
-                      key={
-                        transaction.id
-                      }
-                      className="flex items-center gap-4 p-4 sm:p-5"
-                    >
-                      {}
-                      <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted">
-                        <TransactionIcon className="size-5 text-foreground" />
-                      </div>
-
-                      {}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
-                          <p className="font-medium">
-                            {getTransactionLabel(
-                              transaction,
-                            )}
-                          </p>
-
-                          <span className="w-fit rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-                            Berhasil
-                          </span>
-                        </div>
-
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {formattedDate}
-                        </p>
-
-                        {transaction.referenceId && (
-                          <p className="mt-1 truncate text-xs text-muted-foreground">
-                            Ref:{" "}
-                            {
-                              transaction.referenceId
-                            }
-                          </p>
-                        )}
-                      </div>
-
-                      {}
-                      <div className="shrink-0 text-right">
-                        <p
-                          className={
-                            incoming
-                              ? "font-semibold text-emerald-700"
-                              : "font-semibold text-foreground"
-                          }
-                        >
-                          {incoming
-                            ? "+"
-                            : "-"}
-                          {formatCurrency(
-                            transaction.amount,
-                          )}
-                        </p>
-                      </div>
+                return (
+                  <div
+                    key={transaction.id}
+                    className="flex items-center gap-4 p-4 sm:p-5"
+                  >
+                    <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted">
+                      <TransactionIcon className="size-5 text-foreground" />
                     </div>
-                  );
-                },
-              )}
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                        <p className="font-medium">
+                          {getTransactionLabel(transaction)}
+                        </p>
+
+                        <span
+                          className={cn(
+                            "w-fit rounded-full px-2 py-0.5 text-[11px] font-medium",
+                            getTransactionStatusClassName(transaction.status),
+                          )}
+                        >
+                          {getTransactionStatusLabel(transaction.status)}
+                        </span>
+                      </div>
+
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {formattedDate}
+                      </p>
+
+                      {transaction.referenceId && (
+                        <p className="mt-1 truncate text-xs text-muted-foreground">
+                          Ref: {transaction.referenceId}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="shrink-0 text-right">
+                      <p
+                        className={
+                          incoming
+                            ? "font-semibold text-emerald-700"
+                            : "font-semibold text-foreground"
+                        }
+                      >
+                        {incoming ? "+" : "-"}
+                        {formatCurrency(transaction.amount)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ) : (
