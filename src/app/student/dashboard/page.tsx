@@ -12,36 +12,35 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 
-import { studentDashboard } from "@/mocks/dashboard";
 import {
-  getStudentWallet,
-} from "@/lib/api/student-wallet";
+  getStudentDashboard,
+} from "@/lib/api/student-dashboard";
 
 import { formatCurrency } from "@/lib/utils";
 
 export default async function StudentDashboardPage() {
-  const wallet =
-    await getStudentWallet();
+  const dashboard =
+    await getStudentDashboard();
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {}
+      
       <PageHeader
         title="Dashboard Siswa"
         description="Akses kantin, koperasi, pesanan, dan wallet kamu dari satu tempat."
       />
 
-      {}
+      
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Pesanan Aktif"
-          value={studentDashboard.activeOrders}
+          value={dashboard.activeOrders}
           description="Pesanan yang sedang berjalan"
           icon={Clock3}
         />
 
         <StatCard
           title="Pesanan Selesai"
-          value={studentDashboard.completedOrders}
+          value={dashboard.completedOrders}
           description="Total pesanan yang telah selesai"
           icon={CheckCircle2}
         />
@@ -49,14 +48,14 @@ export default async function StudentDashboardPage() {
         <StatCard
           title="Saldo Wallet"
           value={formatCurrency(
-            wallet.balance,
+            dashboard.wallet.balance,
           )}
           description="Saldo yang tersedia"
           icon={WalletCards}
         />
       </section>
 
-      {}
+      
       <section className="mt-8">
         <div className="mb-4">
           <h2 className="text-lg font-semibold">
@@ -69,7 +68,7 @@ export default async function StudentDashboardPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {}
+          
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <Store className="size-5 text-primary" />
@@ -98,7 +97,7 @@ export default async function StudentDashboardPage() {
             </Button>
           </div>
 
-          {}
+          
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <ShoppingBag className="size-5 text-primary" />
@@ -130,9 +129,9 @@ export default async function StudentDashboardPage() {
         </div>
       </section>
 
-      {}
+      
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
-        {}
+        
         <div className="flex flex-col justify-between rounded-2xl border bg-background p-6 sm:flex-row sm:items-center">
           <div>
             <p className="text-sm text-muted-foreground">
@@ -162,7 +161,7 @@ export default async function StudentDashboardPage() {
           </Button>
         </div>
 
-        {}
+        
         <div className="flex flex-col justify-between rounded-2xl border bg-background p-6 sm:flex-row sm:items-center">
           <div>
             <p className="text-sm text-muted-foreground">
@@ -171,7 +170,7 @@ export default async function StudentDashboardPage() {
 
             <p className="mt-1 text-2xl font-semibold">
               {formatCurrency(
-                wallet.balance,
+                dashboard.wallet.balance,
               )}
             </p>
 

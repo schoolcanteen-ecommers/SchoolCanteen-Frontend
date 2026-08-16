@@ -89,9 +89,6 @@ function mapOrderStatus(status: string): OrderStatus {
     case "ready":
       return "READY";
 
-    case "picked_up":
-      return "PICKED_UP";
-
     case "completed":
       return "COMPLETED";
 

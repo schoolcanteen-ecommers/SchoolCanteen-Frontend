@@ -7,7 +7,7 @@ import type {
 import { apiRequest } from "@/lib/api/client";
 
 
-interface ApiMerchant {
+export interface ApiMerchant {
   id: string;
   owner_user_id: string;
 
@@ -64,7 +64,7 @@ interface ApiProduct {
 }
 
 
-function mapMerchant(
+export function mapMerchant(
   merchant: ApiMerchant,
 ): Merchant {
   return {
@@ -91,6 +91,9 @@ function mapMerchant(
       merchant.is_active
         ? "ACTIVE"
         : "INACTIVE",
+
+    productsCount:
+      merchant.products_count,
   };
 }
 

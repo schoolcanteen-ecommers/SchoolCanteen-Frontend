@@ -138,11 +138,18 @@ export function StudentTopUpCard({
     }
 
     if (window.snap) {
-      setSnapReady(
-        true,
-      );
+      const timeoutId =
+        window.setTimeout(() => {
+          setSnapReady(
+            true,
+          );
+        }, 0);
 
-      return;
+      return () => {
+        window.clearTimeout(
+          timeoutId,
+        );
+      };
     }
 
     const existingScript =

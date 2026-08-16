@@ -13,6 +13,7 @@ interface AddToCartButtonProps {
   stock: number;
   disabled?: boolean;
   className?: string;
+  quantityToAdd?: number;
 }
 
 export function AddToCartButton({
@@ -20,6 +21,7 @@ export function AddToCartButton({
   stock,
   disabled = false,
   className,
+  quantityToAdd = 1,
 }: AddToCartButtonProps) {
   const {
     addItem,
@@ -29,8 +31,8 @@ export function AddToCartButton({
 
   const quantity = getItemQuantity(productId);
 
-  const reachedStock =
-    quantity >= stock;
+ 
+  const reachedStock = quantity + quantityToAdd > stock;
 
   const isDisabled =
     disabled ||
@@ -43,7 +45,8 @@ export function AddToCartButton({
       return;
     }
 
-    addItem(productId, 1);
+   
+    addItem(productId, quantityToAdd); 
   }
 
   return (
@@ -59,7 +62,7 @@ export function AddToCartButton({
           <Check className="size-4" />
 
           {reachedStock
-            ? `Maksimal ${quantity} di keranjang`
+            ? `Maksimal ${stock} di keranjang`
             : `Tambah Lagi (${quantity})`}
         </>
       ) : (

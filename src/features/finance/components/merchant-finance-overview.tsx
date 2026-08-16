@@ -76,7 +76,7 @@ const WITHDRAWAL_STATUS_LABEL: Record<
   APPROVED:
     "Disetujui",
 
-  PROCESSING:
+  PROCESSED:
     "Sedang Diproses",
 
   COMPLETED:
@@ -96,7 +96,7 @@ function getWithdrawalStatusClassName(
     case "APPROVED":
       return "bg-blue-50 text-blue-700";
 
-    case "PROCESSING":
+    case "PROCESSED":
       return "bg-violet-50 text-violet-700";
 
     case "COMPLETED":
@@ -135,7 +135,7 @@ export function MerchantFinanceOverview({
 }: MerchantFinanceOverviewProps) {
   return (
     <>
-      {}
+      
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Saldo Tersedia"
@@ -166,7 +166,7 @@ export function MerchantFinanceOverview({
       </section>
 
       <div className="mt-8 grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-        {}
+        
         <section>
           <div>
             <h2 className="text-lg font-semibold">
@@ -305,7 +305,7 @@ export function MerchantFinanceOverview({
           )}
         </section>
 
-        {}
+        
         <aside className="space-y-6">
           <MerchantWithdrawalForm
             availableBalance={

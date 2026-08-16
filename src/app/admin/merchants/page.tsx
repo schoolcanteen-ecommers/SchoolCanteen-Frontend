@@ -4,39 +4,38 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 
-import { StatCard } from "@/components/dashboard/stat-card";
-import { PageHeader } from "@/components/shared/page-header";
-
-import { AdminMerchantList } from "@/features/merchants/components/admin-merchant-list";
+import {
+  StatCard,
+} from "@/components/dashboard/stat-card";
 
 import {
-  getCanteenCatalog,
-  getCooperativeCatalog,
-} from "@/lib/api/catalog";
+  PageHeader,
+} from "@/components/shared/page-header";
+
+import {
+  AdminMerchantList,
+} from "@/features/merchants/components/admin-merchant-list";
+
+import {
+  getAdminMerchants,
+} from "@/lib/api/admin-merchants";
 
 export default async function AdminMerchantsPage() {
-    const [
-    canteenCatalog,
-    cooperativeCatalog,
-  ] = await Promise.all([
-    getCanteenCatalog(),
-    getCooperativeCatalog(),
-  ]);
+  const merchants =
+    await getAdminMerchants();
 
-  const merchants = [
-    ...canteenCatalog.merchants,
-    ...cooperativeCatalog.merchants,
-  ];
-
-  const products = [
-    ...canteenCatalog.products,
-    ...cooperativeCatalog.products,
-  ];
+  const activeMerchantCount =
+    merchants.filter(
+      (merchant) =>
+        merchant.status ===
+        "ACTIVE",
+    ).length;
 
   const canteenCount =
     merchants.filter(
       (merchant) =>
-        merchant.type === "CANTEEN",
+        merchant.type ===
+        "CANTEEN",
     ).length;
 
   const cooperativeCount =
@@ -53,33 +52,43 @@ export default async function AdminMerchantsPage() {
         description="Pantau merchant kantin dan koperasi yang tersedia di SchoolCanteen."
       />
 
-      {}
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Merchant Aktif"
-          value={merchants.length}
-          description="Merchant yang tersedia"
+          value={
+            activeMerchantCount
+          }
+          description="Merchant yang sedang aktif"
           icon={Store}
         />
 
         <StatCard
           title="Kantin"
-          value={canteenCount}
+          value={
+            canteenCount
+          }
           description="Merchant kategori kantin"
-          icon={UtensilsCrossed}
+          icon={
+            UtensilsCrossed
+          }
         />
 
         <StatCard
           title="Koperasi"
-          value={cooperativeCount}
+          value={
+            cooperativeCount
+          }
           description="Merchant kategori koperasi"
-          icon={ShoppingBasket}
+          icon={
+            ShoppingBasket
+          }
         />
       </section>
 
       <AdminMerchantList
-        merchants={merchants}
-        products={products}
+        merchants={
+          merchants
+        }
       />
     </div>
   );

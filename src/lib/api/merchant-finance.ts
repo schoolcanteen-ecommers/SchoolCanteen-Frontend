@@ -189,8 +189,8 @@ function mapWithdrawalStatus(
     case "approved":
       return "APPROVED";
 
-    case "processing":
-      return "PROCESSING";
+    case "processed":
+      return "PROCESSED";
 
     case "completed":
       return "COMPLETED";

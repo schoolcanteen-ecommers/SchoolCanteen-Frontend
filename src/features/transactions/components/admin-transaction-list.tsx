@@ -109,7 +109,7 @@ export function AdminTransactionList({
 
   return (
     <section className="mt-8">
-      {}
+      
       <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-lg font-semibold">
@@ -122,7 +122,7 @@ export function AdminTransactionList({
           </p>
         </div>
 
-        {}
+        
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div className="relative w-full xl:max-w-sm">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -171,7 +171,7 @@ export function AdminTransactionList({
       {filteredTransactions.length >
       0 ? (
         <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
-          {}
+          
           <div className="hidden grid-cols-[160px_minmax(180px,1fr)_150px_150px_150px_170px] gap-4 border-b bg-muted/30 px-5 py-3 text-xs font-medium text-muted-foreground lg:grid">
             <span>Order</span>
             <span>Siswa</span>
@@ -207,7 +207,7 @@ export function AdminTransactionList({
                     key={order.id}
                     className="p-5"
                   >
-                    {}
+                    
                     <div className="hidden grid-cols-[160px_minmax(180px,1fr)_150px_150px_150px_170px] items-center gap-4 lg:grid">
                       <p className="truncate text-sm font-semibold">
                         {order.orderCode}
@@ -244,7 +244,7 @@ export function AdminTransactionList({
                       </p>
                     </div>
 
-                    {}
+                    
                     <div className="lg:hidden">
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
@@ -330,7 +330,6 @@ function OrderStatusBadge({
           "WAITING",
           "CONFIRMED",
           "PREPARING",
-          "PICKED_UP",
         ].includes(status) &&
           "bg-amber-50 text-amber-700",
       )}

@@ -25,7 +25,7 @@ export function OrderCard({ order, merchantName, items }: OrderCardProps) {
 
   return (
     <article className="overflow-hidden rounded-2xl border bg-background">
-      {}
+      
       <div className="flex flex-col gap-4 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
@@ -48,10 +48,10 @@ export function OrderCard({ order, merchantName, items }: OrderCardProps) {
         <StatusBadge status={order.status} />
       </div>
 
-      {}
+      
       <div className="p-5">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_200px]">
-          {}
+          
           <div>
             <div className="flex items-center gap-2 text-sm font-medium">
               <Package className="size-4 text-primary" />
@@ -74,7 +74,7 @@ export function OrderCard({ order, merchantName, items }: OrderCardProps) {
             </div>
           </div>
 
-          {}
+          
           <div className="rounded-xl bg-muted/40 p-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Clock3 className="size-4 text-primary" />
@@ -97,7 +97,7 @@ export function OrderCard({ order, merchantName, items }: OrderCardProps) {
           </div>
         </div>
 
-        {}
+        
         <div className="mt-5 flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs text-muted-foreground">Total Pesanan</p>

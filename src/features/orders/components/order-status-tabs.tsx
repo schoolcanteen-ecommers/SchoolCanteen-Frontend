@@ -25,7 +25,6 @@ const orderStatuses: OrderStatus[] = [
   "CONFIRMED",
   "PREPARING",
   "READY",
-  "PICKED_UP",
   "COMPLETED",
   "CANCELLED",
 ];

@@ -1,10 +1,4 @@
-import {
-  Clock3,
-  ImageIcon,
-  ShoppingBag,
-  Store,
-} from "lucide-react";
-
+import { Store, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Merchant } from "@/types/merchant";
 
@@ -16,91 +10,46 @@ interface MerchantCardProps {
 
 export function MerchantCard({
   merchant,
-  productCount,
   className,
 }: MerchantCardProps) {
   const isCanteen = merchant.type === "CANTEEN";
-
-  const MerchantIcon = isCanteen
-    ? Store
-    : ShoppingBag;
-
-  const merchantLabel = isCanteen
-    ? "Kantin"
-    : "Koperasi";
-
-  const productLabel = isCanteen
-    ? "menu"
-    : "produk";
+  const isOpen = merchant.status === "ACTIVE";
+  const MerchantFallback = isCanteen ? Store : ShoppingBag;
 
   return (
     <article
       className={cn(
-        "overflow-hidden rounded-2xl border bg-background",
+        "group flex flex-col items-center gap-2 rounded-[24px] border border-arctic-blue bg-white p-3 shadow-sm transition-transform hover:-translate-y-1 md:flex-row md:items-center md:gap-4 md:p-4",
+        !isOpen && "opacity-75",
         className,
       )}
     >
-      <div className="flex flex-col sm:flex-row">
-        {}
-        <div className="relative flex aspect-[16/8] w-full shrink-0 items-center justify-center overflow-hidden bg-muted sm:aspect-auto sm:w-44">
-          {merchant.imageUrl ? (
-           
-            <img
-              src={merchant.imageUrl}
-              alt={merchant.name}
-              className="size-full object-cover"
-            />
-          ) : (
-            <ImageIcon className="size-8 text-muted-foreground/40" />
-          )}
-        </div>
+      <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-arctic-blue bg-neutral-surface p-0.5 transition-colors group-hover:border-navy-steel/30">
+        {merchant.imageUrl ? (
+          <img
+            src={merchant.imageUrl}
+            alt={merchant.name}
+            className="size-full rounded-full object-cover"
+          />
+        ) : (
+          <MerchantFallback className="size-6 text-muted-foreground/40" />
+        )}
+      </div>
 
-        {}
-        <div className="flex min-w-0 flex-1 flex-col justify-center p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                  <MerchantIcon className="size-3.5" />
-                  {merchantLabel}
-                </span>
-
-                {merchant.status === "ACTIVE" && (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600">
-                    <span className="size-1.5 rounded-full bg-emerald-500" />
-                    Buka
-                  </span>
-                )}
-              </div>
-
-              <h2 className="truncate text-lg font-semibold tracking-tight">
-                {merchant.name}
-              </h2>
-
-              {merchant.description && (
-                <p className="mt-1 line-clamp-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  {merchant.description}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
-            {typeof productCount === "number" && (
-              <span>
-                {productCount} {productLabel} tersedia
-              </span>
-            )}
-
-            <span className="flex items-center gap-1.5">
-              <Clock3 className="size-3.5" />
-
-              {isCanteen
-                ? "Pre-order tersedia"
-                : "Belanja tersedia"}
-            </span>
-          </div>
-        </div>
+      <div className="flex min-w-0 flex-col items-center md:items-start">
+        <h3 className="w-full truncate text-center font-heading text-sm font-bold text-navy-steel transition-colors group-hover:text-primary md:text-left md:text-lg">
+          {merchant.name}
+        </h3>
+        
+        {isOpen ? (
+          <span className="mt-1 inline-block rounded-full bg-arctic-blue px-2 py-0.5 font-sans text-[10px] font-bold uppercase tracking-wider text-navy-steel md:text-xs">
+            Buka
+          </span>
+        ) : (
+          <span className="mt-1 inline-block rounded-full bg-surface-variant px-2 py-0.5 font-sans text-[10px] font-bold uppercase tracking-wider text-muted-foreground md:text-xs">
+            Tutup
+          </span>
+        )}
       </div>
     </article>
   );

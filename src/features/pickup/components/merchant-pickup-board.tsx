@@ -212,7 +212,7 @@ export function MerchantPickupBoard({
 
   return (
     <>
-      {}
+      
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Menunggu Pickup"
@@ -242,7 +242,7 @@ export function MerchantPickupBoard({
         />
       </section>
 
-      {}
+      
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -294,7 +294,7 @@ export function MerchantPickupBoard({
                     }
                     className="overflow-hidden rounded-2xl border bg-background"
                   >
-                    {}
+                    
                     <div className="flex flex-col gap-4 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
@@ -336,9 +336,9 @@ export function MerchantPickupBoard({
                       </div>
                     </div>
 
-                    {}
+                    
                     <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-                      {}
+                      
                       <div>
                         <div className="flex items-center gap-2 text-sm font-medium">
                           <Package className="size-4 text-primary" />
@@ -415,7 +415,7 @@ export function MerchantPickupBoard({
                         </div>
                       </div>
 
-                      {}
+                      
                       <div className="rounded-2xl border bg-muted/20 p-5">
                         <div className="flex items-center gap-2">
                           <QrCode className="size-5 text-primary" />
@@ -508,7 +508,7 @@ export function MerchantPickupBoard({
         )}
       </section>
 
-      {}
+      
       {verifiedPickups.length >
         0 && (
         <section className="mt-8">

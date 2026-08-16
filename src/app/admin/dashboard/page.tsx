@@ -21,13 +21,13 @@ import { adminDashboard } from "@/mocks/dashboard";
 export default function AdminDashboardPage() {
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      {}
+      
       <PageHeader
         title="Dashboard Admin"
         description="Pantau aktivitas siswa, merchant, pesanan, dan transaksi SchoolCanteen."
       />
 
-      {}
+      
       <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Siswa"
@@ -60,7 +60,7 @@ export default function AdminDashboardPage() {
         />
       </section>
 
-      {}
+      
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -73,7 +73,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {}
+          
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <Store className="size-5 text-primary" />
@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
             </Button>
           </div>
 
-          {}
+          
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <Users className="size-5 text-primary" />
@@ -127,7 +127,7 @@ export default function AdminDashboardPage() {
             </Button>
           </div>
 
-          {}
+          
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <ReceiptText className="size-5 text-primary" />
@@ -154,7 +154,7 @@ export default function AdminDashboardPage() {
             </Button>
           </div>
 
-          {}
+          
           <div className="rounded-2xl border bg-background p-6">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
               <CircleDollarSign className="size-5 text-primary" />
@@ -183,7 +183,7 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      {}
+      
       <section className="mt-8 rounded-2xl border bg-background">
         <div className="border-b px-5 py-4 sm:px-6">
           <h2 className="font-semibold">
@@ -196,7 +196,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {}
+          
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <ClipboardList className="size-4" />
@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
             </p>
           </div>
 
-          {}
+          
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <ShoppingCart className="size-4" />
@@ -230,7 +230,7 @@ export default function AdminDashboardPage() {
             </p>
           </div>
 
-          {}
+          
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Store className="size-4" />

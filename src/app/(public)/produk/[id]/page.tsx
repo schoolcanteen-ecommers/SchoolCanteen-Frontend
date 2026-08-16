@@ -1,23 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
 import {
-  ArrowLeft,
-  CheckCircle2,
-  ImageIcon,
-  Package,
-  ShoppingBag,
+  ChevronRight,
   Store,
+  ShoppingBag,
+  ArrowRight,
+  CheckCircle2
 } from "lucide-react";
 
 import { ProductCard } from "@/components/commerce/product-card";
-import { AddToCartButton } from "@/features/cart/components/add-to-cart-button";
-
 import { formatCurrency } from "@/lib/utils";
-
-import {
-  getProductDetail,
-} from "@/lib/api/catalog";
+import { getProductDetail } from "@/lib/api/catalog";
+import { ProductDetailActions } from "@/features/products/components/product-detail-actions";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -31,226 +25,170 @@ export default async function ProductDetailPage({
   const { id } = await params;
 
   let detail;
-
   try {
-    detail =
-      await getProductDetail(id);
+    detail = await getProductDetail(id);
   } catch {
     notFound();
   }
 
-  const {
-    product,
-    merchant,
-    category,
-    relatedProducts,
-  } = detail;
+  const { product, merchant, category, relatedProducts } = detail;
 
-  const isAvailable =
-    product.isActive &&
-    product.stock > 0;
-
-  const isCooperative =
-    merchant?.type ===
-    "COOPERATIVE";
-
-  const backHref =
-    isCooperative
-      ? "/koperasi"
-      : "/kantin";
-
-  const merchantLabel =
-    isCooperative
-      ? "Koperasi"
-      : "Kantin";
-
-  const MerchantIcon =
-    isCooperative
-      ? ShoppingBag
-      : Store;
+  const isAvailable = product.isActive && product.stock > 0;
+  const isCooperative = merchant?.type === "COOPERATIVE";
+  const backHref = isCooperative ? "/koperasi" : "/kantin";
+  const merchantLabel = isCooperative ? "Koperasi" : "Kantin";
+  const MerchantIcon = isCooperative ? ShoppingBag : Store;
 
   return (
-    <div>
-      {}
-      <section className="border-b bg-background">
-        <div className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            href={backHref}
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" />
-
-            Kembali ke {merchantLabel}
-          </Link>
-        </div>
+    <div className="flex flex-col min-h-screen bg-neutral-surface md:bg-white pb-6">
+      
+      
+      <section className="mx-auto max-w-[1200px] w-full px-4 pt-6 pb-4 sm:px-6 lg:px-10 md:pt-8 md:pb-6">
+        <nav aria-label="Breadcrumb" className="flex text-navy-steel font-heading text-sm font-bold">
+          <ol className="inline-flex items-center space-x-1 md:space-x-2">
+            <li className="inline-flex items-center">
+              <Link href={backHref} className="hover:text-primary transition-colors text-muted-foreground font-medium">
+                {merchantLabel}
+              </Link>
+            </li>
+            {category && (
+              <li>
+                <div className="flex items-center">
+                  <ChevronRight className="size-4 mx-1 text-muted-foreground" />
+                  <span className="text-muted-foreground font-medium">{category.name}</span>
+                </div>
+              </li>
+            )}
+            <li aria-current="page">
+              <div className="flex items-center">
+                <ChevronRight className="size-4 mx-1 text-muted-foreground" />
+                <span>{product.name}</span>
+              </div>
+            </li>
+          </ol>
+        </nav>
       </section>
 
-      {}
-      <section className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          {}
-          <div className="overflow-hidden rounded-3xl border bg-muted">
-            <div className="flex aspect-square items-center justify-center sm:aspect-[4/3] lg:aspect-square">
+      
+      <section className="mx-auto max-w-[1200px] w-full px-4 pb-8 sm:px-6 lg:px-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12">
+          
+          
+          <div className="md:col-span-7">
+            <div className="w-full aspect-[4/3] rounded-[24px] md:rounded-[32px] overflow-hidden bg-arctic-blue/30 border border-arctic-blue shadow-sm md:shadow-none flex items-center justify-center">
               {product.imageUrl ? (
-               
                 <img
-                  src={
-                    product.imageUrl
-                  }
+                  src={product.imageUrl}
                   alt={product.name}
                   className="size-full object-cover"
                 />
               ) : (
-                <div className="flex size-full flex-col items-center justify-center gap-3">
-                  <div className="flex size-16 items-center justify-center rounded-2xl bg-background">
-                    <ImageIcon className="size-7 text-muted-foreground/40" />
-                  </div>
-
-                  <p className="text-sm text-muted-foreground">
-                    Gambar produk belum tersedia
-                  </p>
+                <div className="flex flex-col items-center justify-center gap-3">
+                  <ShoppingBag className="size-10 text-muted-foreground/40" />
+                  <p className="text-sm font-sans text-muted-foreground">Gambar belum tersedia</p>
                 </div>
               )}
             </div>
           </div>
 
-          {}
-          <div className="flex flex-col">
-            <div className="mb-4 flex flex-wrap items-center gap-2">
+          
+          <div className="md:col-span-5 flex flex-col justify-center">
+            
+            
+            <div className="flex items-center gap-2 mb-3 mt-4 md:mt-0">
+              <span className="bg-arctic-blue text-navy-steel text-[10px] font-bold font-sans px-2.5 py-1 rounded-md uppercase tracking-wider">
+                {merchantLabel}
+              </span>
               {merchant && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
-                  <MerchantIcon className="size-3.5" />
-
+                <span className="flex items-center gap-1.5 text-on-surface-variant font-sans text-xs font-medium">
+                  <MerchantIcon className="size-4" />
                   {merchant.name}
                 </span>
               )}
-
-              {category && (
-                <span className="rounded-full border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
-                  {category.name}
-                </span>
-              )}
             </div>
 
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+            
+            <h1 className="font-heading text-[32px] md:text-[42px] font-bold text-navy-steel leading-tight mb-2">
               {product.name}
             </h1>
-
-            <p className="mt-4 text-2xl font-semibold text-primary sm:text-3xl">
-              {formatCurrency(
-                product.price,
-              )}
-            </p>
-
-            {product.description && (
-              <p className="mt-6 max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
-                {
-                  product.description
-                }
-              </p>
-            )}
-
-            {}
-            <div className="mt-7 grid gap-3 sm:grid-cols-2">
-              <div className="flex items-center gap-3 rounded-2xl border bg-background p-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted">
-                  <Package className="size-5 text-muted-foreground" />
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    Stok tersedia
-                  </p>
-
-                  <p className="mt-0.5 text-sm font-semibold">
-                    {product.stock} item
-                  </p>
-                </div>
+            
+            
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <div className="text-2xl md:text-3xl font-bold text-navy-steel font-heading">
+                {formatCurrency(product.price)}
               </div>
-
-              <div className="flex items-center gap-3 rounded-2xl border bg-background p-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted">
-                  <CheckCircle2 className="size-5 text-muted-foreground" />
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    Status
-                  </p>
-
-                  <p className="mt-0.5 text-sm font-semibold">
-                    {isAvailable
-                      ? "Tersedia"
-                      : "Stok habis"}
-                  </p>
-                </div>
+              <div className="text-xs md:text-sm font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-emerald-100">
+                <CheckCircle2 className="size-4" />
+                {isAvailable ? "Tersedia" : "Habis"}
               </div>
             </div>
 
-            {}
-            <div className="mt-8 border-t pt-8">
-              <AddToCartButton
-                productId={
-                  product.id
-                }
-                stock={
-                  product.stock
-                }
-                disabled={
-                  !isAvailable
-                }
-                className="w-full sm:w-auto"
-              />
+            
+            <p className="font-sans text-sm md:text-base text-on-surface-variant leading-relaxed mb-6 md:mb-8">
+              {product.description || "Produk demo SchoolCanteen."}
+            </p>
 
-              <p className="mt-3 text-xs text-muted-foreground">
-                Kamu belum perlu
-                login untuk menambahkan
-                produk ke keranjang.
-              </p>
+            
+            <div className="mb-2">
+              <ProductDetailActions 
+                productId={product.id} 
+                stock={product.stock} 
+                isAvailable={isAvailable} 
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {}
-      {relatedProducts.length >
-        0 && (
-          <section className="border-t bg-background">
-            <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-              <div className="mb-6">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Produk lainnya
-                </p>
+      
+      <section className="mx-auto max-w-[1200px] w-full px-4 py-8 sm:px-6 lg:px-10 border-t border-arctic-blue bg-neutral-surface md:bg-white">
+        <h3 className="font-heading text-lg md:text-xl font-bold text-navy-steel mb-6">Detail Produk</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          <div className="flex flex-col justify-start">
+            <h4 className="font-sans text-xs font-bold text-secondary uppercase tracking-wider mb-1 md:mb-2">Kategori</h4>
+            <p className="font-sans text-sm text-navy-steel font-medium text-left">{category?.name || "Umum"}</p>
+          </div>
+          <div className="flex flex-col justify-start">
+            <h4 className="font-sans text-xs font-bold text-secondary uppercase tracking-wider mb-1 md:mb-2">Penjual</h4>
+            <p className="font-sans text-sm text-navy-steel font-medium text-left">{merchant?.name || "Kantin Sekolah"}</p>
+          </div>
+          <div className="flex flex-col justify-start">
+            <h4 className="font-sans text-xs font-bold text-secondary uppercase tracking-wider mb-1 md:mb-2">Komposisi</h4>
+            <p className="font-sans text-sm text-navy-steel font-medium text-left line-clamp-3 md:line-clamp-none">{product.description || "-"}</p>
+          </div>
+          <div className="flex flex-col justify-start">
+            <h4 className="font-sans text-xs font-bold text-secondary uppercase tracking-wider mb-1 md:mb-2">Ketersediaan</h4>
+            <p className="font-sans text-sm text-navy-steel font-medium text-left flex items-center justify-start gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              Sisa {product.stock} porsi/item
+            </p>
+          </div>
+        </div>
+      </section>
 
-                <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-                  Pilihan dari{" "}
-                  {merchant?.name ??
-                    "merchant ini"}
-                </h2>
-              </div>
+      
+      {relatedProducts.length > 0 && (
+        <section className="mx-auto max-w-[1200px] w-full px-4 py-8 sm:px-6 lg:px-10 mb-8 border-t border-arctic-blue md:border-none">
+          <div className="flex justify-between items-end mb-6">
+            <h2 className="font-heading text-xl md:text-2xl font-bold text-navy-steel">
+              Mungkin kamu juga suka
+            </h2>
+            <Link href={backHref} className="flex items-center gap-1 font-sans text-sm font-medium text-navy-steel hover:opacity-70 transition-opacity">
+              Lihat semua <ArrowRight className="size-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {relatedProducts.map((relatedProduct) => (
+              <ProductCard
+                key={relatedProduct.id}
+                product={relatedProduct}
+                merchantName={merchant?.name}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {relatedProducts.map(
-                  (
-                    relatedProduct,
-                  ) => (
-                    <ProductCard
-                      key={
-                        relatedProduct.id
-                      }
-                      product={
-                        relatedProduct
-                      }
-                      merchantName={
-                        merchant?.name
-                      }
-                    />
-                  ),
-                )}
-              </div>
-            </div>
-          </section>
-        )}
     </div>
   );
 }

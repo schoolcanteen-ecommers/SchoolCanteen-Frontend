@@ -27,9 +27,6 @@ export function StatusBadge({
         status === "READY" &&
           "bg-emerald-50 text-emerald-700",
 
-        status === "PICKED_UP" &&
-          "bg-cyan-50 text-cyan-700",
-
         status === "COMPLETED" &&
           "bg-slate-100 text-slate-700",
 

@@ -23,7 +23,6 @@ const orderFlow: OrderStatus[] = [
   "CONFIRMED",
   "PREPARING",
   "READY",
-  "PICKED_UP",
   "COMPLETED",
 ];
 
@@ -75,7 +74,7 @@ export function OrderTimeline({
               key={timelineStatus}
               className="relative flex gap-4"
             >
-              {}
+              
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
@@ -119,7 +118,7 @@ export function OrderTimeline({
                 )}
               </div>
 
-              {}
+              
               <div className="pb-8 pt-1">
                 <p
                   className={cn(

@@ -6,7 +6,7 @@ export type WithdrawalMethod =
 export type WithdrawalStatus =
   | "WAITING_APPROVAL"
   | "APPROVED"
-  | "PROCESSING"
+  | "PROCESSED"
   | "COMPLETED"
   | "REJECTED";
 

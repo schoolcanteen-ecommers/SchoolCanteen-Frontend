@@ -42,7 +42,6 @@ const ORDER_STATUS_SEQUENCE: OrderStatus[] = [
   "CONFIRMED",
   "PREPARING",
   "READY",
-  "PICKED_UP",
   "COMPLETED",
   "CANCELLED",
 ];
@@ -162,7 +161,7 @@ export function AdminReportOverview({
 
   return (
     <>
-      {}
+      
       <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Pesanan"
@@ -195,9 +194,9 @@ export function AdminReportOverview({
         />
       </section>
 
-      {}
+      
       <div className="mt-8 grid gap-6 xl:grid-cols-2">
-        {}
+        
         <section className="rounded-2xl border bg-background">
           <div className="border-b px-5 py-4 sm:px-6">
             <h2 className="font-semibold">
@@ -267,7 +266,7 @@ export function AdminReportOverview({
           </div>
         </section>
 
-        {}
+        
         <section className="rounded-2xl border bg-background">
           <div className="border-b px-5 py-4 sm:px-6">
             <h2 className="font-semibold">
@@ -343,7 +342,7 @@ export function AdminReportOverview({
         </section>
       </div>
 
-      {}
+      
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -432,7 +431,7 @@ export function AdminReportOverview({
         </div>
       </section>
 
-      {}
+      
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">
@@ -447,7 +446,7 @@ export function AdminReportOverview({
         {sortedTransactions.length >
         0 ? (
           <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
-            {}
+            
             <div className="hidden grid-cols-[160px_minmax(180px,1fr)_130px_150px_150px] gap-4 border-b bg-muted/30 px-5 py-3 text-xs font-medium text-muted-foreground lg:grid">
               <span>Order</span>
               <span>Siswa</span>
@@ -480,7 +479,7 @@ export function AdminReportOverview({
                       key={order.id}
                       className="p-5"
                     >
-                      {}
+                      
                       <div className="hidden grid-cols-[160px_minmax(180px,1fr)_130px_150px_150px] items-center gap-4 lg:grid">
                         <p className="truncate text-sm font-semibold">
                           {
@@ -523,7 +522,7 @@ export function AdminReportOverview({
                         </p>
                       </div>
 
-                      {}
+                      
                       <div className="lg:hidden">
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">

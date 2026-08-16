@@ -59,7 +59,6 @@ export const ORDER_STATUS_LABEL: Record<
   CONFIRMED: "Dikonfirmasi",
   PREPARING: "Sedang Diproses",
   READY: "Siap Diambil",
-  PICKED_UP: "Sudah Diambil",
   COMPLETED: "Selesai",
   CANCELLED: "Dibatalkan",
 };

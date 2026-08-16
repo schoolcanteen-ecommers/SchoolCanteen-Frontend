@@ -1,33 +1,24 @@
-import {
-  GraduationCap,
-  Phone,
-  Users,
-} from "lucide-react";
+import { GraduationCap, Phone, Users } from "lucide-react";
 
 import { StatCard } from "@/components/dashboard/stat-card";
+
 import { PageHeader } from "@/components/shared/page-header";
 
 import { AdminStudentList } from "@/features/students/components/admin-student-list";
 
-import { adminStudentPreviews } from "@/mocks/students";
+import { getAdminStudents } from "@/lib/api/admin-students";
 
-export default function AdminStudentsPage() {
-  const totalStudents =
-    adminStudentPreviews.length;
+export default async function AdminStudentsPage() {
+  const students = await getAdminStudents();
 
-  const totalClasses =
-    new Set(
-      adminStudentPreviews.map(
-        ({ student }) =>
-          student.className,
-      ),
-    ).size;
+  const totalStudents = students.length;
 
-  const studentsWithPhone =
-    adminStudentPreviews.filter(
-      ({ user }) =>
-        Boolean(user.phone),
-    ).length;
+  const totalClasses = new Set(students.map(({ student }) => student.className))
+    .size;
+
+  const studentsWithPhone = students.filter(({ user }) =>
+    Boolean(user.phone),
+  ).length;
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
@@ -59,11 +50,7 @@ export default function AdminStudentsPage() {
         />
       </section>
 
-      <AdminStudentList
-        students={
-          adminStudentPreviews
-        }
-      />
+      <AdminStudentList students={students} />
     </div>
   );
 }

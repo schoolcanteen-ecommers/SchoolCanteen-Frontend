@@ -1,9 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import {
-  ArrowRight,
-  ImageIcon,
-  Package,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ImageIcon, Plus } from "lucide-react";
 
 import { cn, formatCurrency } from "@/lib/utils";
 import type { Product } from "@/types/product";
@@ -19,92 +18,76 @@ export function ProductCard({
   merchantName,
   className,
 }: ProductCardProps) {
-  const isAvailable =
-    product.isActive && product.stock > 0;
+  const pathname = usePathname() || "";
+  const isAvailable = product.isActive && product.stock > 0;
+
+ 
+  const isKantin = pathname.includes("kantin");
+  const isKoperasi = pathname.includes("koperasi");
+  const sourceQuery = isKantin ? "?source=kantin" : isKoperasi ? "?source=koperasi" : "";
+  const productUrl = `/produk/${product.id}${sourceQuery}`;
 
   return (
     <article
       className={cn(
-        "group overflow-hidden rounded-2xl border bg-background transition-all duration-200",
-        "hover:-translate-y-0.5 hover:shadow-md",
+        "group overflow-hidden rounded-[16px] border border-arctic-blue bg-white shadow-sm transition-all duration-200",
+        "hover:-translate-y-1 hover:shadow-ambient-drift",
         className,
       )}
     >
-      {}
       <Link
-        href={`/produk/${product.id}`}
-        className="relative block aspect-[4/3] overflow-hidden bg-muted"
+        href={productUrl}
+        className="relative block h-40 w-full overflow-hidden bg-neutral-surface"
       >
         {product.imageUrl ? (
-         
-         
-         
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="flex size-full items-center justify-center">
             <ImageIcon className="size-9 text-muted-foreground/40" />
           </div>
         )}
+      </Link>
 
-        {}
-        <div className="absolute left-3 top-3">
+      <div className="p-5 flex flex-col h-[calc(100%-10rem)]">
+        <div className="mb-2">
           {isAvailable ? (
-            <span className="inline-flex items-center rounded-full bg-background/90 px-2.5 py-1 text-[11px] font-medium shadow-sm backdrop-blur">
+            <span className="inline-block rounded bg-arctic-blue px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-navy-steel">
               Tersedia
             </span>
           ) : (
-            <span className="inline-flex items-center rounded-full bg-destructive px-2.5 py-1 text-[11px] font-medium text-destructive-foreground shadow-sm">
+            <span className="inline-block rounded bg-destructive/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-destructive">
               Habis
             </span>
           )}
         </div>
-      </Link>
 
-      {}
-      <div className="p-4">
+        <Link href={productUrl}>
+          <h4 className="line-clamp-2 font-heading text-lg font-bold text-navy-steel transition-colors group-hover:opacity-80 sm:text-xl">
+            {product.name}
+          </h4>
+        </Link>
+
         {merchantName && (
-          <p className="mb-1 truncate text-xs font-medium text-muted-foreground">
+          <p className="mb-3 mt-1 truncate text-sm text-muted-foreground">
             {merchantName}
           </p>
         )}
 
-        <Link href={`/produk/${product.id}`}>
-          <h3 className="line-clamp-2 text-base font-semibold tracking-tight transition-colors group-hover:text-primary">
-            {product.name}
-          </h3>
-        </Link>
-
-        {product.description && (
-          <p className="mt-1.5 line-clamp-2 min-h-10 text-sm leading-5 text-muted-foreground">
-            {product.description}
-          </p>
-        )}
-
-        <div className="mt-4 flex items-end justify-between gap-3">
-          <div>
-            <p className="text-lg font-semibold text-foreground">
-              {formatCurrency(product.price)}
-            </p>
-
-            <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-              <Package className="size-3.5" />
-
-              <span>
-                Stok {product.stock}
-              </span>
-            </div>
-          </div>
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <span className="font-heading text-lg font-semibold text-navy-steel sm:text-xl">
+            {formatCurrency(product.price)}
+          </span>
 
           <Link
-            href={`/produk/${product.id}`}
+            href={productUrl}
             aria-label={`Lihat ${product.name}`}
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-transform group-hover:translate-x-0.5"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-navy-steel text-white shadow-md transition-transform hover:scale-105 active:scale-95 sm:size-12"
           >
-            <ArrowRight className="size-4" />
+            <Plus className="size-5 sm:size-6" />
           </Link>
         </div>
       </div>

@@ -111,7 +111,7 @@ export default async function StudentWalletPage() {
         title="Saku Wallet"
         description="Pantau saldo dan riwayat transaksi SchoolCanteen."
       />
-      {}
+      
       <section className="mt-8 overflow-hidden rounded-2xl border bg-background">
         <div className="p-6 sm:p-8">
           <div className="flex items-start justify-between gap-4">
@@ -140,7 +140,7 @@ export default async function StudentWalletPage() {
 
       <StudentTopUpCard walletIsActive={wallet.isActive} />
 
-      {}
+      
       <section className="mt-6 grid gap-4 sm:grid-cols-2">
         <StatCard
           title="Total Top Up"
@@ -157,7 +157,7 @@ export default async function StudentWalletPage() {
         />
       </section>
 
-      {}
+      
       <section className="mt-8">
         <div>
           <h2 className="text-lg font-semibold">Riwayat Transaksi</h2>
