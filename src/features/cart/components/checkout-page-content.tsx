@@ -5,26 +5,21 @@ import { useRouter } from "next/navigation";
 
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  CheckCircle2,
-  ChevronLeft,
-  ImageIcon,
-  ShoppingBag,
-  Store,
-  WalletCards,
-} from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 import { EmptyState } from "@/components/shared/empty-state";
-import { PageHeader } from "@/components/shared/page-header";
 
+import { CheckoutMobilePaymentBar } from "@/features/cart/components/checkout/checkout-mobile-payment-bar";
+import { CheckoutOrderSection } from "@/features/cart/components/checkout/checkout-order-section";
+import { CheckoutPaymentSummary } from "@/features/cart/components/checkout/checkout-payment-summary";
+import { CheckoutPickupSection } from "@/features/cart/components/checkout/checkout-pickup-section";
+import { CheckoutProgress } from "@/features/cart/components/checkout/checkout-progress";
 import { useCart } from "@/features/cart/use-cart";
 
 import { authenticatedApiRequest } from "@/lib/api/authenticated-client";
 import { getCartProduct } from "@/lib/api/catalog";
-
-import { formatCurrency } from "@/lib/utils";
 
 import type { CheckoutMerchantGroup } from "@/types/checkout";
 import type { Merchant } from "@/types/merchant";
@@ -93,6 +88,9 @@ export function CheckoutPageContent() {
   );
 
   const [wallet, setWallet] = useState<StudentWalletResponse | null>(null);
+  const [merchantNotes, setMerchantNotes] = useState<Record<string, string>>(
+    {},
+  );
 
   const [isResolving, setIsResolving] = useState(true);
   const [isLoadingWallet, setIsLoadingWallet] = useState(true);
@@ -172,13 +170,12 @@ export function CheckoutPageContent() {
       setWalletError(null);
 
       try {
-        const data =
-          await authenticatedApiRequest<StudentWalletResponse>(
-            "/student/wallet",
-            {
-              cache: "no-store",
-            },
-          );
+        const data = await authenticatedApiRequest<StudentWalletResponse>(
+          "/student/wallet",
+          {
+            cache: "no-store",
+          },
+        );
 
         if (cancelled) {
           return;
@@ -193,9 +190,7 @@ export function CheckoutPageContent() {
         setWallet(null);
 
         setWalletError(
-          error instanceof Error
-            ? error.message
-            : "Wallet gagal dimuat.",
+          error instanceof Error ? error.message : "Wallet gagal dimuat.",
         );
       } finally {
         if (!cancelled) {
@@ -259,9 +254,7 @@ export function CheckoutPageContent() {
   const walletBalance = wallet?.balance ?? 0;
 
   const hasEnoughBalance =
-    wallet !== null &&
-    wallet.is_active &&
-    walletBalance >= total;
+    wallet !== null && wallet.is_active && walletBalance >= total;
 
   const canSubmit =
     groups.length > 0 &&
@@ -270,6 +263,13 @@ export function CheckoutPageContent() {
     wallet.is_active &&
     hasEnoughBalance &&
     !isSubmitting;
+
+  function handleMerchantNoteChange(merchantId: string, value: string) {
+    setMerchantNotes((current) => ({
+      ...current,
+      [merchantId]: value,
+    }));
+  }
 
   async function handleSubmitOrder() {
     if (!canSubmit) {
@@ -283,6 +283,8 @@ export function CheckoutPageContent() {
 
     try {
       for (const group of groups) {
+        const note = merchantNotes[group.merchantId]?.trim();
+
         await authenticatedApiRequest<CreateOrderResponse>(
           "/student/orders",
           {
@@ -290,9 +292,6 @@ export function CheckoutPageContent() {
 
             body: {
               merchant_id: group.merchantId,
-
-             
-             
               pickup_slot_id: null,
 
               items: group.items.map(({ product, quantity }) => ({
@@ -300,7 +299,7 @@ export function CheckoutPageContent() {
                 quantity,
               })),
 
-              notes: null,
+              notes: note || null,
             },
           },
         );
@@ -332,16 +331,17 @@ export function CheckoutPageContent() {
 
   if (!isHydrated || isResolving) {
     return (
-      <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-        <div className="animate-pulse space-y-5">
-          <div className="h-8 w-48 rounded-lg bg-muted" />
-
-          <div className="h-4 w-80 max-w-full rounded bg-muted" />
+      <div className="mx-auto w-full max-w-[1200px] px-5 py-6 lg:px-10 lg:py-12">
+        <div className="animate-pulse">
+          <div className="h-10 w-44 rounded-lg bg-[#E6E8EA] lg:h-14 lg:w-56" />
+          <div className="mt-3 h-5 w-72 max-w-full rounded bg-[#E6E8EA]" />
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-            <div className="h-96 rounded-2xl bg-muted" />
-
-            <div className="h-72 rounded-2xl bg-muted" />
+            <div className="space-y-6">
+              <div className="h-80 rounded-2xl bg-white" />
+              <div className="h-40 rounded-2xl bg-white" />
+            </div>
+            <div className="h-96 rounded-[20px] bg-white" />
           </div>
         </div>
       </div>
@@ -350,7 +350,7 @@ export function CheckoutPageContent() {
 
   if (resolvedItems.length === 0) {
     return (
-      <div className="mx-auto flex min-h-[70vh] w-full max-w-[1200px] items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[70vh] w-full max-w-[1200px] items-center justify-center px-5 lg:px-10">
         <EmptyState
           icon={ShoppingBag}
           title="Tidak ada item untuk checkout"
@@ -366,238 +366,53 @@ export function CheckoutPageContent() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      <Link
-        href="/keranjang"
-        className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ChevronLeft className="size-4" />
-        Kembali ke Keranjang
-      </Link>
-
-      <div className="mt-5">
-        <PageHeader
-          title="Checkout"
-          description="Periksa kembali pesanan dan pastikan saldo wallet mencukupi sebelum melakukan pembayaran."
-        />
-      </div>
-
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="space-y-6">
-          {groups.map((group) => {
-            const isCanteen = group.merchantType === "CANTEEN";
-
-            const MerchantIcon = isCanteen ? Store : ShoppingBag;
-
-            return (
-              <section
-                key={group.merchantId}
-                className="overflow-hidden rounded-2xl border bg-background"
-              >
-                <div className="flex items-center justify-between gap-4 border-b px-5 py-4 sm:px-6">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                      <MerchantIcon className="size-5 text-primary" />
-                    </div>
-
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">
-                        {isCanteen ? "Kantin" : "Koperasi"}
-                      </p>
-
-                      <h2 className="truncate font-semibold">
-                        {group.merchantName}
-                      </h2>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 text-right">
-                    <p className="text-xs text-muted-foreground">Subtotal</p>
-
-                    <p className="mt-0.5 font-semibold">
-                      {formatCurrency(group.subtotal)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="divide-y">
-                  {group.items.map(({ product, quantity }) => (
-                    <article
-                      key={product.id}
-                      className="flex gap-4 px-5 py-4 sm:px-6"
-                    >
-                      <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
-                        {product.imageUrl ? (
-                          <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="size-full object-cover"
-                          />
-                        ) : (
-                          <ImageIcon className="size-6 text-muted-foreground/40" />
-                        )}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium">{product.name}</p>
-
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {formatCurrency(product.price)} × {quantity}
-                        </p>
-
-                        <p className="mt-2 text-sm font-semibold sm:hidden">
-                          {formatCurrency(product.price * quantity)}
-                        </p>
-                      </div>
-
-                      <p className="hidden shrink-0 font-semibold sm:block">
-                        {formatCurrency(product.price * quantity)}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-
-                <div className="border-t bg-muted/20 px-5 py-4 sm:px-6">
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    Waktu pengambilan akan tersedia setelah integrasi pickup
-                    slot selesai.
-                  </p>
-                </div>
-              </section>
-            );
-          })}
+    <div className="mx-auto w-full max-w-[1200px] px-5 pb-36 pt-6 lg:px-10 lg:pb-20 lg:pt-12">
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="font-heading text-[28px] font-bold leading-9 tracking-tight text-navy-steel lg:text-5xl lg:leading-[56px]">
+            Checkout
+          </h1>
+          <p className="mt-2 font-sans text-base text-[#536069] lg:text-lg">
+            Periksa pesananmu sebelum pembayaran.
+          </p>
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-24">
-          <section className="rounded-2xl border bg-background p-5">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                <WalletCards className="size-5 text-primary" />
-              </div>
+        <CheckoutProgress />
+      </div>
 
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">Saldo Wallet</p>
+      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="space-y-6 lg:space-y-8">
+          <CheckoutOrderSection
+            groups={groups}
+            notes={merchantNotes}
+            disabled={isSubmitting}
+            onNoteChange={handleMerchantNoteChange}
+          />
 
-                <p className="mt-0.5 text-xl font-semibold">
-                  {isLoadingWallet
-                    ? "Memuat..."
-                    : wallet
-                      ? formatCurrency(wallet.balance)
-                      : "-"}
-                </p>
-              </div>
-            </div>
+          <CheckoutPickupSection />
+        </div>
 
-            {walletError ? (
-              <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
-                <p className="text-sm font-medium text-destructive">
-                  Wallet gagal dimuat
-                </p>
-
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {walletError}
-                </p>
-              </div>
-            ) : wallet && !wallet.is_active ? (
-              <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
-                <p className="text-sm font-medium text-destructive">
-                  Wallet tidak aktif
-                </p>
-              </div>
-            ) : hasEnoughBalance ? (
-              <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2.5 text-xs font-medium text-emerald-700">
-                <CheckCircle2 className="size-4 shrink-0" />
-                Saldo mencukupi untuk pembayaran
-              </div>
-            ) : wallet ? (
-              <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
-                <p className="text-sm font-medium text-destructive">
-                  Saldo tidak mencukupi
-                </p>
-
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Kamu membutuhkan tambahan saldo sebesar{" "}
-                  <span className="font-medium text-foreground">
-                    {formatCurrency(Math.max(total - wallet.balance, 0))}
-                  </span>
-                  .
-                </p>
-
-                <Button
-                  nativeButton={false}
-                  variant="outline"
-                  size="sm"
-                  className="mt-3"
-                  render={<Link href="/student/wallet" />}
-                >
-                  Buka Wallet
-                </Button>
-              </div>
-            ) : null}
-          </section>
-
-          <section className="rounded-2xl border bg-background p-5">
-            <h2 className="text-lg font-semibold">Ringkasan Pembayaran</h2>
-
-            <div className="mt-5 space-y-3 text-sm">
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-muted-foreground">Jumlah merchant</span>
-
-                <span className="font-medium">{groups.length}</span>
-              </div>
-
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-muted-foreground">Subtotal</span>
-
-                <span className="font-medium">{formatCurrency(total)}</span>
-              </div>
-
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-muted-foreground">Biaya layanan</span>
-
-                <span className="font-medium">Rp0</span>
-              </div>
-
-              <div className="border-t pt-4">
-                <div className="flex items-end justify-between gap-4">
-                  <span className="font-semibold">Total Pembayaran</span>
-
-                  <span className="text-xl font-semibold text-primary">
-                    {formatCurrency(total)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {checkoutError ? (
-              <div className="mt-5 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
-                <p className="text-sm font-medium text-destructive">
-                  Checkout gagal
-                </p>
-
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {checkoutError}
-                </p>
-              </div>
-            ) : null}
-
-            <Button
-              type="button"
-              size="lg"
-              className="mt-6 w-full"
-              disabled={!canSubmit}
-              onClick={handleSubmitOrder}
-            >
-              {isSubmitting ? "Memproses Pesanan..." : "Bayar dengan Wallet"}
-            </Button>
-
-            <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-              Total pembayaran akan diverifikasi kembali oleh server saat
-              pesanan dibuat.
-            </p>
-          </section>
+        <aside className="lg:sticky lg:top-24">
+          <CheckoutPaymentSummary
+            total={total}
+            walletBalance={wallet?.balance ?? null}
+            isLoadingWallet={isLoadingWallet}
+            walletIsActive={wallet?.is_active ?? false}
+            hasEnoughBalance={hasEnoughBalance}
+            walletError={walletError}
+            checkoutError={checkoutError}
+            canSubmit={canSubmit}
+            isSubmitting={isSubmitting}
+            onSubmit={handleSubmitOrder}
+          />
         </aside>
       </div>
+
+      <CheckoutMobilePaymentBar
+        canSubmit={canSubmit}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmitOrder}
+      />
     </div>
   );
 }

@@ -1,196 +1,286 @@
-import Link from "next/link";
+import {
+  StudentActiveOrder,
+} from "@/features/students/components/dashboard/student-active-order";
+import {
+  StudentDashboardHero,
+} from "@/features/students/components/dashboard/student-dashboard-hero";
+import {
+  StudentDashboardWallet,
+} from "@/features/students/components/dashboard/student-dashboard-wallet";
+import {
+  StudentQuickAccess,
+} from "@/features/students/components/dashboard/student-quick-access";
+import {
+  StudentRecentActivity,
+} from "@/features/students/components/dashboard/student-recent-activity";
+import {
+  StudentReorderSection,
+  type StudentReorderItem,
+} from "@/features/students/components/dashboard/student-reorder-section";
 
 import {
-  CheckCircle2,
-  Clock3,
-  ShoppingBag,
-  Store,
-  WalletCards,
-} from "lucide-react";
-
-import { StatCard } from "@/components/dashboard/stat-card";
-import { PageHeader } from "@/components/shared/page-header";
-import { Button } from "@/components/ui/button";
-
+  getCartProduct,
+} from "@/lib/api/catalog";
 import {
   getStudentDashboard,
 } from "@/lib/api/student-dashboard";
+import {
+  getStudentOrders,
+  type StudentOrderData,
+} from "@/lib/api/student-orders";
+import {
+  getStudentProfile,
+} from "@/lib/api/student-profile";
+import {
+  getStudentWalletTransactions,
+} from "@/lib/api/student-wallet";
 
-import { formatCurrency } from "@/lib/utils";
+function sortOrdersNewest(
+  orders: StudentOrderData[],
+): StudentOrderData[] {
+  return [...orders].sort(
+    (left, right) =>
+      new Date(
+        right.order.createdAt,
+      ).getTime() -
+      new Date(
+        left.order.createdAt,
+      ).getTime(),
+  );
+}
+
+function getReorderItems(
+  orders: StudentOrderData[],
+): StudentReorderItem[] {
+  const items: StudentReorderItem[] = [];
+  const seenProductIds = new Set<string>();
+
+  for (const orderData of orders) {
+    for (const item of orderData.items) {
+      if (
+        !item.productId ||
+        seenProductIds.has(
+          item.productId,
+        )
+      ) {
+        continue;
+      }
+
+      seenProductIds.add(
+        item.productId,
+      );
+
+      items.push({
+        productId:
+          item.productId,
+        productName:
+          item.productName,
+        imageUrl:
+          item.imageUrl ?? null,
+        merchantName:
+          orderData.merchantName,
+        price:
+          item.price,
+      });
+
+      if (items.length === 4) {
+        return items;
+      }
+    }
+  }
+
+  return items;
+}
+
+
+async function getProductImageFallbacks(
+  productIds: string[],
+): Promise<Map<string, string | null>> {
+  const uniqueProductIds =
+    Array.from(
+      new Set(
+        productIds.filter(Boolean),
+      ),
+    );
+
+  const entries =
+    await Promise.all(
+      uniqueProductIds.map(
+        async (productId) => {
+          try {
+            const { product } =
+              await getCartProduct(
+                productId,
+              );
+
+            return [
+              productId,
+              product.imageUrl ?? null,
+            ] as const;
+          } catch {
+            return [
+              productId,
+              null,
+            ] as const;
+          }
+        },
+      ),
+    );
+
+  return new Map(entries);
+}
 
 export default async function StudentDashboardPage() {
-  const dashboard =
-    await getStudentDashboard();
+  const [
+    profile,
+    dashboard,
+  ] = await Promise.all([
+    getStudentProfile(),
+    getStudentDashboard(),
+  ]);
+
+  const [
+    orders,
+    walletTransactions,
+  ] = await Promise.all([
+    getStudentOrders(
+      profile.id,
+    ),
+    getStudentWalletTransactions(
+      dashboard.wallet.id,
+    ),
+  ]);
+
+  const sortedOrders =
+    sortOrdersNewest(
+      orders,
+    );
+
+  const activeOrders =
+    sortedOrders.filter(
+      ({ order }) =>
+        order.status !==
+          "COMPLETED" &&
+        order.status !==
+          "CANCELLED",
+    );
+
+  const activeOrder =
+    activeOrders[0] ?? null;
+
+  const rawReorderItems =
+    getReorderItems(
+      sortedOrders,
+    );
+
+  const fallbackProductIds = [
+    ...(activeOrder?.items[0] &&
+    !activeOrder.items[0]
+      .imageUrl
+      ? [
+          activeOrder.items[0]
+            .productId,
+        ]
+      : []),
+    ...rawReorderItems
+      .filter(
+        (item) =>
+          !item.imageUrl,
+      )
+      .map(
+        (item) =>
+          item.productId,
+      ),
+  ];
+
+  const productImageFallbacks =
+    await getProductImageFallbacks(
+      fallbackProductIds,
+    );
+
+  const activeOrderWithImage =
+    activeOrder?.items[0] &&
+    !activeOrder.items[0]
+      .imageUrl
+      ? {
+          ...activeOrder,
+          items:
+            activeOrder.items.map(
+              (item, index) =>
+                index === 0
+                  ? {
+                      ...item,
+                      imageUrl:
+                        productImageFallbacks.get(
+                          item.productId,
+                        ) ?? null,
+                    }
+                  : item,
+            ),
+        }
+      : activeOrder;
+
+  const reorderItems =
+    rawReorderItems.map(
+      (item) =>
+        item.imageUrl
+          ? item
+          : {
+              ...item,
+              imageUrl:
+                productImageFallbacks.get(
+                  item.productId,
+                ) ?? null,
+            },
+    );
+
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      
-      <PageHeader
-        title="Dashboard Siswa"
-        description="Akses kantin, koperasi, pesanan, dan wallet kamu dari satu tempat."
+    <div className="mx-auto w-full max-w-[1240px] px-5 pb-10 pt-7 sm:px-6 lg:px-8 lg:pb-20 lg:pt-12">
+      <StudentDashboardHero
+        name={profile.name}
       />
 
-      
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          title="Pesanan Aktif"
-          value={dashboard.activeOrders}
-          description="Pesanan yang sedang berjalan"
-          icon={Clock3}
+      <section className="mt-8 grid gap-6 lg:mt-12 lg:grid-cols-12 lg:items-start lg:gap-6">
+        <StudentDashboardWallet
+          balance={
+            dashboard.wallet
+              .balance
+          }
+          className="lg:col-span-8 lg:row-start-1"
         />
 
-        <StatCard
-          title="Pesanan Selesai"
-          value={dashboard.completedOrders}
-          description="Total pesanan yang telah selesai"
-          icon={CheckCircle2}
+        <StudentActiveOrder
+          activeOrder={
+            activeOrderWithImage
+          }
+          additionalOrderCount={
+            Math.max(
+              activeOrders.length -
+                1,
+              0,
+            )
+          }
+          className="lg:col-span-8 lg:row-start-2"
         />
 
-        <StatCard
-          title="Saldo Wallet"
-          value={formatCurrency(
-            dashboard.wallet.balance,
-          )}
-          description="Saldo yang tersedia"
-          icon={WalletCards}
+        <StudentQuickAccess
+          className="lg:col-span-4 lg:col-start-9 lg:row-start-1"
         />
-      </section>
 
-      
-      <section className="mt-8">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">
-            Layanan Sekolah
-          </h2>
+        <StudentRecentActivity
+          transactions={
+            walletTransactions.slice(
+              0,
+              3,
+            )
+          }
+          className="lg:col-span-4 lg:col-start-9 lg:row-start-2 lg:row-span-2"
+        />
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            Pilih layanan yang ingin kamu gunakan.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          
-          <div className="rounded-2xl border bg-background p-6">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
-              <Store className="size-5 text-primary" />
-            </div>
-
-            <p className="mt-5 text-sm font-medium text-primary">
-              Kantin Digital
-            </p>
-
-            <h3 className="mt-2 text-xl font-semibold">
-              Pesan makanan tanpa antre
-            </h3>
-
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Pilih makanan atau minuman dari kantin
-              sekolah dan pesan sebelum waktu
-              istirahat.
-            </p>
-
-            <Button
-              nativeButton={false}
-              className="mt-5"
-              render={<Link href="/kantin" />}
-            >
-              Lihat Kantin
-            </Button>
-          </div>
-
-          
-          <div className="rounded-2xl border bg-background p-6">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
-              <ShoppingBag className="size-5 text-primary" />
-            </div>
-
-            <p className="mt-5 text-sm font-medium text-primary">
-              Koperasi Sekolah
-            </p>
-
-            <h3 className="mt-2 text-xl font-semibold">
-              Kebutuhan sekolah lebih mudah
-            </h3>
-
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Temukan alat tulis, buku, dan
-              perlengkapan sekolah langsung dari
-              koperasi.
-            </p>
-
-            <Button
-              nativeButton={false}
-              variant="outline"
-              className="mt-5"
-              render={<Link href="/koperasi" />}
-            >
-              Lihat Koperasi
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      
-      <section className="mt-8 grid gap-4 lg:grid-cols-2">
-        
-        <div className="flex flex-col justify-between rounded-2xl border bg-background p-6 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              Pesanan
-            </p>
-
-            <h2 className="mt-1 text-lg font-semibold">
-              Pantau pesanan kamu
-            </h2>
-
-            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Lihat pesanan yang sedang diproses,
-              siap diambil, maupun yang sudah
-              selesai.
-            </p>
-          </div>
-
-          <Button
-            nativeButton={false}
-            variant="outline"
-            className="mt-5 sm:mt-0"
-            render={
-              <Link href="/student/orders" />
-            }
-          >
-            Lihat Pesanan
-          </Button>
-        </div>
-
-        
-        <div className="flex flex-col justify-between rounded-2xl border bg-background p-6 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              Wallet
-            </p>
-
-            <p className="mt-1 text-2xl font-semibold">
-              {formatCurrency(
-                dashboard.wallet.balance,
-              )}
-            </p>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              Saldo sementara untuk transaksi
-              SchoolCanteen.
-            </p>
-          </div>
-
-          <Button
-            nativeButton={false}
-            variant="outline"
-            className="mt-5 sm:mt-0"
-            render={
-              <Link href="/student/wallet" />
-            }
-          >
-            Buka Wallet
-          </Button>
-        </div>
+        <StudentReorderSection
+          items={reorderItems}
+          className="lg:col-span-8 lg:row-start-3"
+        />
       </section>
     </div>
   );

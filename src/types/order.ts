@@ -38,6 +38,7 @@ export interface OrderItem {
   productId: string;
 
   productName: string;
+  imageUrl?: string | null;
 
   quantity: number;
   price: number;

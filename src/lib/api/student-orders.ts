@@ -1,6 +1,10 @@
 import { authenticatedServerApiRequest } from "@/lib/api/authenticated-server";
 
 import type {
+  MerchantType,
+} from "@/types/merchant";
+
+import type {
   Order,
   OrderItem,
   OrderStatus,
@@ -10,17 +14,25 @@ import type {
 export interface StudentOrderData {
   order: Order;
   merchantName: string;
+  merchantType: MerchantType;
+  pickupEndTime: string | null;
+  notes: string | null;
+  paymentHeldAt: string | null;
+  timeline: {
+    confirmedAt: string | null;
+    preparingAt: string | null;
+    readyAt: string | null;
+    completedAt: string | null;
+    cancelledAt: string | null;
+  };
   items: OrderItem[];
-}
-
-interface ApiStudentOrderSummary {
-  id: string;
 }
 
 interface ApiStudentOrderItem {
   id: string;
   product_id: string | null;
   product_name: string;
+  product_image_url: string | null;
   unit_price: number;
   quantity: number;
   subtotal: number;
@@ -36,7 +48,7 @@ interface ApiStudentOrderDetail {
   merchant: {
     id: string;
     name: string;
-    type: string;
+    type: "canteen" | "cooperative";
     logo_url: string | null;
   };
 
@@ -167,6 +179,33 @@ function mapStudentOrder(
 
     merchantName: data.merchant.name,
 
+    merchantType:
+      data.merchant.type === "canteen"
+        ? "CANTEEN"
+        : "COOPERATIVE",
+
+    pickupEndTime: formatPickupTime(
+      data.pickup_slot?.end_at,
+    ),
+
+    notes: data.notes,
+
+    paymentHeldAt:
+      data.escrow?.held_at ?? null,
+
+    timeline: {
+      confirmedAt:
+        data.timeline.confirmed_at,
+      preparingAt:
+        data.timeline.preparing_at,
+      readyAt:
+        data.timeline.ready_at,
+      completedAt:
+        data.timeline.completed_at,
+      cancelledAt:
+        data.timeline.cancelled_at,
+    },
+
     items: data.items.map((item) => ({
       id: item.id,
 
@@ -177,6 +216,9 @@ function mapStudentOrder(
 
       productName:
         item.product_name,
+
+      imageUrl:
+        item.product_image_url,
 
       quantity:
         item.quantity,
@@ -213,7 +255,7 @@ export async function getStudentOrders(
 ): Promise<StudentOrderData[]> {
   const orders =
     await authenticatedServerApiRequest<
-      ApiStudentOrderSummary[]
+      ApiStudentOrderDetail[]
     >(
       "/student/orders",
       {
@@ -221,12 +263,11 @@ export async function getStudentOrders(
       },
     );
 
-  return Promise.all(
-    orders.map(({ id }) =>
-      getStudentOrderDetail(
-        id,
+  return orders.map(
+    (order) =>
+      mapStudentOrder(
+        order,
         userId,
       ),
-    ),
   );
 }

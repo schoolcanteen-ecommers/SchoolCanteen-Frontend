@@ -418,42 +418,35 @@ export function StudentTopUpCard({
     isSynchronizing;
 
   return (
-    <section className="mt-6 overflow-hidden rounded-2xl border bg-background">
-      <div className="p-5 sm:p-6">
+    <section className="overflow-hidden rounded-[18px] border border-[#DCE5ED] bg-white shadow-[0_12px_32px_rgba(13,27,42,0.04)]">
+      <div className="p-5 sm:p-6 md:p-7">
         <div className="flex items-start gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-            <CircleDollarSign className="size-5 text-primary" />
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#E6F4FF] text-[#0D1B2A]">
+            <CircleDollarSign className="size-5" />
           </div>
 
           <div>
-            <h2 className="font-semibold">
+            <h2 className="font-sans text-lg font-semibold text-[#191C1E]">
               Top Up Saldo
             </h2>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Tambahkan saldo wallet
-              menggunakan pembayaran
-              Midtrans.
+            <p className="mt-1 text-sm text-[#536069]">
+              Tambahkan saldo wallet menggunakan pembayaran Midtrans.
             </p>
           </div>
         </div>
 
-        <form
-          onSubmit={
-            handleSubmit
-          }
-          className="mt-5"
-        >
+        <form onSubmit={handleSubmit} className="mt-5">
           <label
             htmlFor="topup-amount"
-            className="text-sm font-medium"
+            className="text-sm font-semibold text-[#191C1E]"
           >
             Nominal Top Up
           </label>
 
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-[#536069]">
                 Rp
               </span>
 
@@ -463,31 +456,18 @@ export function StudentTopUpCard({
                 min={1}
                 step={1}
                 inputMode="numeric"
-                value={
-                  amount
-                }
-                onChange={(
-                  event,
-                ) =>
-                  setAmount(
-                    event.target
-                      .value,
-                  )
-                }
+                value={amount}
+                onChange={(event) => setAmount(event.target.value)}
                 placeholder="50000"
-                disabled={
-                  disabled
-                }
-                className="h-10 w-full rounded-lg border bg-background pl-9 pr-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={disabled}
+                className="h-12 w-full rounded-xl border border-[#C4C6CC] bg-white pl-11 pr-4 text-sm text-[#191C1E] outline-none transition placeholder:text-[#74777D] focus:border-[#0D1B2A] focus:ring-2 focus:ring-[#0D1B2A]/10 disabled:cursor-not-allowed disabled:opacity-60"
               />
             </div>
 
             <Button
               type="submit"
-              disabled={
-                disabled
-              }
-              className="sm:min-w-48"
+              disabled={disabled}
+              className="h-12 rounded-xl bg-[#0D1B2A] px-6 text-white hover:bg-[#162A3D] sm:min-w-52"
             >
               <CreditCard className="size-4" />
 
@@ -499,26 +479,18 @@ export function StudentTopUpCard({
             </Button>
           </div>
 
-          {amount &&
-            Number(amount) >
-              0 && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Nominal pembayaran:{" "}
-                <span className="font-medium text-foreground">
-                  {formatCurrency(
-                    Number(
-                      amount,
-                    ),
-                  )}
-                </span>
-              </p>
-            )}
+          {amount && Number(amount) > 0 && (
+            <p className="mt-2 text-xs text-[#536069]">
+              Nominal pembayaran:{" "}
+              <span className="font-semibold text-[#191C1E]">
+                {formatCurrency(Number(amount))}
+              </span>
+            </p>
+          )}
 
           {!walletIsActive && (
             <div className="mt-4 rounded-xl bg-red-50 px-3 py-2.5 text-xs font-medium text-red-700">
-              Wallet sedang tidak
-              aktif sehingga top up
-              tidak dapat dilakukan.
+              Wallet sedang tidak aktif sehingga top up tidak dapat dilakukan.
             </div>
           )}
 
@@ -529,7 +501,7 @@ export function StudentTopUpCard({
           )}
 
           {message && (
-            <div className="mt-4 rounded-xl bg-muted/50 px-3 py-2.5 text-xs font-medium text-muted-foreground">
+            <div className="mt-4 rounded-xl bg-[#F2F4F6] px-3 py-2.5 text-xs font-medium text-[#536069]">
               {message}
             </div>
           )}

@@ -1,32 +1,54 @@
 import {
-  BookOpen,
-  GraduationCap,
-  IdCard,
-  Phone,
-  ShieldCheck,
-  UserRound,
-} from "lucide-react";
-
+  StudentProfileEditProvider,
+} from "@/features/students/components/profile/student-profile-edit-provider";
 import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar";
-
+  StudentProfileHero,
+} from "@/features/students/components/profile/student-profile-hero";
 import {
-  PageHeader,
-} from "@/components/shared/page-header";
+  StudentProfileInformation,
+} from "@/features/students/components/profile/student-profile-information";
+import {
+  StudentProfileLogoutButton,
+} from "@/features/students/components/profile/student-profile-logout-button";
+import {
+  StudentProfileSettings,
+} from "@/features/students/components/profile/student-profile-settings";
+import {
+  StudentProfileWallet,
+} from "@/features/students/components/profile/student-profile-wallet";
 
 import {
   getStudentProfile,
 } from "@/lib/api/student-profile";
+import {
+  getStudentWallet,
+} from "@/lib/api/student-wallet";
+import {
+  createClient,
+} from "@/lib/supabase/server";
 
 export default async function StudentProfilePage() {
-  const profile =
-    await getStudentProfile();
+  const supabase =
+    await createClient();
+
+  const [
+    profile,
+    wallet,
+    authResult,
+  ] = await Promise.all([
+    getStudentProfile(),
+    getStudentWallet(),
+    supabase.auth.getUser(),
+  ]);
+
+  const email =
+    authResult.data.user?.email ??
+    null;
 
   const initials =
     profile.name
       .split(" ")
+      .filter(Boolean)
       .map((word) =>
         word.charAt(0),
       )
@@ -34,159 +56,64 @@ export default async function StudentProfilePage() {
       .slice(0, 2)
       .toUpperCase();
 
+  const className =
+    profile.studentProfile
+      ?.className ?? null;
+
+  const classDisplay =
+    className ?? "Belum tersedia";
+
   return (
-    <div className="mx-auto w-full max-w-[1000px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      
-      <PageHeader
-        title="Profil Siswa"
-        description="Informasi akun dan data siswa yang terdaftar di SchoolCanteen."
-      />
+    <div className="mx-auto w-full max-w-[1200px] px-4 pb-28 pt-4 sm:px-6 lg:px-10 lg:pb-16 lg:pt-14">
+      <StudentProfileEditProvider>
+        <header className="hidden lg:block">
+        <h1 className="font-heading text-5xl font-bold leading-[1.1] tracking-[-0.02em] text-navy-steel">
+          Profil Saya
+        </h1>
 
-      
-      <section className="mt-8 rounded-2xl border bg-background p-6 sm:p-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <Avatar className="size-20">
-            <AvatarFallback className="text-xl font-semibold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+        <p className="mt-3 text-lg text-[#536069]">
+          Kelola informasi akun dan pengaturan profil kamu.
+        </p>
+        </header>
 
-          <div className="min-w-0">
-            <h1 className="truncate text-2xl font-semibold tracking-tight">
-              {profile.name}
-            </h1>
+        <div className="lg:mt-16">
+        <StudentProfileHero
+          name={profile.name}
+          className={classDisplay}
+          avatarUrl={profile.avatarUrl}
+          initials={initials}
+        />
+        </div>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              {profile.studentProfile?.className ??
-                "Belum tersedia"}
-            </p>
+        <div className="mt-6 grid items-start gap-6 lg:mt-12 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <StudentProfileInformation
+            name={profile.name}
+            nis={
+              profile.studentProfile
+                ?.nis ?? null
+            }
+            className={className}
+            email={email}
+            phone={profile.phone}
+          />
+        </div>
 
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
-              <ShieldCheck className="size-3.5" />
+        <div className="lg:col-span-4 lg:col-start-9 lg:row-start-1">
+          <StudentProfileWallet
+            balance={wallet.balance}
+          />
+        </div>
 
-              Siswa
-            </div>
+        <div className="flex flex-col gap-6 lg:col-span-8 lg:row-start-2">
+          <StudentProfileSettings />
+
+          <div className="border-t border-[#E0E3E5] pt-6 lg:pt-10">
+            <StudentProfileLogoutButton />
           </div>
         </div>
-      </section>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        
-        <section className="rounded-2xl border bg-background">
-          <div className="border-b px-5 py-4 sm:px-6">
-            <div className="flex items-center gap-2">
-              <UserRound className="size-4 text-primary" />
-
-              <h2 className="font-semibold">
-                Informasi Akun
-              </h2>
-            </div>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Data dasar akun pengguna.
-            </p>
-          </div>
-
-          <div className="divide-y">
-            
-            <div className="px-5 py-4 sm:px-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Nama Lengkap
-              </p>
-
-              <p className="mt-1.5 text-sm font-medium">
-                {profile.name}
-              </p>
-            </div>
-
-            
-            <div className="px-5 py-4 sm:px-6">
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                <Phone className="size-3.5" />
-
-                Nomor Telepon
-              </div>
-
-              <p className="mt-1.5 text-sm font-medium">
-                {profile.phone ??
-                  "Belum tersedia"}
-              </p>
-            </div>
-
-            
-            <div className="px-5 py-4 sm:px-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Role
-              </p>
-
-              <p className="mt-1.5 text-sm font-medium">
-                Siswa
-              </p>
-            </div>
-          </div>
-        </section>
-
-        
-        <section className="rounded-2xl border bg-background">
-          <div className="border-b px-5 py-4 sm:px-6">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="size-4 text-primary" />
-
-              <h2 className="font-semibold">
-                Informasi Siswa
-              </h2>
-            </div>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Informasi akademik siswa.
-            </p>
-          </div>
-
-          <div className="divide-y">
-            
-            <div className="px-5 py-4 sm:px-6">
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                <IdCard className="size-3.5" />
-
-                NIS
-              </div>
-
-              <p className="mt-1.5 text-sm font-medium">
-                {profile.studentProfile?.nis ??
-                  "Belum tersedia"}
-              </p>
-            </div>
-
-            
-            <div className="px-5 py-4 sm:px-6">
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                <GraduationCap className="size-3.5" />
-
-                Kelas
-              </div>
-
-              <p className="mt-1.5 text-sm font-medium">
-                {profile.studentProfile?.className ??
-                "Belum tersedia"}
-              </p>
-            </div>
-
-            
-            <div className="px-5 py-4 sm:px-6">
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                <BookOpen className="size-3.5" />
-
-                Jurusan
-              </div>
-
-              <p className="mt-1.5 text-sm font-medium">
-                {profile.studentProfile?.major ??
-                  "Belum tersedia"}
-              </p>
-            </div>
-          </div>
-        </section>
       </div>
+      </StudentProfileEditProvider>
     </div>
   );
 }
