@@ -1,8 +1,6 @@
-import { authenticatedServerApiRequest } from "@/lib/api/authenticated-server";
-
-import type { UserProfile } from "@/types/profile";
-
-import type { StudentProfile } from "@/types/user";
+import {
+  authenticatedServerApiRequest,
+} from "@/lib/api/authenticated-server";
 
 interface ApiAdminStudent {
   id: string;
@@ -12,8 +10,8 @@ interface ApiAdminStudent {
   avatar_url: string | null;
 
   student_profile: {
-    nis: string;
-    class: string;
+    nis: string | null;
+    class: string | null;
     major: string | null;
   } | null;
 
@@ -30,62 +28,206 @@ interface ApiAdminStudent {
 }
 
 export interface AdminStudentData {
-  user: UserProfile;
-  student: StudentProfile;
+  id: string;
+  name: string;
+  phone: string | null;
+  avatarUrl: string | null;
+
+  nis: string | null;
+  className: string | null;
+  major: string | null;
+
+  walletBalance: number | null;
+  walletIsActive: boolean | null;
+
+  ordersCount: number;
+  createdAt: string | null;
 }
 
-function mapAdminStudent(student: ApiAdminStudent): AdminStudentData | null {
-  if (!student.student_profile) {
-    return null;
-  }
+export interface AdminStudentFilters {
+  page?: number;
+  search?: string;
+  className?: string;
+  major?: string;
+}
 
+export interface AdminStudentsPageData {
+  students: AdminStudentData[];
+  page: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface AdminStudentMonitoringStats {
+  activeWallets: number;
+}
+
+const ADMIN_STUDENT_PAGE_SIZE = 20;
+
+function mapAdminStudent(
+  student: ApiAdminStudent,
+): AdminStudentData {
   return {
-    user: {
-      id: student.id,
+    id: student.id,
+    name: student.name,
+    phone: student.phone,
+    avatarUrl: student.avatar_url,
 
-      name: student.name,
+    nis:
+      student.student_profile?.nis ??
+      null,
+    className:
+      student.student_profile?.class ??
+      null,
+    major:
+      student.student_profile?.major ??
+      null,
 
-      phone: student.phone,
+    walletBalance:
+      student.wallet?.balance ?? null,
+    walletIsActive:
+      student.wallet?.is_active ?? null,
 
-      avatar_url: student.avatar_url,
-
-      role: "student",
-    },
-
-    student: {
-      id: student.id,
-
-      userId: student.id,
-
-      nis: student.student_profile.nis,
-
-      className: student.student_profile.class,
-
-      major: student.student_profile.major,
-    },
+    ordersCount:
+      student.orders_count,
+    createdAt:
+      student.created_at,
   };
 }
 
-export async function getAdminStudents(): Promise<AdminStudentData[]> {
-  const students: AdminStudentData[] = [];
+function buildAdminStudentQuery({
+  page = 1,
+  search,
+  className,
+  major,
+}: AdminStudentFilters): string {
+  const params =
+    new URLSearchParams();
 
-  const pageSize = 20;
+  params.set(
+    "page",
+    String(Math.max(1, page)),
+  );
 
-  for (let page = 1; ; page += 1) {
-    const apiStudents = await authenticatedServerApiRequest<ApiAdminStudent[]>(
-      `/admin/students?page=${page}`,
+  if (search?.trim()) {
+    params.set(
+      "search",
+      search.trim(),
     );
-
-    students.push(
-      ...apiStudents
-        .map(mapAdminStudent)
-        .filter((student): student is AdminStudentData => student !== null),
-    );
-
-    if (apiStudents.length < pageSize) {
-      break;
-    }
   }
 
-  return students;
+  if (className?.trim()) {
+    params.set(
+      "class",
+      className.trim(),
+    );
+  }
+
+  if (major?.trim()) {
+    params.set(
+      "major",
+      major.trim(),
+    );
+  }
+
+  return params.toString();
+}
+
+async function getAdminStudentApiPage(
+  filters: AdminStudentFilters,
+): Promise<ApiAdminStudent[]> {
+  const query =
+    buildAdminStudentQuery(
+      filters,
+    );
+
+  return authenticatedServerApiRequest<ApiAdminStudent[]>(
+    `/admin/students?${query}`,
+  );
+}
+
+export async function getAdminStudentDetail(
+  studentId: string,
+): Promise<AdminStudentData> {
+  const student =
+    await authenticatedServerApiRequest<ApiAdminStudent>(
+      `/admin/students/${studentId}`,
+    );
+
+  return mapAdminStudent(
+    student,
+  );
+}
+
+export async function getAdminStudentsPage(
+  filters: AdminStudentFilters = {},
+): Promise<AdminStudentsPageData> {
+  const page = Math.max(
+    1,
+    filters.page ?? 1,
+  );
+
+  const apiStudents =
+    await getAdminStudentApiPage({
+      ...filters,
+      page,
+    });
+
+  let hasNextPage = false;
+
+  if (
+    apiStudents.length ===
+    ADMIN_STUDENT_PAGE_SIZE
+  ) {
+    const nextPage =
+      await getAdminStudentApiPage({
+        ...filters,
+        page: page + 1,
+      });
+
+    hasNextPage =
+      nextPage.length > 0;
+  }
+
+  return {
+    students:
+      apiStudents.map(
+        mapAdminStudent,
+      ),
+    page,
+    hasPreviousPage: page > 1,
+    hasNextPage,
+  };
+}
+
+export async function getAdminStudentMonitoringStats(): Promise<AdminStudentMonitoringStats> {
+  let page = 1;
+  let activeWallets = 0;
+
+  for (;;) {
+    const students =
+      await getAdminStudentApiPage({
+        page,
+      });
+
+    activeWallets +=
+      students.filter(
+        (student) =>
+          student.wallet?.is_active ===
+          true,
+      ).length;
+
+    if (
+      students.length <
+      ADMIN_STUDENT_PAGE_SIZE
+    ) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return {
+    activeWallets,
+  };
 }

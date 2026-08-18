@@ -1,21 +1,21 @@
-import { PageHeader } from "@/components/shared/page-header";
-
 import { AdminCanteenPickupList } from "@/features/canteen/components/admin-canteen-pickup-list";
 
-import { merchantOrders } from "@/mocks/orders";
-import { merchantPickups } from "@/mocks/pickup";
+import { adminPickupMonitoringEntries } from "@/mocks/admin-pickup-monitoring";
 
 export default function AdminCanteenPickupPage() {
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      <PageHeader
-        title="Pickup Verification"
-        description="Pantau proses dan status pengambilan pesanan siswa pada kantin."
-      />
+    <div className="mx-auto w-full max-w-[1320px] space-y-6 px-5 py-6 sm:px-6 md:space-y-8 lg:px-8 lg:py-8">
+      <section>
+        <h1 className="font-heading text-[30px] font-bold leading-tight text-navy-steel md:text-[32px]">
+          Pickup Monitoring
+        </h1>
+        <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#536069] md:mt-2 md:text-base">
+          Monitor status pengambilan pesanan kantin SchoolCanteen.
+        </p>
+      </section>
 
       <AdminCanteenPickupList
-        pickups={merchantPickups}
-        orders={merchantOrders}
+        entries={adminPickupMonitoringEntries}
       />
     </div>
   );

@@ -1,591 +1,838 @@
+import Link from "next/link";
+
 import {
-  Ban,
-  CircleDollarSign,
-  ClipboardCheck,
-  ClipboardList,
-  Clock3,
-  PackageCheck,
+  CalendarDays,
+  CheckCircle2,
+  ImageIcon,
   ReceiptText,
-  RotateCcw,
-  ShoppingBag,
   Store,
+  WalletCards,
 } from "lucide-react";
 
-import { StatCard } from "@/components/dashboard/stat-card";
-import { EmptyState } from "@/components/shared/empty-state";
-
 import {
-  ORDER_STATUS_LABEL,
-  PAYMENT_STATUS_LABEL,
-} from "@/lib/constants";
-
-import {
-  cn,
   formatCurrency,
 } from "@/lib/utils";
 
 import type {
-  Order,
-  OrderStatus,
-  PaymentStatus,
-} from "@/types/order";
+  AdminReportSummaryData,
+} from "@/lib/api/admin-dashboard";
+
+import {
+  adminReportPopularProducts,
+} from "@/mocks/admin-reports";
 
 interface AdminReportOverviewProps {
-  transactions: Array<{
-    order: Order;
-    customerName: string;
-  }>;
+  report: AdminReportSummaryData;
+  activeMerchants: number;
+  selectedRange:
+    | "today"
+    | "7d"
+    | "30d"
+    | "custom";
+  dateFrom: string;
+  dateTo: string;
 }
 
-const ORDER_STATUS_SEQUENCE: OrderStatus[] = [
-  "WAITING",
-  "CONFIRMED",
-  "PREPARING",
-  "READY",
-  "COMPLETED",
-  "CANCELLED",
-];
+interface StatusMetric {
+  label: string;
+  count: number;
+  barClassName: string;
+}
 
-const PAYMENT_STATUS_SEQUENCE: PaymentStatus[] = [
-  "HELD",
-  "RELEASED",
-  "REFUNDED",
-];
+const REPORT_LINKS = [
+  {
+    label: "Today",
+    value: "today",
+    href: "/admin/reports?range=today",
+  },
+  {
+    label: "7 Days",
+    value: "7d",
+    href: "/admin/reports?range=7d",
+  },
+  {
+    label: "30 Days",
+    value: "30d",
+    href: "/admin/reports?range=30d",
+  },
+] as const;
 
 export function AdminReportOverview({
-  transactions,
+  report,
+  activeMerchants,
+  selectedRange,
+  dateFrom,
+  dateTo,
 }: AdminReportOverviewProps) {
-  const totalOrders =
-    transactions.length;
+  const pendingOrders =
+    report.orders.waiting +
+    report.orders.confirmed;
 
-  const totalTransactionValue =
-    transactions.reduce(
-      (total, { order }) =>
-        total +
-        order.totalPrice,
-      0,
-    );
+  const statusMetrics: StatusMetric[] = [
+    {
+      label: "Completed",
+      count: report.orders.completed,
+      barClassName:
+        "bg-[#065F46]",
+    },
+    {
+      label: "Pending",
+      count: pendingOrders,
+      barClassName:
+        "bg-[#0D1B2A]",
+    },
+    {
+      label: "Preparing",
+      count: report.orders.preparing,
+      barClassName:
+        "bg-[#D6B58A]",
+    },
+    {
+      label: "Ready",
+      count: report.orders.ready,
+      barClassName:
+        "bg-[#B8DDF8]",
+    },
+    {
+      label: "Cancelled",
+      count: report.orders.cancelled,
+      barClassName:
+        "bg-[#BA1A1A]",
+    },
+  ];
 
-  const completedOrders =
-    transactions.filter(
-      ({ order }) =>
-        order.status === "COMPLETED",
-    ).length;
+  const merchantPerformance = [
+    ...report.merchantPerformance,
+  ].sort(
+    (a, b) =>
+      b.completedOrderValue -
+      a.completedOrderValue,
+  );
 
-  const cancelledOrders =
-    transactions.filter(
-      ({ order }) =>
-        order.status === "CANCELLED",
-    ).length;
+  const commerce =
+    report.merchantPerformance.reduce(
+      (summary, merchant) => {
+        if (
+          merchant.type ===
+          "CANTEEN"
+        ) {
+          summary.canteen +=
+            merchant.ordersCount;
+        } else {
+          summary.cooperative +=
+            merchant.ordersCount;
+        }
 
-  const orderStatusCounts =
-    new Map<OrderStatus, number>();
-
-  for (const status of ORDER_STATUS_SEQUENCE) {
-    orderStatusCounts.set(
-      status,
-      transactions.filter(
-        ({ order }) =>
-          order.status === status,
-      ).length,
-    );
-  }
-
-  const paymentSummaries =
-    PAYMENT_STATUS_SEQUENCE.map(
-      (status) => {
-        const matching =
-          transactions.filter(
-            ({ order }) =>
-              order.paymentStatus ===
-              status,
-          );
-
-        return {
-          status,
-          count: matching.length,
-
-          amount: matching.reduce(
-            (total, { order }) =>
-              total +
-              order.totalPrice,
-            0,
-          ),
-        };
+        return summary;
+      },
+      {
+        canteen: 0,
+        cooperative: 0,
       },
     );
 
-    const canteenOrders =
-    transactions.filter(
-      ({ order }) =>
-        order.orderCode.startsWith(
-          "SC-KTN-",
-        ),
-    );
+  const commerceTotal =
+    commerce.canteen +
+    commerce.cooperative;
 
-  const cooperativeOrders =
-    transactions.filter(
-      ({ order }) =>
-        order.orderCode.startsWith(
-          "SC-KOP-",
-        ),
-    );
+  const canteenPercentage =
+    commerceTotal > 0
+      ? Math.round(
+          (commerce.canteen /
+            commerceTotal) *
+            100,
+        )
+      : 0;
 
-  const canteenValue =
-    canteenOrders.reduce(
-      (total, { order }) =>
-        total +
-        order.totalPrice,
+  const cooperativePercentage =
+    Math.max(
       0,
+      100 - canteenPercentage,
     );
-
-  const cooperativeValue =
-    cooperativeOrders.reduce(
-      (total, { order }) =>
-        total +
-        order.totalPrice,
-      0,
-    );
-
-  const sortedTransactions = [
-    ...transactions,
-  ].sort(
-    (a, b) =>
-      new Date(
-        b.order.createdAt,
-      ).getTime() -
-      new Date(
-        a.order.createdAt,
-      ).getTime(),
-  );
 
   return (
-    <>
-      
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title="Total Pesanan"
-          value={totalOrders}
-          description="Pesanan dalam laporan"
-          icon={ClipboardList}
+    <div className="mx-auto w-full max-w-[1280px] px-5 py-8 md:px-6 lg:px-8 lg:py-10">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="font-heading text-[34px] font-bold leading-[1.12] tracking-[-0.02em] text-[#0D1B2A] md:text-[38px]">
+            Reports
+          </h1>
+
+          <p className="mt-2 max-w-2xl text-sm text-[#536069] md:text-base">
+            Ringkasan performa SchoolCanteen berdasarkan aktivitas transaksi.
+          </p>
+        </div>
+
+        <ReportPeriodFilter
+          selectedRange={
+            selectedRange
+          }
+          dateFrom={dateFrom}
+          dateTo={dateTo}
         />
-
-        <StatCard
-          title="Nilai Transaksi"
-          value={formatCurrency(
-            totalTransactionValue,
-          )}
-          description="Total nominal pesanan"
-          icon={CircleDollarSign}
-        />
-
-        <StatCard
-          title="Pesanan Selesai"
-          value={completedOrders}
-          description="Pesanan berstatus selesai"
-          icon={ClipboardCheck}
-        />
-
-        <StatCard
-          title="Pesanan Dibatalkan"
-          value={cancelledOrders}
-          description="Pesanan yang dibatalkan"
-          icon={Ban}
-        />
-      </section>
-
-      
-      <div className="mt-8 grid gap-6 xl:grid-cols-2">
-        
-        <section className="rounded-2xl border bg-background">
-          <div className="border-b px-5 py-4 sm:px-6">
-            <h2 className="font-semibold">
-              Ringkasan Status Pesanan
-            </h2>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Distribusi pesanan berdasarkan status operasional.
-            </p>
-          </div>
-
-          <div className="divide-y">
-            {ORDER_STATUS_SEQUENCE.map(
-              (status) => {
-                const count =
-                  orderStatusCounts.get(
-                    status,
-                  ) ?? 0;
-
-                const percentage =
-                  totalOrders > 0
-                    ? Math.round(
-                        (count /
-                          totalOrders) *
-                          100,
-                      )
-                    : 0;
-
-                return (
-                  <div
-                    key={status}
-                    className="px-5 py-4 sm:px-6"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-medium">
-                          {
-                            ORDER_STATUS_LABEL[
-                              status
-                            ]
-                          }
-                        </p>
-
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {percentage}% dari
-                          seluruh pesanan
-                        </p>
-                      </div>
-
-                      <p className="text-lg font-semibold">
-                        {count}
-                      </p>
-                    </div>
-
-                    <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary"
-                        style={{
-                          width: `${percentage}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                );
-              },
-            )}
-          </div>
-        </section>
-
-        
-        <section className="rounded-2xl border bg-background">
-          <div className="border-b px-5 py-4 sm:px-6">
-            <h2 className="font-semibold">
-              Ringkasan Pembayaran
-            </h2>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Rekap dana berdasarkan status pembayaran pesanan.
-            </p>
-          </div>
-
-          <div className="divide-y">
-            {paymentSummaries.map(
-              ({
-                status,
-                count,
-                amount,
-              }) => (
-                <div
-                  key={status}
-                  className="flex items-center gap-4 px-5 py-5 sm:px-6"
-                >
-                  <div
-                    className={cn(
-                      "flex size-11 shrink-0 items-center justify-center rounded-xl",
-
-                      status === "HELD" &&
-                        "bg-amber-50",
-
-                      status ===
-                        "RELEASED" &&
-                        "bg-emerald-50",
-
-                      status ===
-                        "REFUNDED" &&
-                        "bg-red-50",
-                    )}
-                  >
-                    {status ===
-                    "HELD" ? (
-                      <Clock3 className="size-5 text-amber-700" />
-                    ) : status ===
-                      "RELEASED" ? (
-                      <PackageCheck className="size-5 text-emerald-700" />
-                    ) : (
-                      <RotateCcw className="size-5 text-destructive" />
-                    )}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">
-                      {
-                        PAYMENT_STATUS_LABEL[
-                          status
-                        ]
-                      }
-                    </p>
-
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {count} transaksi
-                    </p>
-                  </div>
-
-                  <p className="shrink-0 font-semibold">
-                    {formatCurrency(
-                      amount,
-                    )}
-                  </p>
-                </div>
-              ),
-            )}
-          </div>
-        </section>
       </div>
 
-      
-      <section className="mt-8">
-        <div>
-          <h2 className="text-lg font-semibold">
-            Ringkasan Kanal Perdagangan
-          </h2>
+      <section className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+        <SummaryCard
+          label="Total Orders"
+          value={formatNumber(
+            report.orders.total,
+          )}
+          icon={ReceiptText}
+        />
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            Perbandingan aktivitas kantin dan koperasi dalam data laporan.
-          </p>
-        </div>
+        <SummaryCard
+          label="Transaction Value"
+          value={formatCurrency(
+            report.orders
+              .completedOrderValue,
+          )}
+          mobileValue={
+            formatCompactCurrency(
+              report.orders
+                .completedOrderValue,
+            )
+          }
+          icon={WalletCards}
+          emphasized
+        />
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border bg-background p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
-                <Store className="size-5 text-primary" />
-              </div>
+        <SummaryCard
+          label="Completed"
+          desktopLabel="Completed Orders"
+          value={formatNumber(
+            report.orders.completed,
+          )}
+          icon={CheckCircle2}
+          iconClassName="bg-[#ECFDF5] text-[#065F46]"
+        />
 
-              <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium">
-                Kantin
-              </span>
-            </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Pesanan
-                </p>
-
-                <p className="mt-1 text-2xl font-semibold">
-                  {canteenOrders.length}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Nilai Transaksi
-                </p>
-
-                <p className="mt-1 text-lg font-semibold">
-                  {formatCurrency(
-                    canteenValue,
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border bg-background p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
-                <ShoppingBag className="size-5 text-primary" />
-              </div>
-
-              <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium">
-                Koperasi
-              </span>
-            </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Pesanan
-                </p>
-
-                <p className="mt-1 text-2xl font-semibold">
-                  {
-                    cooperativeOrders.length
-                  }
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Nilai Transaksi
-                </p>
-
-                <p className="mt-1 text-lg font-semibold">
-                  {formatCurrency(
-                    cooperativeValue,
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <SummaryCard
+          label="Active Merchants"
+          value={formatNumber(
+            activeMerchants,
+          )}
+          icon={Store}
+          iconClassName="bg-[#E6E8EA] text-[#0D1B2A]"
+        />
       </section>
 
-      
-      <section className="mt-8">
-        <div>
-          <h2 className="text-lg font-semibold">
-            Laporan Transaksi
-          </h2>
+      <div className="mt-9 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,2fr)]">
+        <div className="space-y-6">
+          <OrdersByStatus
+            metrics={statusMetrics}
+            totalOrders={
+              report.orders.total
+            }
+          />
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            Rekap transaksi yang digunakan dalam laporan operasional.
-          </p>
+          <CommerceDistribution
+            canteenOrders={
+              commerce.canteen
+            }
+            cooperativeOrders={
+              commerce.cooperative
+            }
+            canteenPercentage={
+              canteenPercentage
+            }
+            cooperativePercentage={
+              cooperativePercentage
+            }
+          />
         </div>
 
-        {sortedTransactions.length >
-        0 ? (
-          <div className="mt-4 overflow-hidden rounded-2xl border bg-background">
-            
-            <div className="hidden grid-cols-[160px_minmax(180px,1fr)_130px_150px_150px] gap-4 border-b bg-muted/30 px-5 py-3 text-xs font-medium text-muted-foreground lg:grid">
-              <span>Order</span>
-              <span>Siswa</span>
-              <span>Nominal</span>
-              <span>Status</span>
-              <span>Tanggal</span>
-            </div>
+        <div className="space-y-6">
+          <MerchantPerformance
+            merchants={
+              merchantPerformance
+            }
+          />
 
-            <div className="divide-y">
-              {sortedTransactions.map(
-                ({
-                  order,
-                  customerName,
-                }) => {
-                  const formattedDate =
-                    new Intl.DateTimeFormat(
-                      "id-ID",
-                      {
-                        dateStyle:
-                          "medium",
-                      },
-                    ).format(
-                      new Date(
-                        order.createdAt,
-                      ),
-                    );
-
-                  return (
-                    <article
-                      key={order.id}
-                      className="p-5"
-                    >
-                      
-                      <div className="hidden grid-cols-[160px_minmax(180px,1fr)_130px_150px_150px] items-center gap-4 lg:grid">
-                        <p className="truncate text-sm font-semibold">
-                          {
-                            order.orderCode
-                          }
-                        </p>
-
-                        <p className="truncate text-sm">
-                          {customerName}
-                        </p>
-
-                        <p className="text-sm font-semibold">
-                          {formatCurrency(
-                            order.totalPrice,
-                          )}
-                        </p>
-
-                        <span
-                          className={cn(
-                            "w-fit rounded-full px-2.5 py-1 text-[11px] font-medium",
-
-                            order.status ===
-                              "COMPLETED"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : order.status ===
-                                  "CANCELLED"
-                                ? "bg-red-50 text-red-700"
-                                : "bg-amber-50 text-amber-700",
-                          )}
-                        >
-                          {
-                            ORDER_STATUS_LABEL[
-                              order.status
-                            ]
-                          }
-                        </span>
-
-                        <p className="text-sm text-muted-foreground">
-                          {formattedDate}
-                        </p>
-                      </div>
-
-                      
-                      <div className="lg:hidden">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0">
-                            <p className="font-semibold">
-                              {
-                                order.orderCode
-                              }
-                            </p>
-
-                            <p className="mt-1 truncate text-sm text-muted-foreground">
-                              {customerName}
-                            </p>
-                          </div>
-
-                          <p className="shrink-0 font-semibold">
-                            {formatCurrency(
-                              order.totalPrice,
-                            )}
-                          </p>
-                        </div>
-
-                        <div className="mt-4 flex items-center justify-between gap-4">
-                          <span
-                            className={cn(
-                              "rounded-full px-2.5 py-1 text-[11px] font-medium",
-
-                              order.status ===
-                                "COMPLETED"
-                                ? "bg-emerald-50 text-emerald-700"
-                                : order.status ===
-                                    "CANCELLED"
-                                  ? "bg-red-50 text-red-700"
-                                  : "bg-amber-50 text-amber-700",
-                            )}
-                          >
-                            {
-                              ORDER_STATUS_LABEL[
-                                order.status
-                              ]
-                            }
-                          </span>
-
-                          <span className="text-xs text-muted-foreground">
-                            {formattedDate}
-                          </span>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                },
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-4">
-            <EmptyState
-              icon={ReceiptText}
-              title="Belum ada laporan transaksi"
-              description="Transaksi yang tersedia akan ditampilkan dalam laporan."
-            />
-          </div>
-        )}
-      </section>
-    </>
+          <PopularProducts />
+        </div>
+      </div>
+    </div>
   );
+}
+
+function ReportPeriodFilter({
+  selectedRange,
+  dateFrom,
+  dateTo,
+}: Pick<
+  AdminReportOverviewProps,
+  | "selectedRange"
+  | "dateFrom"
+  | "dateTo"
+>) {
+  return (
+    <div className="flex max-w-full items-center gap-2 overflow-x-auto pb-1 lg:overflow-visible lg:pb-0">
+      <div className="flex shrink-0 items-center gap-2 lg:gap-1 lg:rounded-[14px] lg:border lg:border-[#D8DEE6] lg:bg-white lg:p-1 lg:shadow-[0_2px_8px_rgba(13,27,42,0.03)]">
+        {REPORT_LINKS.map(
+          (item) => {
+            const isActive =
+              selectedRange ===
+              item.value;
+
+            return (
+              <Link
+                key={item.value}
+                href={item.href}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition lg:rounded-[10px] lg:border-0 ${
+                  isActive
+                    ? "border-[#C7DDF0] bg-[#E6F4FF] text-[#0D1B2A]"
+                    : "border-[#C4C6CC] bg-white text-[#536069] hover:bg-[#F2F4F6] hover:text-[#0D1B2A]"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          },
+        )}
+
+        <details
+          className="group relative"
+          open={
+            selectedRange ===
+            "custom"
+          }
+        >
+          <summary
+            className={`flex cursor-pointer list-none items-center gap-1 rounded-full border px-4 py-2 text-sm font-semibold transition lg:rounded-[10px] lg:border-0 [&::-webkit-details-marker]:hidden ${
+              selectedRange ===
+              "custom"
+                ? "border-[#C7DDF0] bg-[#E6F4FF] text-[#0D1B2A]"
+                : "border-[#C4C6CC] bg-white text-[#536069] hover:bg-[#F2F4F6] hover:text-[#0D1B2A]"
+            }`}
+          >
+            <span className="hidden sm:inline">
+              Custom Date
+            </span>
+            <span className="sm:hidden">
+              Custom
+            </span>
+            <CalendarDays className="size-4" />
+          </summary>
+
+          <form
+            method="get"
+            className="fixed left-5 right-5 top-24 z-40 rounded-[18px] border border-[#E2E8F0] bg-white p-4 shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+8px)] sm:w-[340px]"
+          >
+            <input
+              type="hidden"
+              name="range"
+              value="custom"
+            />
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-xs font-bold uppercase tracking-[0.05em] text-[#536069]">
+                From
+                <input
+                  type="date"
+                  name="from"
+                  defaultValue={dateFrom}
+                  required
+                  className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-white px-3 py-2.5 text-sm font-normal tracking-normal text-[#0D1B2A] outline-none transition focus:border-[#0D1B2A]"
+                />
+              </label>
+
+              <label className="text-xs font-bold uppercase tracking-[0.05em] text-[#536069]">
+                To
+                <input
+                  type="date"
+                  name="to"
+                  defaultValue={dateTo}
+                  required
+                  className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-white px-3 py-2.5 text-sm font-normal tracking-normal text-[#0D1B2A] outline-none transition focus:border-[#0D1B2A]"
+                />
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="mt-4 w-full rounded-xl bg-[#0D1B2A] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#172A3D]"
+            >
+              Apply Date Range
+            </button>
+          </form>
+        </details>
+      </div>
+    </div>
+  );
+}
+
+function SummaryCard({
+  label,
+  desktopLabel,
+  value,
+  mobileValue,
+  icon: Icon,
+  iconClassName =
+    "bg-[#E6F4FF] text-[#0D1B2A]",
+  emphasized = false,
+}: {
+  label: string;
+  desktopLabel?: string;
+  value: string;
+  mobileValue?: string;
+  icon: typeof ReceiptText;
+  iconClassName?: string;
+  emphasized?: boolean;
+}) {
+  return (
+    <article
+      className={`min-h-[172px] rounded-[18px] border p-5 shadow-[0_4px_12px_rgba(0,0,0,0.025)] lg:min-h-[130px] ${
+        emphasized
+          ? "border-[#0D1B2A] bg-[#0D1B2A] text-white md:border-[#E2E8F0] md:bg-white md:text-[#0D1B2A]"
+          : "border-[#E2E8F0] bg-white text-[#0D1B2A]"
+      }`}
+    >
+      <div className="flex h-full flex-col justify-between lg:flex-row-reverse lg:items-start">
+        <div
+          className={`flex size-10 items-center justify-center rounded-full ${
+            emphasized
+              ? "bg-white/15 text-white md:bg-[#E6F4FF] md:text-[#0D1B2A]"
+              : iconClassName
+          }`}
+        >
+          <Icon className="size-5" />
+        </div>
+
+        <div className="mt-4 lg:mt-0">
+          <p
+            className={`text-xs font-medium uppercase tracking-[0.04em] ${
+              emphasized
+                ? "text-[#BAC8DC] md:text-[#536069]"
+                : "text-[#536069]"
+            }`}
+          >
+            <span className="lg:hidden">
+              {label}
+            </span>
+            <span className="hidden lg:inline">
+              {desktopLabel ?? label}
+            </span>
+          </p>
+
+          <p className="mt-2 font-heading text-[22px] font-bold leading-tight lg:text-[26px]">
+            {mobileValue ? (
+              <>
+                <span className="md:hidden">
+                  {mobileValue}
+                </span>
+                <span className="hidden md:inline">
+                  {value}
+                </span>
+              </>
+            ) : (
+              value
+            )}
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function OrdersByStatus({
+  metrics,
+  totalOrders,
+}: {
+  metrics: StatusMetric[];
+  totalOrders: number;
+}) {
+  return (
+    <section className="rounded-[18px] border border-[#E2E8F0] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.025)]">
+      <h2 className="text-lg font-semibold text-[#0D1B2A] md:text-base">
+        Orders by Status
+      </h2>
+
+      <div className="mt-6 space-y-5 md:space-y-4">
+        {metrics.map(
+          (metric) => {
+            const percentage =
+              totalOrders > 0
+                ? Math.round(
+                    (metric.count /
+                      totalOrders) *
+                      100,
+                  )
+                : 0;
+
+            return (
+              <div key={metric.label}>
+                <div className="mb-2 flex items-center justify-between text-sm">
+                  <span className="font-medium text-[#536069]">
+                    {metric.label}
+                  </span>
+
+                  <span className="font-bold text-[#0D1B2A]">
+                    <span className="md:hidden">
+                      {percentage}%
+                    </span>
+                    <span className="hidden md:inline">
+                      {formatNumber(
+                        metric.count,
+                      )}
+                    </span>
+                  </span>
+                </div>
+
+                <div className="h-2 overflow-hidden rounded-full bg-[#E0E3E5]">
+                  <div
+                    className={`h-full rounded-full ${metric.barClassName}`}
+                    style={{
+                      width: `${percentage}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          },
+        )}
+      </div>
+    </section>
+  );
+}
+
+function CommerceDistribution({
+  canteenOrders,
+  cooperativeOrders,
+  canteenPercentage,
+  cooperativePercentage,
+}: {
+  canteenOrders: number;
+  cooperativeOrders: number;
+  canteenPercentage: number;
+  cooperativePercentage: number;
+}) {
+  return (
+    <section className="hidden rounded-[18px] border border-[#E2E8F0] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.025)] md:block">
+      <h2 className="text-base font-semibold text-[#0D1B2A]">
+        Commerce Distribution
+      </h2>
+
+      <div className="mt-6 space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-[#536069]">
+            <span className="size-3 rounded-full bg-[#0D1B2A]" />
+            Canteen Orders
+          </div>
+          <strong className="text-[#0D1B2A]">
+            {formatNumber(
+              canteenOrders,
+            )}
+          </strong>
+        </div>
+
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-[#536069]">
+            <span className="size-3 rounded-full bg-[#E6F4FF]" />
+            Cooperative Orders
+          </div>
+          <strong className="text-[#0D1B2A]">
+            {formatNumber(
+              cooperativeOrders,
+            )}
+          </strong>
+        </div>
+
+        <div className="flex h-4 overflow-hidden rounded-full bg-[#F2F4F6]">
+          <div
+            className="bg-[#0D1B2A]"
+            style={{
+              width: `${canteenPercentage}%`,
+            }}
+          />
+          <div
+            className="bg-[#E6F4FF]"
+            style={{
+              width: `${cooperativePercentage}%`,
+            }}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MerchantPerformance({
+  merchants,
+}: {
+  merchants: AdminReportSummaryData["merchantPerformance"];
+}) {
+  return (
+    <section className="hidden overflow-hidden rounded-[18px] border border-[#E2E8F0] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.025)] md:block">
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-base font-semibold text-[#0D1B2A]">
+          Merchant Performance
+        </h2>
+        <Link
+          href="/admin/merchants"
+          className="text-sm font-bold text-[#0D1B2A] transition hover:text-[#536069]"
+        >
+          View All
+        </Link>
+      </div>
+
+      <div className="mt-6 overflow-x-auto">
+        <table className="w-full min-w-[620px] border-collapse text-left">
+          <thead>
+            <tr className="border-b border-[#E2E8F0] text-xs uppercase tracking-[0.05em] text-[#536069]">
+              <th className="pb-3 font-semibold">
+                Merchant
+              </th>
+              <th className="pb-3 font-semibold">
+                Type
+              </th>
+              <th className="pb-3 text-right font-semibold">
+                Orders
+              </th>
+              <th className="pb-3 text-right font-semibold">
+                Value
+              </th>
+              <th className="pb-3 text-center font-semibold">
+                Status
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {merchants.length > 0 ? (
+              merchants
+                .slice(0, 5)
+                .map(
+                  (merchant) => (
+                    <tr
+                      key={merchant.id}
+                      className="border-b border-[#E2E8F0]/70 last:border-0"
+                    >
+                      <td className="py-4 font-semibold text-[#0D1B2A]">
+                        {merchant.name}
+                      </td>
+                      <td className="py-4 text-sm text-[#536069]">
+                        {merchant.type ===
+                        "CANTEEN"
+                          ? "Canteen"
+                          : "Cooperative"}
+                      </td>
+                      <td className="py-4 text-right text-sm font-medium text-[#0D1B2A]">
+                        {formatNumber(
+                          merchant.ordersCount,
+                        )}
+                      </td>
+                      <td className="py-4 text-right text-sm font-medium text-[#0D1B2A]">
+                        {formatCurrency(
+                          merchant.completedOrderValue,
+                        )}
+                      </td>
+                      <td className="py-4 text-center text-sm text-[#74777D]">
+                        —
+                      </td>
+                    </tr>
+                  ),
+                )
+            ) : (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="py-8 text-center text-sm text-[#536069]"
+                >
+                  Belum ada performa merchant pada periode ini.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function PopularProducts() {
+  return (
+    <section className="rounded-[18px] border border-[#E2E8F0] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.025)]">
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-[22px] font-semibold text-[#0D1B2A] md:text-base">
+          Popular Products
+        </h2>
+
+        <button
+          type="button"
+          disabled
+          title="Menunggu dukungan Admin Product Reporting API"
+          className="hidden cursor-not-allowed text-sm font-bold text-[#0D1B2A]/45 md:inline"
+        >
+          View All
+        </button>
+
+        <span className="text-xl font-bold tracking-[0.12em] text-[#44474C] md:hidden">
+          ···
+        </span>
+      </div>
+
+      <div className="mt-5 md:hidden">
+        <div className="divide-y divide-[#E2E8F0]">
+          {adminReportPopularProducts
+            .slice(0, 2)
+            .map((product) => (
+              <div
+                key={product.id}
+                className="flex items-center justify-between gap-4 py-4"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <ProductThumbnail
+                    product={product}
+                    className="size-12 rounded-xl"
+                  />
+
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-[#0D1B2A]">
+                      {product.name}
+                    </p>
+                    <p className="mt-1 truncate text-xs text-[#536069]">
+                      {product.merchantName}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="shrink-0 text-right">
+                  <p className="text-base font-bold text-[#0D1B2A]">
+                    {formatNumber(
+                      product.soldQuantity,
+                    )}
+                  </p>
+                  <p className="text-xs text-[#536069]">
+                    Sold
+                  </p>
+                </div>
+              </div>
+            ))}
+        </div>
+
+        <button
+          type="button"
+          disabled
+          title="Menunggu dukungan Admin Product Reporting API"
+          className="mt-4 w-full cursor-not-allowed rounded-xl bg-[#E6F4FF] px-4 py-2.5 text-sm font-semibold text-[#0D1B2A]/55"
+        >
+          View All Products
+        </button>
+      </div>
+
+      <div className="mt-6 hidden overflow-x-auto md:block">
+        <table className="w-full min-w-[560px] border-collapse text-left">
+          <thead>
+            <tr className="border-b border-[#E2E8F0] text-xs uppercase tracking-[0.05em] text-[#536069]">
+              <th className="pb-3 font-semibold">
+                Product
+              </th>
+              <th className="pb-3 font-semibold">
+                Merchant
+              </th>
+              <th className="pb-3 text-right font-semibold">
+                Sold Quantity
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {adminReportPopularProducts.map(
+              (product) => (
+                <tr
+                  key={product.id}
+                  className="border-b border-[#E2E8F0]/70 last:border-0"
+                >
+                  <td className="py-4">
+                    <div className="flex items-center gap-3">
+                      <ProductThumbnail
+                        product={product}
+                        className="size-10 rounded-lg"
+                      />
+                      <span className="font-semibold text-[#0D1B2A]">
+                        {product.name}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-4 text-sm text-[#536069]">
+                    {product.merchantName}
+                  </td>
+                  <td className="py-4 text-right text-sm font-bold text-[#0D1B2A]">
+                    {formatNumber(
+                      product.soldQuantity,
+                    )}
+                  </td>
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function ProductThumbnail({
+  product,
+  className,
+}: {
+  product: (typeof adminReportPopularProducts)[number];
+  className: string;
+}) {
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-center overflow-hidden bg-[#ECEEF0] ${className}`}
+    >
+      {product.imageUrl ? (
+        <img
+          src={product.imageUrl}
+          alt={product.name}
+          className="size-full object-cover"
+        />
+      ) : (
+        <ImageIcon className="size-5 text-[#536069]" />
+      )}
+    </div>
+  );
+}
+
+function formatNumber(
+  value: number,
+) {
+  return new Intl.NumberFormat(
+    "id-ID",
+  ).format(value);
+}
+
+function formatCompactCurrency(
+  value: number,
+) {
+  if (value >= 1_000_000_000) {
+    return `Rp${trimCompact(
+      value / 1_000_000_000,
+    )}B`;
+  }
+
+  if (value >= 1_000_000) {
+    return `Rp${trimCompact(
+      value / 1_000_000,
+    )}M`;
+  }
+
+  if (value >= 1_000) {
+    return `Rp${trimCompact(
+      value / 1_000,
+    )}K`;
+  }
+
+  return formatCurrency(value);
+}
+
+function trimCompact(
+  value: number,
+) {
+  return value
+    .toFixed(1)
+    .replace(/\.0$/, "");
 }

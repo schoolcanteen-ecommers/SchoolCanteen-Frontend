@@ -1,19 +1,11 @@
 import {
-  Boxes,
-  PackageX,
-  TriangleAlert,
-} from "lucide-react";
-
-import { StatCard } from "@/components/dashboard/stat-card";
-import { PageHeader } from "@/components/shared/page-header";
-
-import { AdminCooperativeInventoryList } from "@/features/cooperative/components/admin-cooperative-inventory-list";
-
+  AdminCooperativeInventoryList,
+} from "@/features/cooperative/components/admin-cooperative-inventory-list";
 import {
   getCooperativeCatalog,
 } from "@/lib/api/catalog";
 
-const LOW_STOCK_THRESHOLD = 5;
+const LOW_STOCK_THRESHOLD = 10;
 
 export default async function AdminCooperativeInventoryPage() {
   const catalog =
@@ -41,38 +33,22 @@ export default async function AdminCooperativeInventoryPage() {
     ).length;
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      <PageHeader
-        title="Inventory Koperasi"
-        description="Pantau stok dan ketersediaan seluruh produk koperasi sekolah."
-      />
-
-      <section className="mt-8 grid gap-4 sm:grid-cols-3">
-        <StatCard
-          title="Total Stok"
-          value={totalStock}
-          description="Jumlah seluruh stok produk"
-          icon={Boxes}
-        />
-
-        <StatCard
-          title="Stok Rendah"
-          value={lowStockProducts}
-          description="Produk dengan stok 1–5"
-          icon={TriangleAlert}
-        />
-
-        <StatCard
-          title="Stok Habis"
-          value={outOfStockProducts}
-          description="Produk yang perlu diisi"
-          icon={PackageX}
-        />
-      </section>
+    <div className="mx-auto w-full max-w-[1280px] px-5 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <div className="mb-7">
+        <h1 className="font-heading text-[30px] font-bold tracking-[-0.02em] text-navy-steel sm:text-[32px]">
+          Cooperative Inventory
+        </h1>
+        <p className="mt-2 text-sm text-[#536069] sm:text-base">
+          Monitor stok produk koperasi SchoolCanteen.
+        </p>
+      </div>
 
       <AdminCooperativeInventoryList
         products={catalog.products}
         categories={catalog.categories}
+        totalStock={totalStock}
+        lowStockProducts={lowStockProducts}
+        outOfStockProducts={outOfStockProducts}
       />
     </div>
   );

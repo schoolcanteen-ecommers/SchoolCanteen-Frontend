@@ -1,12 +1,38 @@
-import { PageHeader } from "@/components/shared/page-header";
+import {
+  requireRole,
+} from "@/features/auth/server/require-role";
 
-export default function AdminSettingsPage() {
+import {
+  AdminSettingsOverview,
+} from "@/features/settings/components/admin/admin-settings-overview";
+
+import {
+  createClient,
+} from "@/lib/supabase/server";
+
+import packageJson from "../../../../package.json";
+
+export default async function AdminSettingsPage() {
+  const profile =
+    await requireRole("admin");
+
+  const supabase =
+    await createClient();
+
+  const {
+    data: sessionData,
+  } =
+    await supabase.auth.getSession();
+
+  const email =
+    sessionData.session?.user.email ??
+    null;
+
   return (
-    <div className="p-6 lg:p-8">
-      <PageHeader
-        title="Settings"
-        description="Kelola konfigurasi sistem SchoolCanteen."
-      />
-    </div>
+    <AdminSettingsOverview
+      profile={profile}
+      email={email}
+      version={packageJson.version}
+    />
   );
 }

@@ -1,14 +1,6 @@
 import {
-  Package,
-  ShoppingBag,
-  TriangleAlert,
-} from "lucide-react";
-
-import { StatCard } from "@/components/dashboard/stat-card";
-import { PageHeader } from "@/components/shared/page-header";
-
-import { AdminCooperativeProductList } from "@/features/cooperative/components/admin-cooperative-product-list";
-
+  AdminCooperativeProductList,
+} from "@/features/cooperative/components/admin-cooperative-product-list";
 import {
   getCooperativeCatalog,
 } from "@/lib/api/catalog";
@@ -17,46 +9,40 @@ export default async function AdminCooperativeProductsPage() {
   const catalog =
     await getCooperativeCatalog();
 
-  const outOfStockProducts =
+  const totalProducts =
+    catalog.merchants.reduce(
+      (total, merchant) =>
+        total + merchant.productsCount,
+      0,
+    );
+
+  const activeProducts =
+    catalog.products.length;
+
+  const lowStockProducts =
     catalog.products.filter(
       (product) =>
-        product.stock <= 0,
+        product.stock > 0 &&
+        product.stock <= 10,
     ).length;
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      <PageHeader
-        title="Produk Koperasi"
-        description="Pantau produk, harga, dan ketersediaan barang pada koperasi sekolah."
-      />
-
-      <section className="mt-8 grid gap-4 sm:grid-cols-3">
-        <StatCard
-          title="Koperasi Tersedia"
-          value={catalog.merchants.length}
-          description="Merchant koperasi yang tampil"
-          icon={ShoppingBag}
-        />
-
-        <StatCard
-          title="Produk Tampil"
-          value={catalog.products.length}
-          description="Produk koperasi yang tersedia"
-          icon={Package}
-        />
-
-        <StatCard
-          title="Stok Habis"
-          value={outOfStockProducts}
-          description="Produk yang perlu diperhatikan"
-          icon={TriangleAlert}
-        />
-      </section>
+    <div className="mx-auto w-full max-w-[1280px] px-5 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <div className="mb-7">
+        <h1 className="font-heading text-[30px] font-bold tracking-[-0.02em] text-navy-steel sm:text-[32px]">
+          Cooperative Products
+        </h1>
+        <p className="mt-2 text-sm text-[#536069] sm:text-base">
+          Monitor katalog produk koperasi SchoolCanteen.
+        </p>
+      </div>
 
       <AdminCooperativeProductList
-        merchants={catalog.merchants}
         products={catalog.products}
         categories={catalog.categories}
+        totalProducts={totalProducts}
+        activeProducts={activeProducts}
+        lowStockProducts={lowStockProducts}
       />
     </div>
   );
