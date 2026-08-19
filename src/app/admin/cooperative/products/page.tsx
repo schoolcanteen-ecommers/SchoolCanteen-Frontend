@@ -12,7 +12,11 @@ export default async function AdminCooperativeProductsPage() {
   const totalProducts =
     catalog.merchants.reduce(
       (total, merchant) =>
+<<<<<<< HEAD
         total + merchant.productsCount,
+=======
+        total + (merchant.productsCount ?? 0),
+>>>>>>> source/main
       0,
     );
 

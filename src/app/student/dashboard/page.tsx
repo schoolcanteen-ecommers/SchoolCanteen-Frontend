@@ -1,6 +1,7 @@
 import {
   StudentActiveOrder,
 } from "@/features/students/components/dashboard/student-active-order";
+<<<<<<< HEAD
 import {
   StudentDashboardHero,
 } from "@/features/students/components/dashboard/student-dashboard-hero";
@@ -13,12 +14,32 @@ import {
 import {
   StudentRecentActivity,
 } from "@/features/students/components/dashboard/student-recent-activity";
+=======
+
+import {
+  StudentDashboardHero,
+} from "@/features/students/components/dashboard/student-dashboard-hero";
+
+import {
+  StudentDashboardWallet,
+} from "@/features/students/components/dashboard/student-dashboard-wallet";
+
+import {
+  StudentQuickAccess,
+} from "@/features/students/components/dashboard/student-quick-access";
+
+import {
+  StudentRecentActivity,
+} from "@/features/students/components/dashboard/student-recent-activity";
+
+>>>>>>> source/main
 import {
   StudentReorderSection,
   type StudentReorderItem,
 } from "@/features/students/components/dashboard/student-reorder-section";
 
 import {
+<<<<<<< HEAD
   getCartProduct,
 } from "@/lib/api/catalog";
 import {
@@ -40,6 +61,26 @@ function sortOrdersNewest(
 ): StudentOrderData[] {
   return [...orders].sort(
     (left, right) =>
+=======
+  getStudentDashboard,
+} from "@/lib/api/student-dashboard";
+
+import type {
+  StudentOrderData,
+} from "@/lib/api/student-orders";
+
+function sortOrdersNewest(
+  orders:
+    StudentOrderData[],
+): StudentOrderData[] {
+  return [
+    ...orders,
+  ].sort(
+    (
+      left,
+      right,
+    ) =>
+>>>>>>> source/main
       new Date(
         right.order.createdAt,
       ).getTime() -
@@ -50,6 +91,7 @@ function sortOrdersNewest(
 }
 
 function getReorderItems(
+<<<<<<< HEAD
   orders: StudentOrderData[],
 ): StudentReorderItem[] {
   const items: StudentReorderItem[] = [];
@@ -57,6 +99,25 @@ function getReorderItems(
 
   for (const orderData of orders) {
     for (const item of orderData.items) {
+=======
+  orders:
+    StudentOrderData[],
+): StudentReorderItem[] {
+  const items:
+    StudentReorderItem[] = [];
+
+  const seenProductIds =
+    new Set<string>();
+
+  for (
+    const orderData
+    of orders
+  ) {
+    for (
+      const item
+      of orderData.items
+    ) {
+>>>>>>> source/main
       if (
         !item.productId ||
         seenProductIds.has(
@@ -73,17 +134,38 @@ function getReorderItems(
       items.push({
         productId:
           item.productId,
+<<<<<<< HEAD
         productName:
           item.productName,
         imageUrl:
           item.imageUrl ?? null,
         merchantName:
           orderData.merchantName,
+=======
+
+        productName:
+          item.productName,
+
+        imageUrl:
+          item.imageUrl ??
+          null,
+
+        merchantName:
+          orderData
+            .merchantName,
+
+>>>>>>> source/main
         price:
           item.price,
       });
 
+<<<<<<< HEAD
       if (items.length === 4) {
+=======
+      if (
+        items.length === 4
+      ) {
+>>>>>>> source/main
         return items;
       }
     }
@@ -92,6 +174,7 @@ function getReorderItems(
   return items;
 }
 
+<<<<<<< HEAD
 
 async function getProductImageFallbacks(
   productIds: string[],
@@ -154,11 +237,26 @@ export default async function StudentDashboardPage() {
   const sortedOrders =
     sortOrdersNewest(
       orders,
+=======
+export default async function StudentDashboardPage() {
+  const dashboard =
+    await getStudentDashboard();
+
+  const sortedOrders =
+    sortOrdersNewest(
+      dashboard.orders,
+>>>>>>> source/main
     );
 
   const activeOrders =
     sortedOrders.filter(
+<<<<<<< HEAD
       ({ order }) =>
+=======
+      ({
+        order,
+      }) =>
+>>>>>>> source/main
         order.status !==
           "COMPLETED" &&
         order.status !==
@@ -166,13 +264,21 @@ export default async function StudentDashboardPage() {
     );
 
   const activeOrder =
+<<<<<<< HEAD
     activeOrders[0] ?? null;
 
   const rawReorderItems =
+=======
+    activeOrders[0] ??
+    null;
+
+  const reorderItems =
+>>>>>>> source/main
     getReorderItems(
       sortedOrders,
     );
 
+<<<<<<< HEAD
   const fallbackProductIds = [
     ...(activeOrder?.items[0] &&
     !activeOrder.items[0]
@@ -247,11 +353,40 @@ export default async function StudentDashboardPage() {
               .balance
           }
           className="lg:col-span-8 lg:row-start-1"
+=======
+  return (
+    <div className="mx-auto w-full max-w-[1180px] px-4 pb-10 pt-5 sm:px-6 sm:pt-7 lg:px-8 lg:pb-16 lg:pt-9">
+      <StudentDashboardHero
+        name={
+          dashboard
+            .profile
+            .name
+        }
+      />
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-12 lg:gap-5">
+        <StudentDashboardWallet
+          balance={
+            dashboard
+              .wallet
+              .balance
+          }
+          isActive={
+            dashboard
+              .wallet
+              .isActive
+          }
+          className="lg:col-span-7"
+>>>>>>> source/main
         />
 
         <StudentActiveOrder
           activeOrder={
+<<<<<<< HEAD
             activeOrderWithImage
+=======
+            activeOrder
+>>>>>>> source/main
           }
           additionalOrderCount={
             Math.max(
@@ -260,6 +395,7 @@ export default async function StudentDashboardPage() {
               0,
             )
           }
+<<<<<<< HEAD
           className="lg:col-span-8 lg:row-start-2"
         />
 
@@ -282,6 +418,30 @@ export default async function StudentDashboardPage() {
           className="lg:col-span-8 lg:row-start-3"
         />
       </section>
+=======
+          className="lg:col-span-5"
+        />
+
+        <StudentQuickAccess
+          className="lg:col-span-12"
+        />
+
+        <StudentReorderSection
+          items={
+            reorderItems
+          }
+          className="lg:col-span-8"
+        />
+
+        <StudentRecentActivity
+          transactions={
+            dashboard
+              .recentWalletTransactions
+          }
+          className="lg:col-span-4"
+        />
+      </div>
+>>>>>>> source/main
     </div>
   );
 }

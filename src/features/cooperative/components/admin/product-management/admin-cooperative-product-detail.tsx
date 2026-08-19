@@ -6,7 +6,11 @@ import {
   ReceiptText,
   ShoppingCart,
   Truck,
+<<<<<<< HEAD
   Update,
+=======
+  RefreshCw,
+>>>>>>> source/main
 } from "lucide-react";
 
 import {
@@ -109,7 +113,11 @@ export function AdminCooperativeProductDetail({
             value="Belum tersedia"
           />
           <InventoryRow
+<<<<<<< HEAD
             icon={Update}
+=======
+            icon={RefreshCw}
+>>>>>>> source/main
             label="Last Updated"
             description="Stock revision"
             value="Belum tersedia"

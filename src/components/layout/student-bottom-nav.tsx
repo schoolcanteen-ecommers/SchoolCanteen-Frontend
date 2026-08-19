@@ -1,19 +1,147 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import type {
+  CSSProperties,
+} from "react";
 
-import { studentNavigation } from "@/lib/navigation";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+
+import {
+  ClipboardList,
+  Home,
+  Store,
+  UserRound,
+  UtensilsCrossed,
+} from "lucide-react";
+
+import {
+  usePathname,
+} from "next/navigation";
+
+import {
+  cn,
+} from "@/lib/utils";
+
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: typeof Home;
+}
+
+const navigationItems:
+  NavigationItem[] = [
+    {
+      name: "Beranda",
+      href:
+        "/student/dashboard",
+      icon: Home,
+    },
+    {
+      name: "Kantin",
+      href:
+        "/student/kantin",
+      icon:
+        UtensilsCrossed,
+    },
+    {
+      name: "Koperasi",
+      href:
+        "/student/koperasi",
+      icon: Store,
+    },
+    {
+      name: "Pesanan",
+      href:
+        "/student/orders",
+      icon:
+        ClipboardList,
+    },
+    {
+      name: "Profil",
+      href:
+        "/student/profile",
+      icon:
+        UserRound,
+    },
+  ];
 
 export function StudentBottomNav() {
+<<<<<<< HEAD
   const pathname = usePathname() || "";
+=======
+  const pathname =
+    usePathname() || "";
+>>>>>>> source/main
 
-  const navigation = studentNavigation.filter(
-    (item) => item.mobile
-  );
+  function isActive(
+    item: NavigationItem,
+  ) {
+    /*
+     * Wallet sekarang merupakan
+     * bagian dari area Profil.
+     */
+    if (
+      item.name ===
+        "Profil" &&
+      pathname.startsWith(
+        "/student/wallet",
+      )
+    ) {
+      return true;
+    }
+
+    if (
+      item.name ===
+      "Beranda"
+    ) {
+      return (
+        pathname ===
+        "/student/dashboard"
+      );
+    }
+
+    return (
+      pathname ===
+        item.href ||
+      pathname.startsWith(
+        `${item.href}/`,
+      )
+    );
+  }
+
+  const activeIndex =
+    navigationItems.findIndex(
+      isActive,
+    );
+
+  const safeIndex =
+    Math.max(
+      activeIndex,
+      0,
+    );
+
+  /*
+   * Sama seperti Public:
+   *
+   * 0 -> 10%
+   * 1 -> 30%
+   * 2 -> 50%
+   * 3 -> 70%
+   * 4 -> 90%
+   */
+  const style = {
+    "--liquid-index":
+      safeIndex,
+
+    "--liquid-center":
+      `${
+        10 +
+        safeIndex * 20
+      }%`,
+  } as CSSProperties;
 
   return (
+<<<<<<< HEAD
     <nav className="fixed bottom-4 left-4 right-4 z-50 flex h-[68px] items-end justify-between rounded-[24px] bg-navy-steel px-2 pb-2 shadow-lg lg:hidden">
       {navigation.map((item) => {
         if (!item.href || !item.icon) {
@@ -59,6 +187,90 @@ export function StudentBottomNav() {
           </Link>
         );
       })}
+=======
+    <nav
+      aria-label="Navigasi siswa"
+      style={style}
+      className="public-liquid-nav fixed left-3 right-3 z-50 md:hidden"
+    >
+      <div className="relative grid h-full grid-cols-5">
+        <div
+          aria-hidden="true"
+          className={cn(
+            "liquid-nav-indicator",
+            activeIndex < 0 &&
+              "opacity-0",
+          )}
+        >
+          <div className="liquid-nav-bubble" />
+        </div>
+
+        {navigationItems.map(
+          (item) => {
+            const active =
+              isActive(
+                item,
+              );
+
+            const Icon =
+              item.icon;
+
+            return (
+              <Link
+                key={
+                  item.name
+                }
+                href={
+                  item.href
+                }
+                prefetch={
+                  false
+                }
+                aria-current={
+                  active
+                    ? "page"
+                    : undefined
+                }
+                className={cn(
+                  "liquid-nav-item",
+                  active &&
+                    "liquid-nav-item-active",
+                )}
+              >
+                <span
+                  className={cn(
+                    "liquid-nav-icon",
+                    active &&
+                      "liquid-nav-icon-active",
+                  )}
+                >
+                  <Icon
+                    aria-hidden="true"
+                    strokeWidth={
+                      active
+                        ? 2.4
+                        : 2
+                    }
+                  />
+                </span>
+
+                <span
+                  className={cn(
+                    "liquid-nav-label",
+                    active &&
+                      "liquid-nav-label-active",
+                  )}
+                >
+                  {
+                    item.name
+                  }
+                </span>
+              </Link>
+            );
+          },
+        )}
+      </div>
+>>>>>>> source/main
     </nav>
   );
 }

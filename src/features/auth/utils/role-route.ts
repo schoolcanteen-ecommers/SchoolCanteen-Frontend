@@ -57,4 +57,42 @@ export function getRedirectForRole(
   }
 
   return fallback;
+<<<<<<< HEAD
 }
+=======
+}
+
+export function getSafeAuthRedirect(
+  requestedRedirect?: string,
+): string {
+  const fallback =
+    ROLE_HOME_ROUTES.student;
+
+  if (
+    !requestedRedirect ||
+    !requestedRedirect.startsWith("/") ||
+    requestedRedirect.startsWith("//")
+  ) {
+    return fallback;
+  }
+
+  const allowedPrefixes =
+    Object.values(
+      ROLE_ROUTE_PREFIXES,
+    );
+
+  const isAllowed =
+    allowedPrefixes.some(
+      (prefix) =>
+        requestedRedirect ===
+          prefix ||
+        requestedRedirect.startsWith(
+          `${prefix}/`,
+        ),
+    );
+
+  return isAllowed
+    ? requestedRedirect
+    : fallback;
+}
+>>>>>>> source/main

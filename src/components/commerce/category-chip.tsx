@@ -1,4 +1,6 @@
-import { cn } from "@/lib/utils";
+import {
+  cn,
+} from "@/lib/utils";
 
 interface CategoryChipProps {
   label: string;
@@ -14,12 +16,13 @@ export function CategoryChip({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+        "min-h-10 shrink-0 rounded-full border px-4 text-[13px] font-medium transition-colors sm:text-sm",
         active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+          ? "border-navy-steel bg-navy-steel text-white"
+          : "border-[#DCEAF3] bg-white text-muted-foreground hover:border-navy-steel/25 hover:text-navy-steel",
       )}
     >
       {label}

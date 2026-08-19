@@ -9,6 +9,10 @@ import {
   Pencil,
   Plus,
   Power,
+<<<<<<< HEAD
+=======
+  SlidersHorizontal,
+>>>>>>> source/main
   Tags,
   Trash2,
 } from "lucide-react";
@@ -25,6 +29,11 @@ import { Button } from "@/components/ui/button";
 
 import { MerchantProductForm } from "@/features/products/components/merchant-product-form";
 
+<<<<<<< HEAD
+=======
+import { MerchantProductModifierManager } from "@/features/products/components/merchant-product-modifier-manager";
+
+>>>>>>> source/main
 import {
   deleteMerchantProduct,
   updateMerchantProductStatus,
@@ -49,6 +58,11 @@ export function MerchantProductList({
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+<<<<<<< HEAD
+=======
+  const [modifierProduct, setModifierProduct] = useState<Product | null>(null);
+
+>>>>>>> source/main
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -308,6 +322,19 @@ export function MerchantProductList({
                       </div>
                     </div>
 
+<<<<<<< HEAD
+=======
+                    <button
+                      type="button"
+                      onClick={() => setModifierProduct(product)}
+                      disabled={processing}
+                      className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-arctic-blue bg-arctic-blue/45 px-4 text-sm font-semibold text-navy-steel transition hover:bg-arctic-blue disabled:opacity-50"
+                    >
+                      <SlidersHorizontal className="size-4" />
+                      Kelola Pilihan
+                    </button>
+
+>>>>>>> source/main
                     <div className="mt-4 grid grid-cols-3 gap-2 border-t pt-4">
                       <button
                         type="button"
@@ -356,6 +383,17 @@ export function MerchantProductList({
         )}
       </section>
 
+<<<<<<< HEAD
+=======
+      {modifierProduct && (
+        <MerchantProductModifierManager
+          key={modifierProduct.id}
+          product={modifierProduct}
+          onClose={() => setModifierProduct(null)}
+        />
+      )}
+
+>>>>>>> source/main
       {formOpen && (
         <MerchantProductForm
           key={editingProduct?.id ?? "create"}

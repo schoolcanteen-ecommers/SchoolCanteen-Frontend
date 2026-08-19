@@ -1,19 +1,33 @@
 "use client";
 
 import {
+<<<<<<< HEAD
+=======
+  GraduationCap,
+>>>>>>> source/main
   Pencil,
 } from "lucide-react";
 
 import {
+<<<<<<< HEAD
   useStudentProfileEdit,
 } from "@/features/students/components/profile/student-profile-edit-provider";
 
 import {
+=======
+>>>>>>> source/main
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
 
+<<<<<<< HEAD
+=======
+import {
+  useStudentProfileEdit,
+} from "@/features/students/components/profile/student-profile-edit-provider";
+
+>>>>>>> source/main
 interface StudentProfileHeroProps {
   name: string;
   className: string;
@@ -27,6 +41,7 @@ export function StudentProfileHero({
   avatarUrl,
   initials,
 }: StudentProfileHeroProps) {
+<<<<<<< HEAD
   const { startEditing } =
     useStudentProfileEdit();
 
@@ -98,6 +113,67 @@ export function StudentProfileHero({
             Edit Profil
           </button>
         </div>
+=======
+  const {
+    isEditing,
+    startEditing,
+  } =
+    useStudentProfileEdit();
+
+  return (
+    <section className="rounded-[20px] border border-[#E1E8ED] bg-white p-5 sm:p-6 lg:p-7">
+      <div className="flex items-center gap-4 sm:gap-5">
+        <Avatar className="size-[72px] shrink-0 border border-[#DCE7EE] bg-[#F3F7F9] sm:size-20 lg:size-24">
+          {avatarUrl ? (
+            <AvatarImage
+              src={avatarUrl}
+              alt={`Foto profil ${name}`}
+              className="object-cover"
+            />
+          ) : null}
+
+          <AvatarFallback className="bg-arctic-blue text-xl font-bold text-navy-steel sm:text-2xl">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-[#74818A]">
+            Profil siswa
+          </p>
+
+          <h1 className="mt-1 truncate font-heading text-[25px] font-bold leading-tight tracking-[-0.02em] text-navy-steel sm:text-[30px]">
+            {name}
+          </h1>
+
+          <div className="mt-2 flex items-center gap-1.5 text-[13px] font-medium text-[#5F6D76]">
+            <GraduationCap className="size-4" />
+
+            <span className="truncate">
+              {className}
+            </span>
+          </div>
+        </div>
+
+        {!isEditing ? (
+          <button
+            type="button"
+            onClick={startEditing}
+            aria-label="Edit profil"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#CFD9DF] bg-white px-3.5 text-sm font-semibold text-navy-steel transition-colors hover:bg-[#F4F8FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-steel focus-visible:ring-offset-2"
+          >
+            <Pencil className="size-4" />
+
+            <span className="hidden sm:inline">
+              Edit Profil
+            </span>
+
+            <span className="sm:hidden">
+              Edit
+            </span>
+          </button>
+        ) : null}
+>>>>>>> source/main
       </div>
     </section>
   );

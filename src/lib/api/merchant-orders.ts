@@ -21,20 +21,52 @@ export interface MerchantPickupData {
   pickedAt: string | null;
 }
 
+<<<<<<< HEAD
+=======
+export interface MerchantOrderItemModifier {
+  id: string;
+
+  modifierGroupId: string | null;
+  modifierOptionId: string | null;
+
+  groupName: string;
+  optionName: string;
+
+  priceDelta: number;
+}
+
+export interface MerchantOrderItem extends OrderItem {
+  notes: string | null;
+
+  modifiers: MerchantOrderItemModifier[];
+}
+
+>>>>>>> source/main
 export interface MerchantOrderData {
   order: MerchantOrderView;
 
   customerName: string;
 
+<<<<<<< HEAD
   items: OrderItem[];
+=======
+  orderNotes: string | null;
+
+  pickupEndTime?: string | null;
+
+  items: MerchantOrderItem[];
+>>>>>>> source/main
 
   pickup: MerchantPickupData | null;
 }
 
+<<<<<<< HEAD
 interface ApiMerchantOrderSummary {
   id: string;
 }
 
+=======
+>>>>>>> source/main
 interface ApiMerchantOrderItem {
   id: string;
 
@@ -44,6 +76,23 @@ interface ApiMerchantOrderItem {
   unit_price: number;
   quantity: number;
   subtotal: number;
+<<<<<<< HEAD
+=======
+
+  notes: string | null;
+
+  modifiers: Array<{
+    id: string;
+
+    modifier_group_id: string | null;
+    modifier_option_id: string | null;
+
+    group_name: string;
+    option_name: string;
+
+    price_delta: number;
+  }>;
+>>>>>>> source/main
 }
 
 interface ApiMerchantOrderDetail {
@@ -196,6 +245,17 @@ function mapMerchantOrder(
     customerName:
       data.student.name,
 
+<<<<<<< HEAD
+=======
+    orderNotes:
+      data.notes,
+
+    pickupEndTime:
+      formatPickupTime(
+        data.pickup_slot?.end_at,
+      ),
+
+>>>>>>> source/main
     items:
       data.items.map(
         (item) => ({
@@ -220,6 +280,37 @@ function mapMerchantOrder(
 
           subtotal:
             item.subtotal,
+<<<<<<< HEAD
+=======
+
+          notes:
+            item.notes ?? null,
+
+          modifiers:
+            (item.modifiers ?? []).map(
+              (modifier) => ({
+                id:
+                  modifier.id,
+
+                modifierGroupId:
+                  modifier.modifier_group_id ?? null,
+
+                modifierOptionId:
+                  modifier.modifier_option_id ?? null,
+
+                groupName:
+                  modifier.group_name,
+
+                optionName:
+                  modifier.option_name,
+
+                priceDelta:
+                  Number(
+                    modifier.price_delta ?? 0,
+                  ),
+              }),
+            ),
+>>>>>>> source/main
         }),
       ),
 
@@ -267,7 +358,11 @@ export async function getMerchantOrders(): Promise<
 > {
   const orders =
     await authenticatedServerApiRequest<
+<<<<<<< HEAD
       ApiMerchantOrderSummary[]
+=======
+      ApiMerchantOrderDetail[]
+>>>>>>> source/main
     >(
       "/merchant/orders",
       {
@@ -275,6 +370,7 @@ export async function getMerchantOrders(): Promise<
       },
     );
 
+<<<<<<< HEAD
   return Promise.all(
     orders.map(
       ({ id }) =>
@@ -282,5 +378,9 @@ export async function getMerchantOrders(): Promise<
           id,
         ),
     ),
+=======
+  return orders.map(
+    mapMerchantOrder,
+>>>>>>> source/main
   );
 }

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 
 import { getCurrentProfile } from "@/features/auth/services/profile-service";
@@ -10,7 +11,11 @@ import type {
   UserRole,
 } from "@/types/profile";
 
+<<<<<<< HEAD
 export async function requireRole(
+=======
+async function requireRoleInternal(
+>>>>>>> source/main
   requiredRole: UserRole,
 ): Promise<UserProfile> {
   const supabase =
@@ -84,4 +89,13 @@ export async function requireRole(
   }
 
   return profile;
+<<<<<<< HEAD
 }
+=======
+}
+
+export const requireRole =
+  cache(
+    requireRoleInternal,
+  );
+>>>>>>> source/main

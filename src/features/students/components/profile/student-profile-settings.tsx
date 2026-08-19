@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   ChevronRight,
   LockKeyhole,
@@ -38,6 +39,95 @@ export function StudentProfileSettings() {
 
         <ChevronRight className="size-5 text-[#536069]" />
       </button>
+=======
+"use client";
+
+import {
+  ChevronRight,
+  LockKeyhole,
+  X,
+} from "lucide-react";
+
+import {
+  useState,
+} from "react";
+
+import {
+  StudentChangePasswordForm,
+} from "@/features/students/components/profile/student-change-password-form";
+
+export function StudentProfileSettings() {
+  const [
+    isChangingPassword,
+    setIsChangingPassword,
+  ] =
+    useState(false);
+
+  return (
+    <section className="rounded-[20px] border border-[#E1E8ED] bg-white p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-heading text-xl font-bold text-navy-steel">
+            Pengaturan
+          </h2>
+
+          <p className="mt-1 text-[13px] leading-5 text-[#68757E]">
+            Kelola keamanan dan akses akun kamu.
+          </p>
+        </div>
+
+        {isChangingPassword ? (
+          <button
+            type="button"
+            onClick={() =>
+              setIsChangingPassword(
+                false,
+              )
+            }
+            aria-label="Tutup ubah password"
+            className="flex size-11 shrink-0 items-center justify-center rounded-xl text-[#68757E] transition-colors hover:bg-[#F2F5F7]"
+          >
+            <X className="size-5" />
+          </button>
+        ) : null}
+      </div>
+
+      {!isChangingPassword ? (
+        <button
+          type="button"
+          onClick={() =>
+            setIsChangingPassword(
+              true,
+            )
+          }
+          className="mt-5 flex min-h-[64px] w-full items-center gap-4 rounded-2xl border border-[#E4E9EC] px-4 text-left transition-colors hover:bg-[#F7F9FA]"
+        >
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#F1F4F6] text-navy-steel">
+            <LockKeyhole className="size-5" />
+          </span>
+
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold text-navy-steel">
+              Ubah Password
+            </span>
+
+            <span className="mt-0.5 block text-xs leading-5 text-[#74818A]">
+              Perbarui password untuk menjaga keamanan akun.
+            </span>
+          </span>
+
+          <ChevronRight className="size-5 shrink-0 text-[#74818A]" />
+        </button>
+      ) : (
+        <StudentChangePasswordForm
+          onCancel={() =>
+            setIsChangingPassword(
+              false,
+            )
+          }
+        />
+      )}
+>>>>>>> source/main
     </section>
   );
 }

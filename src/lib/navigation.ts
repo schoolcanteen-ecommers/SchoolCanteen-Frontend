@@ -55,30 +55,23 @@ export const studentNavigation: NavigationItem[] = [
   },
   {
     title: "Kantin",
-    href: "/kantin",
+    href: "/student/kantin",
     icon: Store,
     desktop: true,
     mobile: true,
   },
   {
     title: "Koperasi",
-    href: "/koperasi",
+    href: "/student/koperasi",
     icon: ShoppingBag,
     desktop: true,
-    mobile: false,
+    mobile: true,
   },
   {
     title: "Pesanan",
     href: "/student/orders",
     icon: ClipboardList,
     desktop: true,
-    mobile: true,
-  },
-  {
-    title: "Wallet",
-    href: "/student/wallet",
-    icon: WalletCards,
-    desktop: false,
     mobile: true,
   },
   {
@@ -92,65 +85,65 @@ export const studentNavigation: NavigationItem[] = [
 
 export const merchantNavigation: NavigationGroup[] = [
   {
-    label: "MAIN",
+    label: "UTAMA",
     items: [
       {
-        title: "Dashboard",
+        title: "Beranda",
         href: "/merchant/dashboard",
         icon: LayoutDashboard,
       },
     ],
   },
   {
-    label: "OPERATIONS",
+    label: "OPERASIONAL",
     items: [
       {
-        title: "Orders",
+        title: "Pesanan",
         href: "/merchant/orders",
         icon: ShoppingCart,
       },
       {
-        title: "Production",
+        title: "Produksi",
         href: "/merchant/production",
         icon: Truck,
       },
       {
-        title: "Pickup Verification",
+        title: "Verifikasi Pickup",
         href: "/merchant/pickup",
         icon: ClipboardCheck,
       },
     ],
   },
   {
-    label: "CATALOG",
+    label: "KATALOG",
     items: [
       {
-        title: "Products",
+        title: "Produk",
         href: "/merchant/products",
         icon: Package,
       },
       {
-        title: "Inventory",
+        title: "Stok",
         href: "/merchant/inventory",
         icon: Boxes,
       },
     ],
   },
   {
-    label: "FINANCE",
+    label: "KEUANGAN",
     items: [
       {
-        title: "Revenue",
+        title: "Keuangan",
         href: "/merchant/finance",
         icon: DollarSign,
       },
     ],
   },
   {
-    label: "SYSTEM",
+    label: "SISTEM",
     items: [
       {
-        title: "Settings",
+        title: "Pengaturan",
         href: "/merchant/settings",
         icon: Settings,
       },

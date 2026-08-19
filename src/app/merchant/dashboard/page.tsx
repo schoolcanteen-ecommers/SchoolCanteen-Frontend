@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Link from "next/link";
 
 import {
@@ -253,5 +254,118 @@ export default function MerchantDashboardPage() {
         </div>
       </section>
     </div>
+=======
+import {
+  MerchantDashboardMobile,
+} from "@/features/dashboard/components/merchant/merchant-dashboard-mobile";
+
+import {
+  MerchantDashboardOverview,
+} from "@/features/dashboard/components/merchant/merchant-dashboard-overview";
+
+import {
+  getMerchantWallet,
+} from "@/lib/api/merchant-finance";
+
+import {
+  getMerchantOrders,
+} from "@/lib/api/merchant-orders";
+
+function getJakartaDateKey(
+  value: string | Date,
+) {
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone:
+          "Asia/Jakarta",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+      },
+    ).formatToParts(
+      new Date(
+        value,
+      ),
+    );
+
+  const values =
+    Object.fromEntries(
+      parts.map(
+        (
+          part,
+        ) => [
+          part.type,
+          part.value,
+        ],
+      ),
+    );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+export default async function MerchantDashboardPage() {
+  const [
+    orders,
+    wallet,
+  ] =
+    await Promise.all([
+      getMerchantOrders(),
+      getMerchantWallet(),
+    ]);
+
+  const todayKey =
+    getJakartaDateKey(
+      new Date(),
+    );
+
+  const todayOrders =
+    orders.filter(
+      (
+        {
+          order,
+        },
+      ) =>
+        getJakartaDateKey(
+          order.createdAt,
+        ) ===
+        todayKey,
+    );
+
+  return (
+    <>
+      <div className="lg:hidden">
+        <MerchantDashboardMobile
+          wallet={
+            wallet
+          }
+          todayOrders={
+            todayOrders
+          }
+        />
+      </div>
+
+      <div className="hidden lg:block">
+        <MerchantDashboardOverview
+          wallet={
+            wallet
+          }
+          todayOrders={
+            todayOrders
+          }
+          allOrders={
+            orders
+          }
+        />
+      </div>
+    </>
+>>>>>>> source/main
   );
 }

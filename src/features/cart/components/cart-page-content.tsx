@@ -1,18 +1,33 @@
 "use client";
 
 import Link from "next/link";
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
+=======
+
 import {
+  useMemo,
+  useState,
+} from "react";
+
+>>>>>>> source/main
+import {
+  AlertTriangle,
+  ArrowRight,
   ImageIcon,
   Minus,
   Plus,
-  ShoppingBag,
   ShoppingCart,
+<<<<<<< HEAD
+=======
+  SlidersHorizontal,
+>>>>>>> source/main
   Store,
   Trash2,
   ArrowRight
 } from "lucide-react";
 
+<<<<<<< HEAD
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/features/cart/use-cart";
 import { formatCurrency } from "@/lib/utils";
@@ -25,14 +40,43 @@ interface ResolvedCartItem {
   product: Product;
   merchantName: string;
 }
+=======
+import {
+  Button,
+} from "@/components/ui/button";
+
+import {
+  ProductCustomizationSheet,
+} from "@/features/cart/components/product-customization-sheet";
+
+import {
+  useCart,
+} from "@/features/cart/use-cart";
+
+import {
+  useResolvedCartLines,
+  type ResolvedCartLine,
+} from "@/features/cart/use-resolved-cart-lines";
+
+import {
+  getOptimizedCloudinaryImageUrl,
+} from "@/lib/cloudinary-image";
+
+import {
+  formatCurrency,
+} from "@/lib/utils";
+>>>>>>> source/main
 
 interface MerchantCartGroup {
   merchantId: string;
   merchantName: string;
-  items: ResolvedCartItem[];
+
+  lines:
+    ResolvedCartLine[];
 }
 
 export function CartPageContent() {
+<<<<<<< HEAD
   const { items, isHydrated, removeItem, updateQuantity, clearCart } = useCart();
   const [resolvedItems, setResolvedItems] = useState<ResolvedCartItem[]>([]);
   const [isResolving, setIsResolving] = useState(true);
@@ -40,16 +84,59 @@ export function CartPageContent() {
  
   useEffect(() => {
     if (!isHydrated) return;
+=======
+  const {
+    items,
+    removeLine,
+    updateLineQuantity,
+    getProductQuantity,
+    clearCart,
+  } = useCart();
 
-    let cancelled = false;
+  const {
+    lines,
+    isHydrated,
+    isResolving,
+    resolveFailed,
+    canCheckout,
+    totalPreview,
+    retry,
+  } =
+    useResolvedCartLines();
 
-    async function resolveCartItems() {
-      if (items.length === 0) {
-        setResolvedItems([]);
-        setIsResolving(false);
-        return;
-      }
+  const [
+    editingLineId,
+    setEditingLineId,
+  ] =
+    useState<
+      string | null
+    >(null);
+>>>>>>> source/main
 
+  const groups =
+    useMemo(
+      () =>
+        lines.reduce<
+          MerchantCartGroup[]
+        >(
+          (
+            result,
+            line,
+          ) => {
+            if (
+              !line.merchant
+            ) {
+              return result;
+            }
+
+            const existing =
+              result.find(
+                (group) =>
+                  group.merchantId ===
+                  line.merchant!.id,
+              );
+
+<<<<<<< HEAD
       const results = await Promise.allSettled(
         items.map(async (item) => {
           const data = await getCartProduct(item.productId);
@@ -75,11 +162,38 @@ export function CartPageContent() {
           removeItem(invalidItem.productId);
         }
       });
+=======
+            if (existing) {
+              existing.lines.push(
+                line,
+              );
 
-      setResolvedItems(validItems);
-      setIsResolving(false);
-    }
+              return result;
+            }
 
+            result.push({
+              merchantId:
+                line.merchant.id,
+
+              merchantName:
+                line.merchant.name,
+
+              lines: [
+                line,
+              ],
+            });
+>>>>>>> source/main
+
+            return result;
+          },
+          [],
+        ),
+      [
+        lines,
+      ],
+    );
+
+<<<<<<< HEAD
     void resolveCartItems();
     return () => {
       cancelled = true;
@@ -99,12 +213,60 @@ export function CartPageContent() {
               <div className="h-48 rounded-[16px] bg-surface-variant" />
             </div>
             <div className="h-64 rounded-2xl bg-surface-variant lg:col-span-4" />
+=======
+  const unavailableLines =
+    useMemo(
+      () =>
+        lines.filter(
+          (line) =>
+            !line.product ||
+            !line.merchant,
+        ),
+      [
+        lines,
+      ],
+    );
+
+  const editingLine =
+    lines.find(
+      (line) =>
+        line.lineId ===
+        editingLineId,
+    ) ?? null;
+
+  const totalQuantity =
+    items.reduce(
+      (
+        total,
+        item,
+      ) =>
+        total +
+        item.quantity,
+      0,
+    );
+
+  if (
+    !isHydrated ||
+    isResolving
+  ) {
+    return (
+      <div className="cart-route mx-auto max-w-[1120px] px-4 py-6 sm:px-6 md:px-8 md:py-10">
+        <div className="animate-pulse">
+          <div className="h-8 w-36 rounded-lg bg-[#DCEAF3]" />
+
+          <div className="mt-3 h-4 w-64 rounded bg-[#E7F0F5]" />
+
+          <div className="mt-8 space-y-4">
+            <div className="h-32 rounded-[18px] bg-[#EAF4FA]" />
+            <div className="h-32 rounded-[18px] bg-[#EAF4FA]" />
+>>>>>>> source/main
           </div>
         </div>
       </div>
     );
   }
 
+<<<<<<< HEAD
  
   const groups = resolvedItems.reduce<MerchantCartGroup[]>(
     (currentGroups, item) => {
@@ -165,9 +327,64 @@ export function CartPageContent() {
               variant="outline"
               className="h-[52px] px-8 rounded-xl border-arctic-blue text-navy-steel font-bold font-sans hover:bg-neutral-surface"
               render={<Link href="/koperasi" />}
+=======
+  if (resolveFailed) {
+    return (
+      <div className="cart-route mx-auto flex min-h-[60svh] max-w-[1120px] items-center justify-center px-4 py-10 sm:px-6">
+        <div className="max-w-sm text-center">
+          <ShoppingCart className="mx-auto size-9 text-muted-foreground/45" />
+
+          <h1 className="mt-4 font-heading text-xl font-bold text-navy-steel">
+            Keranjang belum dapat dimuat
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Periksa koneksi lalu coba kembali.
+          </p>
+
+          <Button
+            type="button"
+            onClick={retry}
+            className="mt-5 h-11 rounded-xl bg-navy-steel px-5 text-sm font-bold text-white"
+          >
+            Coba lagi
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="cart-route mx-auto flex min-h-[65svh] max-w-[1120px] items-center justify-center px-4 py-10 sm:px-6">
+        <div className="flex max-w-md flex-col items-center text-center">
+          <div className="flex size-16 items-center justify-center rounded-[20px] bg-[#EEF7FD] text-navy-steel">
+            <ShoppingCart className="size-7" />
+          </div>
+
+          <h1 className="mt-5 font-heading text-[26px] font-bold tracking-tight text-navy-steel sm:text-3xl">
+            Keranjang masih kosong
+          </h1>
+
+          <p className="mt-2 max-w-sm text-[13px] leading-6 text-muted-foreground sm:text-sm">
+            Tambahkan makanan atau kebutuhan sekolah yang kamu inginkan.
+          </p>
+
+          <div className="mt-6 grid w-full grid-cols-2 gap-3">
+            <Link
+              href="/kantin"
+              className="flex min-h-12 items-center justify-center rounded-[13px] bg-navy-steel px-4 text-[13px] font-bold text-white"
+>>>>>>> source/main
             >
-              Lihat Koperasi
-            </Button>
+              Ke Kantin
+            </Link>
+
+            <Link
+              href="/koperasi"
+              className="flex min-h-12 items-center justify-center rounded-[13px] border border-[#DCE8F0] bg-white px-4 text-[13px] font-bold text-navy-steel"
+            >
+              Ke Koperasi
+            </Link>
           </div>
         </div>
       </div>
@@ -176,6 +393,7 @@ export function CartPageContent() {
 
  
   return (
+<<<<<<< HEAD
     <div className="flex-grow w-full bg-neutral-surface pb-[100px] md:pb-0">
       <div className="mx-auto max-w-[1320px] px-4 md:px-10 py-8 lg:py-12">
         
@@ -308,8 +526,353 @@ export function CartPageContent() {
                                 <Plus className="size-3.5 md:size-4" />
                               </button>
                             </div>
+=======
+    <>
+      <div className="cart-route w-full bg-neutral-surface pb-[120px] lg:pb-0">
+        <div className="mx-auto max-w-[1120px] px-4 py-6 sm:px-6 sm:py-8 md:px-8 lg:py-10">
+          <header className="mb-7 sm:mb-9">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="font-heading text-[30px] font-bold leading-none tracking-tight text-navy-steel sm:text-[36px]">
+                  Keranjang
+                </h1>
+
+                <p className="mt-2 text-[13px] text-muted-foreground sm:text-sm">
+                  {totalQuantity} item
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={
+                  clearCart
+                }
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-xl px-2.5 text-[12px] font-bold text-red-600 transition hover:bg-red-50 sm:px-3 sm:text-sm"
+              >
+                <Trash2 className="size-4" />
+                Kosongkan
+              </button>
+            </div>
+          </header>
+
+          <div className="grid items-start gap-8 lg:grid-cols-12 lg:gap-10">
+            <div className="space-y-8 lg:col-span-8">
+              {groups.map(
+                (group) => (
+                  <section
+                    key={
+                      group.merchantId
+                    }
+                  >
+                    <header className="mb-3 flex items-center gap-2.5 border-b border-[#DCE9F1] pb-3">
+                      <span className="flex size-9 items-center justify-center rounded-[11px] bg-[#EEF7FD] text-navy-steel">
+                        <Store className="size-[17px]" />
+                      </span>
+
+                      <h2 className="truncate font-heading text-[18px] font-bold text-navy-steel sm:text-xl">
+                        {group.merchantName}
+                      </h2>
+                    </header>
+
+                    <div className="space-y-3">
+                      {group.lines.map(
+                        (line) => {
+                          if (
+                            !line.product
+                          ) {
+                            return null;
+                          }
+
+                          const product =
+                            line.product;
+
+                          const productQuantity =
+                            getProductQuantity(
+                              product.id,
+                            );
+
+                          const canIncrease =
+                            productQuantity <
+                              product.stock &&
+                            product.isActive;
+
+                          const canDecrease =
+                            line.quantity > 1;
+
+                          return (
+                            <article
+                              key={
+                                line.lineId
+                              }
+                              className="rounded-[18px] border border-[#DCE8F0] bg-white p-4 shadow-[0_4px_18px_rgba(13,27,42,0.03)] sm:p-5"
+                            >
+                              <div className="flex gap-4">
+                                <div className="flex size-[88px] shrink-0 items-center justify-center overflow-hidden rounded-[14px] border border-[#E2E8F0] bg-neutral-surface sm:size-24">
+                                  {product.imageUrl ? (
+                                    <img
+                                      src={getOptimizedCloudinaryImageUrl(
+                                        product.imageUrl,
+                                        {
+                                          width: 240,
+                                          height: 240,
+                                        },
+                                      )}
+                                      alt={
+                                        product.name
+                                      }
+                                      className="size-full object-cover"
+                                    />
+                                  ) : (
+                                    <ImageIcon className="size-7 text-muted-foreground/40" />
+                                  )}
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                      <Link
+                                        href={`/produk/${product.id}`}
+                                        className="font-heading text-[16px] font-bold text-navy-steel hover:underline sm:text-lg"
+                                      >
+                                        {product.name}
+                                      </Link>
+
+                                      <p className="mt-1 text-xs text-[#66737C]">
+                                        {formatCurrency(
+                                          line.unitPrice,
+                                        )}{" "}
+                                        / item
+                                      </p>
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        removeLine(
+                                          line.lineId,
+                                        )
+                                      }
+                                      aria-label="Hapus item"
+                                      className="flex size-9 shrink-0 items-center justify-center rounded-lg text-red-600 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="size-4" />
+                                    </button>
+                                  </div>
+
+                                  {line.modifierSummaries.length >
+                                    0 && (
+                                    <div className="mt-3 space-y-1">
+                                      {line.modifierSummaries.map(
+                                        (
+                                          summary,
+                                        ) => (
+                                          <p
+                                            key={
+                                              summary.groupId
+                                            }
+                                            className="text-[12px] leading-5 text-[#536069]"
+                                          >
+                                            <span className="font-semibold text-navy-steel">
+                                              {summary.groupName}:
+                                            </span>{" "}
+                                            {summary.optionNames.join(
+                                              ", ",
+                                            )}
+
+                                            {summary.priceDelta >
+                                              0 &&
+                                              ` (+${formatCurrency(
+                                                summary.priceDelta,
+                                              )})`}
+                                          </p>
+                                        ),
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {line.note && (
+                                    <p className="mt-2 text-[12px] italic leading-5 text-[#66737C]">
+                                      Catatan: {line.note}
+                                    </p>
+                                  )}
+
+                                  {product.hasModifiers && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEditingLineId(
+                                          line.lineId,
+                                        )
+                                      }
+                                      className="mt-2 inline-flex items-center gap-1.5 text-[12px] font-bold text-navy-steel hover:underline"
+                                    >
+                                      <SlidersHorizontal className="size-3.5" />
+                                      Edit pilihan
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+
+                              {!line.valid && (
+                                <div className="mt-4 rounded-[12px] border border-amber-200 bg-amber-50 px-3 py-2.5">
+                                  <div className="flex gap-2 text-[12px] leading-5 text-amber-800">
+                                    <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+
+                                    <span>
+                                      {line.issue ??
+                                        "Item perlu diperiksa."}
+                                    </span>
+                                  </div>
+
+                                  {!line.stockValid && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const otherQuantity =
+                                          productQuantity -
+                                          line.quantity;
+
+                                        const allowed =
+                                          product.stock -
+                                          otherQuantity;
+
+                                        if (
+                                          allowed >
+                                          0
+                                        ) {
+                                          updateLineQuantity(
+                                            line.lineId,
+                                            allowed,
+                                          );
+                                        } else {
+                                          removeLine(
+                                            line.lineId,
+                                          );
+                                        }
+                                      }}
+                                      className="mt-2 text-[12px] font-bold text-amber-900 underline"
+                                    >
+                                      Sesuaikan dengan stok
+                                    </button>
+                                  )}
+
+                                  {!line.customizationValid &&
+                                    product.hasModifiers && (
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setEditingLineId(
+                                            line.lineId,
+                                          )
+                                        }
+                                        className="ml-4 mt-2 text-[12px] font-bold text-amber-900 underline"
+                                      >
+                                        Atur ulang pilihan
+                                      </button>
+                                    )}
+                                </div>
+                              )}
+
+                              <div className="mt-4 flex items-center justify-between border-t border-[#EEF2F5] pt-4">
+                                <div className="flex items-center gap-1 rounded-full border border-[#DCE8F0] bg-[#F8FAFC] p-1">
+                                  <button
+                                    type="button"
+                                    disabled={
+                                      !canDecrease
+                                    }
+                                    onClick={() =>
+                                      updateLineQuantity(
+                                        line.lineId,
+                                        line.quantity -
+                                          1,
+                                      )
+                                    }
+                                    className="flex size-8 items-center justify-center rounded-full text-navy-steel disabled:opacity-30"
+                                  >
+                                    <Minus className="size-4" />
+                                  </button>
+
+                                  <span className="min-w-8 text-center text-sm font-bold text-navy-steel">
+                                    {line.quantity}
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    disabled={
+                                      !canIncrease
+                                    }
+                                    onClick={() =>
+                                      updateLineQuantity(
+                                        line.lineId,
+                                        line.quantity +
+                                          1,
+                                      )
+                                    }
+                                    className="flex size-8 items-center justify-center rounded-full text-navy-steel disabled:opacity-30"
+                                  >
+                                    <Plus className="size-4" />
+                                  </button>
+                                </div>
+
+                                <strong className="font-heading text-[17px] text-navy-steel">
+                                  {formatCurrency(
+                                    line.subtotal,
+                                  )}
+                                </strong>
+                              </div>
+                            </article>
+                          );
+                        },
+                      )}
+                    </div>
+                  </section>
+                ),
+              )}
+
+              {unavailableLines.length >
+                0 && (
+                <section>
+                  <header className="mb-3 flex items-center gap-2 border-b border-amber-200 pb-3">
+                    <AlertTriangle className="size-5 text-amber-700" />
+
+                    <h2 className="font-heading text-lg font-bold text-navy-steel">
+                      Perlu diperiksa
+                    </h2>
+                  </header>
+
+                  <div className="space-y-3">
+                    {unavailableLines.map(
+                      (line) => (
+                        <div
+                          key={
+                            line.lineId
+                          }
+                          className="flex items-center justify-between gap-4 rounded-[16px] border border-amber-200 bg-amber-50 p-4"
+                        >
+                          <div>
+                            <p className="text-sm font-bold text-navy-steel">
+                              Produk tidak tersedia
+                            </p>
+
+                            <p className="mt-1 text-xs text-amber-800">
+                              Item ini tidak dihapus otomatis.
+                            </p>
+>>>>>>> source/main
                           </div>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeLine(
+                                line.lineId,
+                              )
+                            }
+                            className="text-xs font-bold text-red-600"
+                          >
+                            Hapus
+                          </button>
                         </div>
+<<<<<<< HEAD
                       </div>
                     );
                   })}
@@ -354,8 +917,147 @@ export function CartPageContent() {
             </div>
           </div>
 
+=======
+                      ),
+                    )}
+                  </div>
+                </section>
+              )}
+            </div>
+
+            <aside className="lg:sticky lg:top-24 lg:col-span-4">
+              <div className="rounded-[20px] border border-[#DCE8F0] bg-white p-5 shadow-[0_8px_30px_rgba(13,27,42,0.05)] sm:p-6">
+                <h2 className="font-heading text-xl font-bold text-navy-steel">
+                  Ringkasan
+                </h2>
+
+                <div className="mt-5 space-y-3 text-sm">
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">
+                      Total item
+                    </span>
+
+                    <span className="font-semibold text-navy-steel">
+                      {totalQuantity}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">
+                      Subtotal
+                    </span>
+
+                    <span className="font-semibold text-navy-steel">
+                      {formatCurrency(
+                        totalPreview,
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">
+                      Biaya layanan
+                    </span>
+
+                    <span className="font-semibold text-navy-steel">
+                      Rp0
+                    </span>
+                  </div>
+
+                  <div className="border-t border-[#E2E8F0] pt-4">
+                    <div className="flex items-end justify-between gap-4">
+                      <span className="font-bold text-navy-steel">
+                        Total
+                      </span>
+
+                      <span className="font-heading text-xl font-bold text-navy-steel">
+                        {formatCurrency(
+                          totalPreview,
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {canCheckout ? (
+                  <Button
+                    nativeButton={
+                      false
+                    }
+                    className="mt-6 h-[52px] w-full rounded-[14px] bg-navy-steel font-bold text-white"
+                    render={
+                      <Link href="/student/checkout" />
+                    }
+                  >
+                    Lanjut Checkout
+                    <ArrowRight className="size-[18px]" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    disabled
+                    className="mt-6 h-[52px] w-full rounded-[14px]"
+                  >
+                    Periksa Keranjang
+                  </Button>
+                )}
+
+                {!canCheckout && (
+                  <p className="mt-3 text-center text-[11px] leading-5 text-amber-700">
+                    Selesaikan masalah stok atau pilihan produk sebelum checkout.
+                  </p>
+                )}
+              </div>
+            </aside>
+          </div>
+>>>>>>> source/main
         </div>
       </div>
-    </div>
+
+      {editingLine?.product &&
+        editingLine.product
+          .hasModifiers && (
+        <ProductCustomizationSheet
+          productId={
+            editingLine.productId
+          }
+          stock={
+            editingLine.product
+              .stock
+          }
+          quantity={
+            editingLine.quantity
+          }
+          lineId={
+            editingLine.lineId
+          }
+          initialSelections={
+            editingLine.selections
+          }
+          initialNote={
+            editingLine.note
+          }
+          open={
+            Boolean(
+              editingLineId,
+            )
+          }
+          onOpenChange={(
+            open,
+          ) => {
+            if (!open) {
+              setEditingLineId(
+                null,
+              );
+            }
+          }}
+          onAdded={() => {
+            setEditingLineId(
+              null,
+            );
+          }}
+        />
+      )}
+    </>
   );
 }

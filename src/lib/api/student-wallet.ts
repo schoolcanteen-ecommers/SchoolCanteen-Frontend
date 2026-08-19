@@ -18,7 +18,11 @@ interface ApiStudentWallet {
   updated_at: string | null;
 }
 
+<<<<<<< HEAD
 interface ApiWalletTransaction {
+=======
+export interface ApiWalletTransaction {
+>>>>>>> source/main
   id: string;
 
   type: string;
@@ -126,7 +130,11 @@ function mapTransactionStatus(
   }
 }
 
+<<<<<<< HEAD
 function mapWalletTransaction(
+=======
+export function mapWalletTransaction(
+>>>>>>> source/main
   transaction: ApiWalletTransaction,
   walletId: string,
 ): WalletTransaction {
@@ -230,6 +238,7 @@ export async function getStudentWalletTransactions(
 }
 
 export async function getStudentWalletOverview() {
+<<<<<<< HEAD
   const wallet =
     await getStudentWallet();
 
@@ -243,3 +252,60 @@ export async function getStudentWalletOverview() {
     transactions,
   };
 }
+=======
+  const data =
+    await authenticatedServerApiRequest<{
+      wallet: ApiStudentWallet;
+
+      transactions:
+        ApiWalletTransaction[];
+
+      monthly_summary: {
+        total_top_up: number;
+        total_outflow: number;
+      };
+    }>(
+      "/student/wallet/overview",
+      {
+        cache: "no-store",
+      },
+    );
+
+  const wallet: StudentWalletData = {
+    id:
+      data.wallet.id,
+
+    balance:
+      data.wallet.balance,
+
+    isActive:
+      data.wallet.is_active,
+
+    updatedAt:
+      data.wallet.updated_at,
+  };
+
+  return {
+    wallet,
+
+    transactions:
+      data.transactions.map(
+        (transaction) =>
+          mapWalletTransaction(
+            transaction,
+            wallet.id,
+          ),
+      ),
+
+    monthlySummary: {
+      totalTopUp:
+        data.monthly_summary
+          .total_top_up,
+
+      totalOutflow:
+        data.monthly_summary
+          .total_outflow,
+    },
+  };
+}
+>>>>>>> source/main

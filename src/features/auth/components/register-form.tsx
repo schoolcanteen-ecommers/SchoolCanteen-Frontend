@@ -113,7 +113,11 @@ export function RegisterForm({
 
         <Button
           nativeButton={false}
+<<<<<<< HEAD
           className="h-[52px] w-full rounded-[14px] border-[#E6F4FF] text-[#0D1B2A] font-bold font-sans hover:bg-[#F8FAFC]"
+=======
+          className="h-12 w-full rounded-xl border-[#E6F4FF] text-[#0D1B2A] font-bold font-sans hover:bg-[#F8FAFC]"
+>>>>>>> source/main
           variant="outline"
           render={
             <Link
@@ -141,7 +145,11 @@ export function RegisterForm({
             type="text"
             autoComplete="name"
             placeholder="Masukkan nama lengkap"
+<<<<<<< HEAD
             className="h-[52px] w-full rounded-[14px] border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-4 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+=======
+            className="h-12 w-full rounded-xl border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-4 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+>>>>>>> source/main
             {...register("name")}
           />
         </div>
@@ -158,7 +166,11 @@ export function RegisterForm({
             type="email"
             autoComplete="email"
             placeholder="Masukkan email atau username"
+<<<<<<< HEAD
             className="h-[52px] w-full rounded-[14px] border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-4 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+=======
+            className="h-12 w-full rounded-xl border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-4 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+>>>>>>> source/main
             {...register("email")}
           />
         </div>
@@ -177,7 +189,11 @@ export function RegisterForm({
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               placeholder="Buat password"
+<<<<<<< HEAD
               className="h-[52px] w-full rounded-[14px] border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-10 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+=======
+              className="h-12 w-full rounded-xl border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-10 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+>>>>>>> source/main
               {...register("password")}
             />
             <button
@@ -202,7 +218,11 @@ export function RegisterForm({
               type={showConfirmPassword ? "text" : "password"}
               autoComplete="new-password"
               placeholder="Ulangi password"
+<<<<<<< HEAD
               className="h-[52px] w-full rounded-[14px] border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-10 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+=======
+              className="h-12 w-full rounded-xl border-[#E6F4FF] bg-[#F8FAFC] pl-12 pr-10 font-sans text-[#0D1B2A] transition-all placeholder:text-[#536069]/60 hover:bg-[#E6F4FF]/30 focus-visible:border-[#0D1B2A] focus-visible:ring-1 focus-visible:ring-[#0D1B2A]"
+>>>>>>> source/main
               {...register("confirmPassword")}
             />
             <button
@@ -232,7 +252,11 @@ export function RegisterForm({
         <Button
           type="submit"
           disabled={isSubmitting}
+<<<<<<< HEAD
           className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[14px] bg-[#0D1B2A] font-sans text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#0D1B2A]/90 active:translate-y-0"
+=======
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0D1B2A] font-sans text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#0D1B2A]/90 active:translate-y-0"
+>>>>>>> source/main
         >
           {isSubmitting ? "Mendaftarkan..." : "Daftar Akun"}
           {!isSubmitting && <ArrowRight className="size-5" />}

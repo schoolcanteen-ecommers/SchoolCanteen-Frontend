@@ -1,14 +1,35 @@
+<<<<<<< HEAD
 import { Package, ReceiptText, Store } from "lucide-react";
 
 import { CheckoutOrderItem } from "@/features/cart/components/checkout/checkout-order-item";
 
 import type { MerchantType } from "@/types/merchant";
 import type { Product } from "@/types/product";
+=======
+import {
+  Package,
+  ReceiptText,
+  Store,
+} from "lucide-react";
+
+import {
+  CheckoutOrderItem,
+} from "@/features/cart/components/checkout/checkout-order-item";
+
+import type {
+  ResolvedCartLine,
+} from "@/features/cart/use-resolved-cart-lines";
+
+import type {
+  MerchantType,
+} from "@/types/merchant";
+>>>>>>> source/main
 
 interface CheckoutOrderGroup {
   merchantId: string;
   merchantName: string;
   merchantType: MerchantType;
+<<<<<<< HEAD
   items: Array<{
     product: Product;
     quantity: number;
@@ -20,6 +41,31 @@ interface CheckoutOrderSectionProps {
   notes: Record<string, string>;
   disabled?: boolean;
   onNoteChange: (merchantId: string, value: string) => void;
+=======
+
+  items:
+    ResolvedCartLine[];
+
+  subtotal: number;
+}
+
+interface CheckoutOrderSectionProps {
+  groups:
+    CheckoutOrderGroup[];
+
+  notes:
+    Record<
+      string,
+      string
+    >;
+
+  disabled?: boolean;
+
+  onNoteChange: (
+    merchantId: string,
+    value: string,
+  ) => void;
+>>>>>>> source/main
 }
 
 export function CheckoutOrderSection({
@@ -38,6 +84,7 @@ export function CheckoutOrderSection({
       </h2>
 
       <div className="relative z-10 space-y-6 lg:space-y-8">
+<<<<<<< HEAD
         {groups.map((group) => {
           const isCanteen = group.merchantType === "CANTEEN";
           const MerchantIcon = isCanteen ? Store : Package;
@@ -89,6 +136,97 @@ export function CheckoutOrderSection({
             </div>
           );
         })}
+=======
+        {groups.map(
+          (group) => {
+            const isCanteen =
+              group.merchantType ===
+              "CANTEEN";
+
+            const MerchantIcon =
+              isCanteen
+                ? Store
+                : Package;
+
+            return (
+              <div
+                key={
+                  group.merchantId
+                }
+                className="rounded-[16px] border border-arctic-blue bg-white p-5 lg:border-0 lg:p-0"
+              >
+                <div className="flex items-center justify-between gap-4 border-b border-arctic-blue pb-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-arctic-blue text-navy-steel">
+                      <MerchantIcon className="size-4" />
+                    </span>
+
+                    <div className="min-w-0">
+                      <p className="text-xs text-[#66737C]">
+                        {isCanteen
+                          ? "Kantin"
+                          : "Koperasi"}
+                      </p>
+
+                      <p className="truncate font-heading font-bold text-navy-steel">
+                        {group.merchantName}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="divide-y divide-[#E6E8EA]">
+                  {group.items.map(
+                    (line) => (
+                      <CheckoutOrderItem
+                        key={
+                          line.lineId
+                        }
+                        line={
+                          line
+                        }
+                      />
+                    ),
+                  )}
+                </div>
+
+                <div className="mt-4">
+                  <label
+                    htmlFor={`merchant-note-${group.merchantId}`}
+                    className="text-xs font-semibold text-[#536069]"
+                  >
+                    Catatan untuk merchant
+                  </label>
+
+                  <textarea
+                    id={`merchant-note-${group.merchantId}`}
+                    value={
+                      notes[
+                        group.merchantId
+                      ] ?? ""
+                    }
+                    disabled={
+                      disabled
+                    }
+                    maxLength={500}
+                    rows={2}
+                    onChange={(
+                      event,
+                    ) =>
+                      onNoteChange(
+                        group.merchantId,
+                        event.target.value,
+                      )
+                    }
+                    placeholder="Catatan umum pesanan..."
+                    className="mt-2 w-full resize-none rounded-xl border border-[#DCE8F0] bg-white px-3 py-2.5 text-sm outline-none focus:border-navy-steel disabled:opacity-60"
+                  />
+                </div>
+              </div>
+            );
+          },
+        )}
+>>>>>>> source/main
       </div>
     </section>
   );

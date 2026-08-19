@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Link from "next/link";
 import {
   ArrowRight,
@@ -130,9 +131,124 @@ export default async function HomePage() {
                 <div className="font-sans text-xs font-bold tracking-wider uppercase text-muted-foreground">Waktu antre</div>
                 <div className="font-sans text-sm font-bold text-navy-steel">Lebih efisien</div>
               </div>
+=======
+"use client";
+
+import {
+  PublicHomeFeedSkeleton,
+} from "@/features/public-home/components/public-home-feed-skeleton";
+
+import {
+  PublicHomeIntro,
+} from "@/features/public-home/components/public-home-intro";
+
+import {
+  PublicHomeProductSection,
+} from "@/features/public-home/components/public-home-product-section";
+
+import {
+  usePublicHomeCatalog,
+} from "@/features/public-home/hooks/use-public-home-catalog";
+
+export default function HomePage() {
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+  } = usePublicHomeCatalog();
+
+  const canteenCatalog =
+    data?.canteen ?? {
+      merchants: [],
+      products: [],
+      categories: [],
+    };
+
+  const cooperativeCatalog =
+    data?.cooperative ?? {
+      merchants: [],
+      products: [],
+      categories: [],
+    };
+
+  const merchantNameById =
+    new Map(
+      [
+        ...canteenCatalog.merchants,
+        ...cooperativeCatalog.merchants,
+      ].map(
+        (merchant) => [
+          merchant.id,
+          merchant.name,
+        ],
+      ),
+    );
+
+  const activeCanteenProducts =
+    canteenCatalog.products
+      .filter(
+        (product) =>
+          product.isActive &&
+          product.stock > 0,
+      )
+      .slice(
+        0,
+        8,
+      );
+
+  const activeCooperativeProducts =
+    cooperativeCatalog.products
+      .filter(
+        (product) =>
+          product.isActive &&
+          product.stock > 0,
+      )
+      .slice(
+        0,
+        8,
+      );
+
+  const hasProducts =
+    activeCanteenProducts.length >
+      0 ||
+    activeCooperativeProducts.length >
+      0;
+
+  return (
+    <main className="bg-neutral-surface">
+      <PublicHomeIntro />
+
+      {isPending && (
+        <PublicHomeFeedSkeleton />
+      )}
+
+      {isError && (
+        <section className="bg-neutral-surface py-10">
+          <div className="mx-auto max-w-[1120px] px-4 text-center sm:px-6 md:px-8">
+            <div className="mx-auto max-w-md rounded-[20px] border border-[#DCEAF3] bg-white p-6 shadow-sm">
+              <h2 className="font-heading text-lg font-bold text-navy-steel">
+                Katalog belum dapat dimuat
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Periksa koneksi lalu coba muat ulang katalog SchoolCanteen.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  void refetch();
+                }}
+                className="mt-5 h-11 rounded-xl bg-navy-steel px-5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+              >
+                Coba lagi
+              </button>
+>>>>>>> source/main
             </div>
           </div>
 
+<<<<<<< HEAD
         </div>
       </section>
 
@@ -234,5 +350,56 @@ export default async function HomePage() {
       )}
 
     </div>
+=======
+      {!isPending &&
+        !isError &&
+        hasProducts && (
+          <>
+            <PublicHomeProductSection
+              title="Populer di kantin"
+              description="Pilihan makanan dan minuman yang bisa kamu pesan sekarang."
+              href="/kantin"
+              source="kantin"
+              products={
+                activeCanteenProducts
+              }
+              merchantNameById={
+                merchantNameById
+              }
+              variant="blue"
+            />
+
+            <PublicHomeProductSection
+              title="Kebutuhan sekolah"
+              description="Alat tulis dan kebutuhan harian dari koperasi sekolah."
+              href="/koperasi"
+              source="koperasi"
+              products={
+                activeCooperativeProducts
+              }
+              merchantNameById={
+                merchantNameById
+              }
+            />
+          </>
+        )}
+
+      {!isPending &&
+        !isError &&
+        !hasProducts && (
+          <section className="py-12">
+            <div className="mx-auto max-w-[1120px] px-4 text-center sm:px-6 md:px-8">
+              <h2 className="font-heading text-xl font-bold text-navy-steel">
+                Belum ada produk tersedia
+              </h2>
+
+              <p className="mt-2 text-sm text-muted-foreground">
+                Produk akan muncul di sini ketika kantin atau koperasi mulai menjual.
+              </p>
+            </div>
+          </section>
+        )}
+    </main>
+>>>>>>> source/main
   );
 }

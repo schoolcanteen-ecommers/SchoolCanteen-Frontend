@@ -145,3 +145,1386 @@
     @apply font-heading tracking-tight;
   }
 }
+
+/* =========================================================
+   SchoolCanteen — Mobile Liquid Navigation
+   ========================================================= */
+
+.public-route-main {
+  padding-bottom:
+    calc(
+      7rem
+      + env(safe-area-inset-bottom)
+    );
+}
+
+.public-liquid-nav {
+  bottom:
+    calc(
+      1rem
+      + env(safe-area-inset-bottom)
+    );
+}
+
+.liquid-nav-indicator {
+  position: absolute;
+  top: -18px;
+  left:
+    calc(
+      var(--liquid-index)
+      * 25%
+    );
+  width: 25%;
+  height: 58px;
+
+  display: flex;
+  justify-content: center;
+
+  pointer-events: none;
+
+  transition:
+    left 480ms
+      cubic-bezier(
+        0.22,
+        1.2,
+        0.36,
+        1
+      ),
+    opacity 180ms ease;
+}
+
+.liquid-nav-bubble {
+  position: relative;
+
+  width: 58px;
+  height: 58px;
+
+  border-radius: 9999px;
+
+  background: white;
+
+  border:
+    7px solid
+    var(--color-neutral-surface);
+
+  box-shadow:
+    0 10px 24px
+      rgba(8, 28, 46, 0.18);
+
+  transform:
+    translateY(-1px);
+
+  transition:
+    transform 420ms
+      cubic-bezier(
+        0.22,
+        1.2,
+        0.36,
+        1
+      );
+}
+
+.liquid-nav-bubble::after {
+  content: "";
+
+  position: absolute;
+  inset: 9px;
+
+  border-radius: inherit;
+
+  background:
+    var(--color-arctic-blue);
+
+  opacity: 0.72;
+}
+
+.liquid-nav-item {
+  -webkit-tap-highlight-color:
+    transparent;
+
+  transition:
+    color 240ms ease,
+    transform 280ms ease;
+}
+
+.liquid-nav-item:active {
+  transform: scale(0.94);
+}
+
+.liquid-nav-icon {
+  transition:
+    transform 440ms
+      cubic-bezier(
+        0.22,
+        1.25,
+        0.36,
+        1
+      ),
+    color 260ms ease,
+    opacity 260ms ease;
+}
+
+.liquid-nav-icon-active {
+  transform:
+    translateY(-24px)
+    scale(1.08);
+}
+
+@media (min-width: 768px) {
+  .public-route-main {
+    padding-bottom: 0;
+  }
+}
+
+/*
+ * Phone landscape:
+ * bottom navigation disappears and the header navigation
+ * behaves like the desktop navigation.
+ */
+@media (
+  orientation: landscape
+) and (max-height: 520px) {
+  .public-liquid-nav {
+    display: none !important;
+  }
+
+  .public-route-main {
+    padding-bottom: 0;
+  }
+
+  .school-header-navigation {
+    display: flex !important;
+  }
+
+  .school-header-brand-label {
+    display: none;
+  }
+
+  .school-header-inner {
+    height: 60px;
+  }
+}
+
+/*
+ * Small portrait phones.
+ */
+@media (
+  orientation: portrait
+) and (max-width: 359px) {
+  .public-liquid-nav {
+    left: 10px;
+    right: 10px;
+  }
+
+  .liquid-nav-bubble {
+    width: 54px;
+    height: 54px;
+  }
+
+  .liquid-nav-indicator {
+    top: -16px;
+  }
+
+  .liquid-nav-icon-active {
+    transform:
+      translateY(-22px)
+      scale(1.04);
+  }
+}
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .liquid-nav-indicator,
+  .liquid-nav-bubble,
+  .liquid-nav-icon,
+  .liquid-nav-item {
+    transition-duration: 0ms !important;
+  }
+}
+
+
+/* =========================================================
+   Public Home Responsive Refinements
+   ========================================================= */
+
+@media (
+  orientation: landscape
+) and (max-height: 520px) {
+  .public-home-hero-grid {
+    padding-top: 24px;
+    padding-bottom: 32px;
+  }
+
+  .public-home-hero h1 {
+    max-width: 780px;
+    font-size:
+      clamp(
+        2rem,
+        5vw,
+        3rem
+      );
+  }
+
+  .public-home-hero p {
+    max-width: 760px;
+    margin-bottom: 18px;
+  }
+}
+
+
+/* =========================================================
+   Liquid Navigation — Motion Polish
+   ========================================================= */
+
+.liquid-nav-bubble-moving {
+  animation:
+    liquid-bubble-stretch
+    520ms
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+}
+
+@keyframes liquid-bubble-stretch {
+  0% {
+    transform:
+      translateY(-1px)
+      scaleX(1)
+      scaleY(1);
+  }
+
+  32% {
+    transform:
+      translateX(
+        calc(
+          var(--liquid-direction)
+          * 5px
+        )
+      )
+      translateY(-1px)
+      scaleX(1.22)
+      scaleY(0.88);
+  }
+
+  68% {
+    transform:
+      translateX(
+        calc(
+          var(--liquid-direction)
+          * -2px
+        )
+      )
+      translateY(-1px)
+      scaleX(0.94)
+      scaleY(1.06);
+  }
+
+  100% {
+    transform:
+      translateY(-1px)
+      scaleX(1)
+      scaleY(1);
+  }
+}
+
+.liquid-nav-label {
+  transform:
+    translateY(0);
+
+  opacity: 0.72;
+
+  transition:
+    transform 320ms
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      ),
+    opacity 260ms ease,
+    color 260ms ease;
+}
+
+.liquid-nav-label-active {
+  transform:
+    translateY(-1px);
+
+  opacity: 1;
+}
+
+.liquid-nav-icon-active {
+  animation:
+    liquid-icon-pop
+    440ms
+    cubic-bezier(
+      0.22,
+      1.35,
+      0.36,
+      1
+    );
+}
+
+@keyframes liquid-icon-pop {
+  0% {
+    transform:
+      translateY(0)
+      scale(0.82);
+  }
+
+  65% {
+    transform:
+      translateY(-27px)
+      scale(1.13);
+  }
+
+  100% {
+    transform:
+      translateY(-24px)
+      scale(1.08);
+  }
+}
+
+
+/*
+ * Membuat active bubble terasa menyatu
+ * dengan body navbar, bukan sekadar
+ * lingkaran yang ditempel di atas.
+ */
+
+.liquid-nav-indicator::before,
+.liquid-nav-indicator::after {
+  content: "";
+
+  position: absolute;
+  top: 17px;
+
+  width: 16px;
+  height: 16px;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.liquid-nav-indicator::before {
+  left:
+    calc(
+      50% - 41px
+    );
+
+  box-shadow:
+    8px 8px 0
+    4px
+    var(--color-navy-steel);
+}
+
+.liquid-nav-indicator::after {
+  right:
+    calc(
+      50% - 41px
+    );
+
+  box-shadow:
+    -8px 8px 0
+    4px
+    var(--color-navy-steel);
+}
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+  .liquid-nav-bubble-moving,
+  .liquid-nav-icon-active {
+    animation: none !important;
+  }
+}
+
+
+@media (
+  orientation: portrait
+) and (max-width: 340px) {
+  .public-liquid-nav {
+    height: 66px;
+
+    border-radius: 21px;
+  }
+
+  .public-route-main {
+    padding-bottom:
+      calc(
+        6.5rem
+        + env(
+          safe-area-inset-bottom
+        )
+      );
+  }
+
+  .liquid-nav-item {
+    padding-bottom: 6px;
+  }
+}
+
+
+/* =========================================================
+   Liquid Navigation — Clean Final Surface
+   ========================================================= */
+
+/*
+ * Active bubble dibuat pure white.
+ * Hilangkan tint Arctic Blue yang sebelumnya
+ * dapat terlihat seperti artefak di sisi bubble.
+ */
+.liquid-nav-bubble::after {
+  display: none;
+}
+
+/*
+ * Hilangkan pseudo-notch lama.
+ * Pada beberapa background section notch tersebut
+ * dapat memperlihatkan warna halaman di bawah navbar.
+ */
+.liquid-nav-indicator::before,
+.liquid-nav-indicator::after {
+  display: none;
+}
+
+/*
+ * Final bubble surface.
+ */
+.liquid-nav-bubble {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border:
+    6px solid
+    var(--color-neutral-surface);
+
+  box-shadow:
+    0 8px 20px
+      rgba(8, 28, 46, 0.14),
+    0 2px 6px
+      rgba(8, 28, 46, 0.08);
+}
+
+/*
+ * Pastikan icon active selalu berada
+ * di atas permukaan bubble.
+ */
+.liquid-nav-icon-active {
+  position: relative;
+  z-index: 2;
+
+  color:
+    var(--color-navy-steel);
+}
+
+/*
+ * Navbar body tetap solid.
+ */
+.public-liquid-nav {
+  overflow: visible;
+
+  background:
+    var(--color-navy-steel);
+}
+
+
+/* Final proportion refinement */
+
+.liquid-nav-bubble {
+  width: 56px;
+  height: 56px;
+}
+
+.liquid-nav-indicator {
+  top: -16px;
+}
+
+.liquid-nav-icon-active {
+  transform:
+    translateY(-22px)
+    scale(1.06);
+}
+
+@keyframes liquid-icon-pop {
+  0% {
+    transform:
+      translateY(0)
+      scale(0.84);
+  }
+
+  68% {
+    transform:
+      translateY(-25px)
+      scale(1.11);
+  }
+
+  100% {
+    transform:
+      translateY(-22px)
+      scale(1.06);
+  }
+}
+
+
+/* Compact public app bar */
+
+@media (
+  orientation: landscape
+) and (max-height: 520px) {
+  .school-header-inner {
+    height: 54px;
+  }
+
+  .school-header-navigation a {
+    padding:
+      6px
+      10px;
+
+    font-size: 12px;
+  }
+}
+
+
+/* =========================================================
+   SchoolCanteen Liquid Glass Navigation — Final
+   ========================================================= */
+
+.public-liquid-nav {
+  /*
+   * Navy-tinted glass:
+   * identitas SchoolCanteen tetap kuat,
+   * tetapi content di belakang masih dapat
+   * sedikit terlihat seperti floating material.
+   */
+  overflow: visible;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(8, 28, 46, 0.82),
+      rgba(8, 28, 46, 0.70)
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.16);
+
+  box-shadow:
+    0 18px 50px
+      rgba(8, 28, 46, 0.20),
+    0 4px 14px
+      rgba(8, 28, 46, 0.10),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.16);
+
+  -webkit-backdrop-filter:
+    blur(22px)
+    saturate(165%);
+
+  backdrop-filter:
+    blur(22px)
+    saturate(165%);
+
+  isolation: isolate;
+}
+
+/*
+ * Specular highlight seperti permukaan kaca.
+ */
+.public-liquid-nav::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: -1;
+
+  border-radius: inherit;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12),
+      rgba(255, 255, 255, 0.025) 42%,
+      rgba(255, 255, 255, 0.00) 70%
+    );
+}
+
+/*
+ * Bubble aktif menjadi glass terang,
+ * bukan lingkaran putih flat.
+ */
+.liquid-nav-bubble {
+  width: 56px;
+  height: 56px;
+
+  overflow: hidden;
+
+  border-radius: 9999px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.94),
+      rgba(239, 248, 255, 0.80)
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.78);
+
+  box-shadow:
+    0 10px 28px
+      rgba(8, 28, 46, 0.17),
+    0 2px 7px
+      rgba(8, 28, 46, 0.09),
+    inset 0 1px 1px
+      rgba(255, 255, 255, 0.94);
+
+  -webkit-backdrop-filter:
+    blur(18px)
+    saturate(175%);
+
+  backdrop-filter:
+    blur(18px)
+    saturate(175%);
+}
+
+/*
+ * Hilangkan dekorasi eksperimen sebelumnya.
+ */
+.liquid-nav-bubble::after,
+.liquid-nav-indicator::before,
+.liquid-nav-indicator::after {
+  display: none;
+}
+
+/*
+ * Inactive tab cukup redup, jangan terlalu pudar.
+ */
+.liquid-nav-item {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.58
+    );
+}
+
+.liquid-nav-item[aria-current="page"] {
+  color: white;
+}
+
+/*
+ * Active icon tetap menggunakan warna brand.
+ */
+.liquid-nav-icon-active {
+  position: relative;
+  z-index: 2;
+
+  color:
+    var(--color-navy-steel);
+}
+
+/*
+ * Label active memiliki kontras penuh.
+ */
+.liquid-nav-label {
+  opacity: 0.68;
+}
+
+.liquid-nav-label-active {
+  opacity: 1;
+}
+
+/*
+ * Fallback kalau browser tidak mendukung
+ * backdrop-filter.
+ */
+@supports not (
+  backdrop-filter: blur(1px)
+) {
+  .public-liquid-nav {
+    background:
+      rgba(
+        8,
+        28,
+        46,
+        0.94
+      );
+  }
+
+  .liquid-nav-bubble {
+    background: #ffffff;
+  }
+}
+
+
+/*
+ * Biarkan content dapat scroll ke belakang glass,
+ * tetapi elemen terakhir tetap bisa diakses.
+ */
+.public-route-main {
+  padding-bottom:
+    calc(
+      6.25rem
+      + env(
+        safe-area-inset-bottom
+      )
+    );
+}
+
+.public-liquid-nav {
+  bottom:
+    calc(
+      0.85rem
+      + env(
+        safe-area-inset-bottom
+      )
+    );
+}
+
+
+/* =========================================================
+   SchoolCanteen Liquid Glass — Animated Notch
+   ========================================================= */
+
+@property --liquid-center {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 12.5%;
+}
+
+.public-liquid-nav {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+
+  isolation: isolate;
+
+  transition:
+    --liquid-center
+    480ms
+    cubic-bezier(
+      0.22,
+      1.1,
+      0.36,
+      1
+    );
+}
+
+/*
+ * Ini body glass sebenarnya.
+ *
+ * Radial mask membuat patahan transparan
+ * tepat di bawah active bubble.
+ */
+.public-liquid-nav::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: -2;
+
+  border-radius: inherit;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(19, 42, 60, 0.78),
+      rgba(19, 42, 60, 0.63)
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18);
+
+  box-shadow:
+    0 18px 50px
+      rgba(8, 28, 46, 0.20),
+    0 5px 16px
+      rgba(8, 28, 46, 0.12),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.18);
+
+  -webkit-backdrop-filter:
+    blur(24px)
+    saturate(175%);
+
+  backdrop-filter:
+    blur(24px)
+    saturate(175%);
+
+  -webkit-mask-image:
+    radial-gradient(
+      circle 38px
+      at var(--liquid-center) -8px,
+      transparent 0 36px,
+      #000 37px
+    );
+
+  mask-image:
+    radial-gradient(
+      circle 38px
+      at var(--liquid-center) -8px,
+      transparent 0 36px,
+      #000 37px
+    );
+}
+
+/*
+ * Highlight kaca ikut dipotong oleh notch.
+ */
+.public-liquid-nav::after {
+  content: "";
+
+  position: absolute;
+  inset: 1px;
+
+  z-index: -1;
+
+  border-radius: inherit;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14),
+      rgba(255, 255, 255, 0.025) 48%,
+      transparent 72%
+    );
+
+  -webkit-mask-image:
+    radial-gradient(
+      circle 38px
+      at var(--liquid-center) -9px,
+      transparent 0 36px,
+      #000 37px
+    );
+
+  mask-image:
+    radial-gradient(
+      circle 38px
+      at var(--liquid-center) -9px,
+      transparent 0 36px,
+      #000 37px
+    );
+}
+
+/*
+ * Bubble aktif.
+ */
+.liquid-nav-bubble {
+  width: 56px;
+  height: 56px;
+
+  border-radius: 9999px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(239, 247, 252, 0.84)
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.86);
+
+  box-shadow:
+    0 9px 24px
+      rgba(8, 28, 46, 0.15),
+    0 2px 6px
+      rgba(8, 28, 46, 0.08),
+    inset 0 1px 1px
+      rgba(255, 255, 255, 0.95);
+
+  -webkit-backdrop-filter:
+    blur(20px)
+    saturate(180%);
+
+  backdrop-filter:
+    blur(20px)
+    saturate(180%);
+}
+
+/*
+ * Nonaktif tetap terbaca, tetapi active
+ * memiliki hierarchy paling kuat.
+ */
+.liquid-nav-item {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.62
+    );
+}
+
+.liquid-nav-item[aria-current="page"] {
+  color: white;
+}
+
+.liquid-nav-icon-active {
+  color:
+    var(--color-navy-steel);
+}
+
+@supports not (
+  backdrop-filter:
+    blur(1px)
+) {
+  .public-liquid-nav::before {
+    background:
+      rgba(
+        19,
+        42,
+        60,
+        0.94
+      );
+  }
+}
+
+
+/* =========================================================
+   Public Auth Screen
+   ========================================================= */
+
+.auth-route-screen {
+  min-height:
+    calc(
+      100svh
+      - 56px
+    );
+
+  padding-bottom:
+    calc(
+      82px
+      + env(safe-area-inset-bottom)
+    );
+}
+
+/*
+ * Normal phone portrait:
+ * body login muat dalam viewport.
+ */
+@media (
+  orientation: portrait
+) and (min-height: 720px)
+  and (max-width: 767px) {
+  .auth-route-screen {
+    height:
+      calc(
+        100svh
+        - 56px
+      );
+
+    min-height: 0;
+
+    overflow: hidden;
+  }
+}
+
+/*
+ * Fallback untuk device sangat pendek /
+ * ketika software keyboard mengecilkan viewport.
+ * Tetap bisa di-scroll, tetapi scrollbar tidak
+ * mengganggu visual.
+ */
+@media (
+  orientation: portrait
+) and (max-height: 719px) {
+  .auth-route-screen {
+    overflow-y: auto;
+
+    scrollbar-width: none;
+  }
+
+  .auth-route-screen::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .auth-route-screen {
+    min-height:
+      calc(
+        100svh
+        - 64px
+      );
+
+    padding-bottom: 0;
+  }
+}
+
+
+/* =========================================================
+   Auth Screen — Final Responsive Behavior
+   ========================================================= */
+
+.auth-route-screen {
+  width: 100%;
+
+  height:
+    calc(
+      100svh
+      - 56px
+    );
+
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  /*
+   * Ruang untuk floating liquid navbar.
+   */
+  padding-bottom:
+    calc(
+      76px
+      + env(safe-area-inset-bottom)
+    );
+
+  /*
+   * Scroll tetap berfungsi jika dibutuhkan,
+   * tapi scrollbar tidak terlihat.
+   */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.auth-route-screen::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+
+  display: none;
+}
+
+
+/*
+ * Desktop tidak membutuhkan ruang bottom nav.
+ */
+@media (min-width: 768px) {
+  .auth-route-screen {
+    min-height:
+      calc(
+        100svh
+        - 64px
+      );
+
+    height: auto;
+
+    overflow-y: visible;
+
+    padding-bottom: 0;
+  }
+}
+
+
+/* =========================================================
+   SchoolCanteen Auth — Final Mobile Layout
+   ========================================================= */
+
+.auth-route-screen {
+  width: 100%;
+
+  height:
+    calc(
+      100svh
+      - 56px
+    );
+
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  /*
+   * Scroll tetap berfungsi pada viewport pendek
+   * atau ketika keyboard terbuka,
+   * tetapi scrollbar tidak terlihat.
+   */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.auth-route-screen::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+
+.auth-route-inner {
+  width: 100%;
+  min-height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-inline: auto;
+
+  padding:
+    16px
+    18px
+    calc(
+      76px
+      + env(safe-area-inset-bottom)
+    );
+
+  max-width: 470px;
+}
+
+
+.auth-card {
+  width: 100%;
+
+  border:
+    1px solid
+    #dceaf3;
+
+  border-radius: 22px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.98
+    );
+
+  padding:
+    24px
+    20px;
+
+  box-shadow:
+    0 10px 32px
+    rgba(
+      8,
+      28,
+      46,
+      0.055
+    );
+}
+
+
+.auth-card-header {
+  margin-bottom: 22px;
+}
+
+
+.auth-card-title {
+  font-family:
+    var(--font-heading),
+    Georgia,
+    serif;
+
+  font-size: 28px;
+  line-height: 1.08;
+
+  font-weight: 700;
+
+  letter-spacing: -0.025em;
+
+  color:
+    var(--color-navy-steel);
+}
+
+
+.auth-card-description {
+  max-width: 330px;
+
+  margin-top: 9px;
+
+  font-size: 13px;
+  line-height: 1.55;
+
+  color:
+    var(--color-muted-foreground);
+}
+
+
+.auth-card-secondary {
+  margin-top: 20px;
+
+  padding-top: 18px;
+
+  border-top:
+    1px solid
+    #e6eef4;
+
+  text-align: center;
+
+  font-size: 13px;
+  line-height: 1.4;
+
+  color:
+    var(--color-muted-foreground);
+}
+
+
+/* Normal phone */
+@media (
+  orientation: portrait
+) and (min-width: 360px)
+  and (min-height: 700px) {
+  .auth-route-inner {
+    padding-top: 18px;
+    padding-bottom:
+      calc(
+        74px
+        + env(
+          safe-area-inset-bottom
+        )
+      );
+  }
+}
+
+
+/* Small / short phone */
+@media (
+  orientation: portrait
+) and (
+    max-height: 699px
+  ) {
+  .auth-route-inner {
+    align-items: flex-start;
+
+    padding-top: 12px;
+
+    padding-bottom:
+      calc(
+        76px
+        + env(
+          safe-area-inset-bottom
+        )
+      );
+  }
+
+  .auth-card {
+    padding:
+      20px
+      18px;
+  }
+
+  .auth-card-header {
+    margin-bottom: 18px;
+  }
+
+  .auth-card-title {
+    font-size: 25px;
+  }
+
+  .auth-card-secondary {
+    margin-top: 16px;
+    padding-top: 15px;
+  }
+}
+
+
+/* Desktop / tablet */
+@media (
+  min-width: 768px
+) {
+  .auth-route-screen {
+    height: auto;
+
+    min-height:
+      calc(
+        100svh
+        - 64px
+      );
+
+    overflow: visible;
+  }
+
+  .auth-route-inner {
+    min-height:
+      calc(
+        100svh
+        - 64px
+      );
+
+    max-width: 500px;
+
+    padding:
+      40px
+      24px;
+  }
+
+  .auth-card {
+    padding:
+      30px;
+  }
+
+  .auth-card-title {
+    font-size: 32px;
+  }
+
+  .auth-card-description,
+  .auth-card-secondary {
+    font-size: 14px;
+  }
+}
+
+
+/* =========================================================
+   Public Shell — Final Bottom Safe Space
+   ========================================================= */
+
+.public-route-main {
+  padding-bottom:
+    calc(
+      5rem
+      + env(safe-area-inset-bottom)
+    );
+}
+
+
+/* Tablet / desktop tidak memakai floating bottom navigation. */
+@media (min-width: 768px) {
+  .public-route-main {
+    padding-bottom: 0;
+  }
+}
+
+
+/* Phone landscape memakai top navigation. */
+@media (
+  orientation: landscape
+) and (max-height: 520px) {
+  .public-route-main {
+    padding-bottom: 0;
+  }
+}
+
+
+/* =========================================================
+   Cart — Focused Transaction Screen
+   ========================================================= */
+
+/*
+ * Cart tidak memakai liquid bottom navigation.
+ * Sticky checkout milik Cart mengatur safe area sendiri.
+ */
+.public-route-main:has(.cart-route) {
+  padding-bottom: 0;
+}

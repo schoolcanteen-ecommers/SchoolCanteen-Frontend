@@ -13,10 +13,13 @@ import {
 } from "@/features/orders/components/order-list";
 
 import {
+<<<<<<< HEAD
   getCartProduct,
 } from "@/lib/api/catalog";
 
 import {
+=======
+>>>>>>> source/main
   getStudentOrders,
 } from "@/lib/api/student-orders";
 
@@ -24,6 +27,7 @@ import {
   ROUTES,
 } from "@/lib/constants";
 
+<<<<<<< HEAD
 async function getProductImageFallbacks(
   productIds: string[],
 ): Promise<Map<string, string | null>> {
@@ -61,6 +65,8 @@ async function getProductImageFallbacks(
   return new Map(entries);
 }
 
+=======
+>>>>>>> source/main
 export default async function StudentOrdersPage() {
   const profile =
     await requireRole("student");
@@ -70,6 +76,7 @@ export default async function StudentOrdersPage() {
       profile.id,
     );
 
+<<<<<<< HEAD
   const fallbackProductIds =
     orders.flatMap(
       ({ items }) =>
@@ -109,6 +116,9 @@ export default async function StudentOrdersPage() {
           ),
       }),
     );
+=======
+
+>>>>>>> source/main
 
   return (
     <div className="mx-auto w-full max-w-[1280px] px-5 py-8 sm:px-6 lg:px-16 lg:py-12">
@@ -138,9 +148,13 @@ export default async function StudentOrdersPage() {
       </div>
 
       <OrderList
+<<<<<<< HEAD
         orders={
           ordersWithProductImages
         }
+=======
+        orders={orders}
+>>>>>>> source/main
       />
     </div>
   );

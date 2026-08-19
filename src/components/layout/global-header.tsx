@@ -59,19 +59,32 @@ export function GlobalHeader({
     .toUpperCase();
 
   return (
+<<<<<<< HEAD
     <header className="sticky top-0 z-50 w-full border-b border-navy-steel/10 bg-gradient-to-b from-white via-[#F7FBFF] to-arctic-blue shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80">
+=======
+    <header className="sticky top-0 z-50 w-full border-b border-[#E8EEF3] bg-white/95 shadow-[0_1px_8px_rgba(12,33,51,0.04)] backdrop-blur-xl">
+>>>>>>> source/main
       <div className="mx-auto flex h-[72px] w-full max-w-[1200px] items-center gap-2 px-4 sm:gap-4 md:px-10">
         
         
         <Link
+            prefetch={false}
           href={brandHref}
           className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-80"
         >
+<<<<<<< HEAD
           <div className="flex size-8 sm:size-9 shrink-0 items-center justify-center rounded-xl bg-navy-steel text-white">
             <GraduationCap className="size-5" />
           </div>
           <div className="min-w-0">
             <p className="font-heading truncate text-lg sm:text-xl font-bold tracking-tight text-navy-steel">
+=======
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-navy-steel text-white sm:size-9">
+            <GraduationCap className="size-5" />
+          </div>
+          <div className="school-header-brand-label min-w-0">
+            <p className="font-heading truncate text-[16px] font-bold tracking-tight text-navy-steel sm:text-lg">
+>>>>>>> source/main
               SchoolCanteen
             </p>
           </div>
@@ -79,7 +92,11 @@ export function GlobalHeader({
 
         
         {navigation ? (
+<<<<<<< HEAD
           <div className="hidden min-w-0 flex-1 items-center justify-center md:flex">
+=======
+          <div className="school-header-navigation hidden min-w-0 flex-1 items-center justify-center md:flex">
+>>>>>>> source/main
             {navigation}
           </div>
         ) : (
@@ -91,6 +108,7 @@ export function GlobalHeader({
           
           {showWallet && (
             <Link
+            prefetch={false}
               href="/student/wallet"
               className="hidden items-center gap-2 rounded-lg border border-arctic-blue bg-white px-3 py-2 transition-colors hover:bg-neutral-surface md:flex"
             >
@@ -115,7 +133,12 @@ export function GlobalHeader({
                 nativeButton={false}
                 variant="ghost"
                 className="hidden font-sans text-sm font-bold text-navy-steel hover:bg-arctic-blue/50 sm:inline-flex"
+<<<<<<< HEAD
                 render={<Link href="/login" />}
+=======
+                render={<Link
+            prefetch={false} href="/login" />}
+>>>>>>> source/main
               >
                 Masuk
               </Button>
@@ -123,15 +146,27 @@ export function GlobalHeader({
               <Button
                 nativeButton={false}
                 className="hidden rounded-xl bg-navy-steel px-6 font-sans text-sm font-bold text-white hover:opacity-90 sm:inline-flex"
+<<<<<<< HEAD
                 render={<Link href="/register" />}
+=======
+                render={<Link
+            prefetch={false} href="/register" />}
+>>>>>>> source/main
               >
                 Daftar
               </Button>
 
               
               <Link
+                prefetch={false}
                 href="/login"
+<<<<<<< HEAD
                 className="inline-flex h-9 items-center justify-center rounded-lg px-3 text-xs font-bold text-navy-steel transition-colors hover:bg-arctic-blue sm:hidden"
+=======
+                className="hidden"
+                aria-hidden="true"
+                tabIndex={-1}
+>>>>>>> source/main
               >
                 Masuk
               </Link>
@@ -203,7 +238,12 @@ export function GlobalHeader({
                   <DropdownMenuSeparator className="bg-arctic-blue" />
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
+<<<<<<< HEAD
                       <Link href={profileHref} className="flex w-full items-center gap-2">
+=======
+                      <Link
+            prefetch={false} href={profileHref} className="flex w-full items-center gap-2">
+>>>>>>> source/main
                         <UserRound className="size-4 text-navy-steel" />
                         <span className="font-medium">Profil</span>
                       </Link>

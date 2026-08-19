@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import {
+  usePathname,
+  useSearchParams,
+} from "next/navigation";
 
 import {
   publicNavigation,
@@ -27,7 +30,14 @@ const navigationMap: Record<
 export function TopNavigation({
   source,
 }: TopNavigationProps) {
-  const pathname = usePathname();
+  const pathname =
+    usePathname();
+
+  const searchParams =
+    useSearchParams();
+
+  const productSource =
+    searchParams.get("source");
 
   const items = navigationMap[source].filter(
     (item) => item.desktop !== false && item.href,
@@ -38,16 +48,33 @@ export function TopNavigation({
       {items.map((item) => {
         const href = item.href!;
 
+        const isProductRoute =
+          pathname.startsWith(
+            "/produk",
+          );
+
         const isActive =
           href === "/"
             ? pathname === "/"
-            : pathname === href ||
-              pathname.startsWith(`${href}/`);
+            : isProductRoute
+              ? (
+                  href === "/kantin" &&
+                  productSource === "kantin"
+                ) ||
+                (
+                  href === "/koperasi" &&
+                  productSource === "koperasi"
+                )
+              : pathname === href ||
+                pathname.startsWith(
+                  `${href}/`,
+                );
 
         return (
           <Link
             key={href}
             href={href}
+            prefetch={false}
             className={cn(
               "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive

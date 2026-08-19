@@ -38,7 +38,11 @@ interface ApiStudentOrderItem {
   subtotal: number;
 }
 
+<<<<<<< HEAD
 interface ApiStudentOrderDetail {
+=======
+export interface ApiStudentOrderDetail {
+>>>>>>> source/main
   id: string;
   order_code: string;
   status: string;
@@ -147,7 +151,11 @@ function formatPickupTime(
   }).format(new Date(value));
 }
 
+<<<<<<< HEAD
 function mapStudentOrder(
+=======
+export function mapStudentOrder(
+>>>>>>> source/main
   data: ApiStudentOrderDetail,
   userId: string,
 ): StudentOrderData {

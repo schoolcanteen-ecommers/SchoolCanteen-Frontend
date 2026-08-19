@@ -33,10 +33,13 @@ import {
 } from "@/features/orders/components/order-timeline";
 
 import {
+<<<<<<< HEAD
   getCartProduct,
 } from "@/lib/api/catalog";
 
 import {
+=======
+>>>>>>> source/main
   ApiError,
 } from "@/lib/api/error";
 
@@ -90,6 +93,7 @@ export default async function StudentOrderDetailPage({
     items,
   } = orderData;
 
+<<<<<<< HEAD
   const resolvedItems = await Promise.all(
     items.map(async (item) => {
       if (
@@ -115,6 +119,9 @@ export default async function StudentOrderDetailPage({
       }
     }),
   );
+=======
+
+>>>>>>> source/main
 
   return (
     <div className="mx-auto w-full max-w-[1240px] px-4 pb-36 pt-8 sm:px-6 lg:px-10 lg:pb-14 lg:pt-12">
@@ -143,6 +150,10 @@ export default async function StudentOrderDetailPage({
           </section>
 
           <StudentOrderPickupCard
+<<<<<<< HEAD
+=======
+            orderStatus={order.status}
+>>>>>>> source/main
             pickupTime={order.pickupTime ?? null}
             pickupEndTime={pickupEndTime}
             pickupCode={order.pickupCode ?? null}
@@ -151,7 +162,11 @@ export default async function StudentOrderDetailPage({
 
         <aside className="space-y-6 lg:sticky lg:top-28 lg:col-span-5 lg:space-y-0 lg:rounded-[20px] lg:border lg:border-arctic-blue lg:bg-white lg:p-8 lg:shadow-[0_12px_32px_rgba(13,27,42,0.08)]">
           <StudentOrderItemsSummary
+<<<<<<< HEAD
             items={resolvedItems}
+=======
+            items={items}
+>>>>>>> source/main
             notes={notes}
           />
 

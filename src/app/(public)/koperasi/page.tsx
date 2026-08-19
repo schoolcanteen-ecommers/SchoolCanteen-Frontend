@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { CommerceProductBrowser } from "@/components/commerce/commerce-product-browser";
 import { getCooperativeCatalog } from "@/lib/api/catalog";
 
@@ -60,6 +61,79 @@ export default async function CooperativePage() {
         />
       </section>
       
+=======
+"use client";
+
+import {
+  CommerceProductBrowser,
+} from "@/components/commerce/commerce-product-browser";
+
+import {
+  PublicCatalogIntro,
+} from "@/features/public-catalog/components/public-catalog-intro";
+
+import {
+  PublicCatalogPageError,
+  PublicCatalogPageSkeleton,
+} from "@/features/public-catalog/components/public-catalog-page-state";
+
+import {
+  useCooperativeCatalogQuery,
+} from "@/features/public-catalog/hooks/use-public-catalog";
+
+export default function CooperativePage() {
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+  } = useCooperativeCatalogQuery();
+
+  if (isPending) {
+    return (
+      <PublicCatalogPageSkeleton />
+    );
+  }
+
+  if (
+    isError ||
+    !data
+  ) {
+    return (
+      <PublicCatalogPageError
+        onRetry={() => {
+          void refetch();
+        }}
+      />
+    );
+  }
+
+  const {
+    merchants,
+    products,
+    categories,
+  } = data;
+
+  return (
+    <div className="bg-neutral-surface">
+      <PublicCatalogIntro
+        title="Cari kebutuhan sekolah"
+        description="Temukan alat tulis dan kebutuhan harian dari koperasi sekolah dalam satu tempat."
+      />
+
+      <CommerceProductBrowser
+        source="koperasi"
+        merchants={merchants}
+        products={products}
+        categories={categories}
+        searchPlaceholder="Cari alat tulis, buku, atau produk..."
+        merchantTitle="Pilih koperasi"
+        title="Semua produk"
+        subtitle="Kebutuhan sekolah yang tersedia sekarang."
+        emptyTitle="Produk tidak ditemukan"
+        emptyDescription="Coba kata kunci, kategori, atau koperasi yang berbeda."
+      />
+>>>>>>> source/main
     </div>
   );
 }

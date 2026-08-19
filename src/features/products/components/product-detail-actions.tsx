@@ -1,20 +1,50 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState } from "react";
 import { Minus, Plus, ShoppingCart, Check } from "lucide-react";
 import { useCart } from "@/features/cart/use-cart";
 import { Button } from "@/components/ui/button";
+=======
+import {
+  Minus,
+  Plus,
+  ShoppingCart,
+  SlidersHorizontal,
+} from "lucide-react";
+
+import {
+  useState,
+} from "react";
+
+import {
+  ProductCustomizationSheet,
+} from "@/features/cart/components/product-customization-sheet";
+
+import {
+  useCart,
+} from "@/features/cart/use-cart";
+>>>>>>> source/main
 
 interface ProductDetailActionsProps {
   productId: string;
   stock: number;
+<<<<<<< HEAD
   isAvailable: boolean;
+=======
+
+  isAvailable: boolean;
+
+  hasModifiers?: boolean;
+  requiresCustomization?: boolean;
+>>>>>>> source/main
 }
 
 export function ProductDetailActions({
   productId,
   stock,
   isAvailable,
+<<<<<<< HEAD
 }: ProductDetailActionsProps) {
   const [quantity, setQuantity] = useState(1);
   const { addItem, getItemQuantity, isHydrated } = useCart();
@@ -87,3 +117,201 @@ export function ProductDetailActions({
     </div>
   );
 }
+=======
+  hasModifiers = false,
+  requiresCustomization = false,
+}: ProductDetailActionsProps) {
+  const {
+    addItem,
+    getProductQuantity,
+    isHydrated,
+  } = useCart();
+
+  const [
+    quantity,
+    setQuantity,
+  ] =
+    useState(1);
+
+  const [
+    customizationOpen,
+    setCustomizationOpen,
+  ] =
+    useState(false);
+
+  const quantityInCart =
+    getProductQuantity(
+      productId,
+    );
+
+  const remainingStock =
+    Math.max(
+      stock -
+        quantityInCart,
+      0,
+    );
+
+  const maxQuantity =
+    Math.max(
+      Math.min(
+        remainingStock,
+        stock,
+      ),
+      1,
+    );
+
+  const canAdd =
+    isHydrated &&
+    isAvailable &&
+    remainingStock >=
+      quantity;
+
+  function decrease() {
+    setQuantity(
+      (current) =>
+        Math.max(
+          1,
+          current - 1,
+        ),
+    );
+  }
+
+  function increase() {
+    setQuantity(
+      (current) =>
+        Math.min(
+          maxQuantity,
+          current + 1,
+        ),
+    );
+  }
+
+  function handleAdd() {
+    if (!canAdd) {
+      return;
+    }
+
+    /*
+     * Di halaman detail, optional
+     * modifier juga boleh dipilih.
+     *
+     * Quick Add tetap instant untuk
+     * optional-only.
+     */
+    if (
+      hasModifiers ||
+      requiresCustomization
+    ) {
+      setCustomizationOpen(
+        true,
+      );
+
+      return;
+    }
+
+    addItem(
+      productId,
+      quantity,
+    );
+
+    setQuantity(1);
+  }
+
+  return (
+    <>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 items-center rounded-[13px] border border-[#DCE8F0] bg-white">
+            <button
+              type="button"
+              aria-label="Kurangi jumlah"
+              disabled={
+                quantity <= 1
+              }
+              onClick={
+                decrease
+              }
+              className="flex size-11 items-center justify-center text-navy-steel disabled:opacity-35"
+            >
+              <Minus className="size-4" />
+            </button>
+
+            <span className="min-w-10 text-center font-heading text-base font-bold text-navy-steel">
+              {quantity}
+            </span>
+
+            <button
+              type="button"
+              aria-label="Tambah jumlah"
+              disabled={
+                quantity >=
+                  maxQuantity ||
+                remainingStock <= 0
+              }
+              onClick={
+                increase
+              }
+              className="flex size-11 items-center justify-center text-navy-steel disabled:opacity-35"
+            >
+              <Plus className="size-4" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            disabled={
+              !canAdd
+            }
+            onClick={
+              handleAdd
+            }
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[13px] bg-navy-steel px-5 text-sm font-bold text-white transition hover:bg-navy-steel/90 disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            {hasModifiers ? (
+              <SlidersHorizontal className="size-[18px]" />
+            ) : (
+              <ShoppingCart className="size-[18px]" />
+            )}
+
+            {!isAvailable
+              ? "Produk Habis"
+              : remainingStock <=
+                  0
+                ? "Stok sudah di keranjang"
+                : hasModifiers
+                  ? requiresCustomization
+                    ? "Pilih & Tambahkan"
+                    : "Atur Pilihan"
+                  : "Tambah ke Keranjang"}
+          </button>
+        </div>
+
+        {quantityInCart > 0 && (
+          <p className="text-xs text-[#66737C]">
+            {quantityInCart} item produk ini sudah ada di keranjang.
+          </p>
+        )}
+      </div>
+
+      <ProductCustomizationSheet
+        productId={
+          productId
+        }
+        stock={stock}
+        quantity={
+          quantity
+        }
+        open={
+          customizationOpen
+        }
+        onOpenChange={
+          setCustomizationOpen
+        }
+        onAdded={() => {
+          setQuantity(1);
+        }}
+      />
+    </>
+  );
+}
+>>>>>>> source/main

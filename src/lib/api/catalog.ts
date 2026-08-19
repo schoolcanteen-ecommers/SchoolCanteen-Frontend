@@ -41,6 +41,27 @@ interface ApiProductCategory {
   slug: string;
 }
 
+interface ApiProductModifierOption {
+  id: string;
+  name: string;
+  price_delta: number;
+}
+
+interface ApiProductModifierGroup {
+  id: string;
+  name: string;
+
+  selection_type:
+    "single" | "multiple";
+
+  is_required: boolean;
+
+  min_select: number;
+  max_select: number;
+
+  options: ApiProductModifierOption[];
+}
+
 interface ApiProduct {
   id: string;
 
@@ -56,11 +77,27 @@ interface ApiProduct {
 
   is_active: boolean;
 
+  has_modifiers?: boolean;
+  requires_customization?: boolean;
+
+  /*
+   * Product detail mengirim full groups.
+   * Catalog/read-model boleh tidak mengirimnya.
+   */
+  modifier_groups?: ApiProductModifierGroup[];
+
   merchant: ApiProductMerchant;
 
   category: ApiProductCategory | null;
 
   created_at: string | null;
+
+  /*
+   * Hanya tersedia ketika detail dipanggil
+   * dengan ?include_related=1.
+   */
+  related_products?: ApiProduct[];
+
 }
 
 
@@ -127,6 +164,7 @@ function mapProduct(
 
     isActive:
       product.is_active,
+<<<<<<< HEAD
   };
 }
 
@@ -161,6 +199,249 @@ function buildCategories(
   );
 }
 
+=======
+
+    hasModifiers:
+      product.has_modifiers ?? false,
+
+    requiresCustomization:
+      product.requires_customization ?? false,
+
+    modifierGroups:
+      (
+        product.modifier_groups ??
+        []
+      ).map((group) => ({
+        id:
+          group.id,
+
+        name:
+          group.name,
+
+        selectionType:
+          group.selection_type,
+
+        isRequired:
+          group.is_required,
+
+        minSelect:
+          group.min_select,
+
+        maxSelect:
+          group.max_select,
+
+        options:
+          group.options.map(
+            (option) => ({
+              id:
+                option.id,
+
+              name:
+                option.name,
+
+              priceDelta:
+                option.price_delta,
+            }),
+          ),
+      })),
+  };
+}
+
+function buildCategories(
+  products: ApiProduct[],
+): Category[] {
+  const categoryMap =
+    new Map<string, Category>();
+
+  for (const product of products) {
+    if (!product.category) {
+      continue;
+    }
+
+    categoryMap.set(
+      product.category.id,
+      {
+        id:
+          product.category.id,
+
+        merchantId:
+          product.merchant.id,
+
+        name:
+          product.category.name,
+      },
+    );
+  }
+
+  return Array.from(
+    categoryMap.values(),
+  );
+}
+
+
+export type PublicCatalogType =
+  | "canteen"
+  | "cooperative";
+
+interface ApiPublicHomeSection {
+  products: ApiProduct[];
+}
+
+interface ApiPublicHomeResponse {
+  canteen: ApiPublicHomeSection;
+  cooperative: ApiPublicHomeSection;
+}
+
+interface ApiPublicCatalogResponse {
+  merchants: ApiMerchant[];
+  products: ApiProduct[];
+  categories: unknown[];
+}
+
+function buildHomeMerchants(
+  products: ApiProduct[],
+): Merchant[] {
+  const merchantMap =
+    new Map<string, Merchant>();
+
+  for (const product of products) {
+    const current =
+      merchantMap.get(
+        product.merchant.id,
+      );
+
+    if (current) {
+      merchantMap.set(
+        product.merchant.id,
+        {
+          ...current,
+
+          productsCount:
+            (current.productsCount ?? 0)
+            + 1,
+        },
+      );
+
+      continue;
+    }
+
+    merchantMap.set(
+      product.merchant.id,
+      {
+        id:
+          product.merchant.id,
+
+        ownerId:
+          "",
+
+        name:
+          product.merchant.name,
+
+        type:
+          product.merchant.type ===
+          "canteen"
+            ? "CANTEEN"
+            : "COOPERATIVE",
+
+        description:
+          null,
+
+        imageUrl:
+          null,
+
+        status:
+          "ACTIVE",
+
+        productsCount:
+          1,
+      },
+    );
+  }
+
+  return Array.from(
+    merchantMap.values(),
+  );
+}
+
+function mapPublicHomeSection(
+  section: ApiPublicHomeSection,
+) {
+  return {
+    merchants:
+      buildHomeMerchants(
+        section.products,
+      ),
+
+    products:
+      section.products.map(
+        mapProduct,
+      ),
+
+    categories:
+      buildCategories(
+        section.products,
+      ),
+  };
+}
+
+export async function getPublicHomeCatalog() {
+  const response =
+    await apiRequest<
+      ApiPublicHomeResponse
+    >(
+      "/public/home",
+      {
+        cache: "no-store",
+      },
+    );
+
+  return {
+    canteen:
+      mapPublicHomeSection(
+        response.canteen,
+      ),
+
+    cooperative:
+      mapPublicHomeSection(
+        response.cooperative,
+      ),
+  };
+}
+
+export async function getPublicCatalog(
+  type: PublicCatalogType,
+) {
+  const response =
+    await apiRequest<
+      ApiPublicCatalogResponse
+    >(
+      `/public/catalog?type=${encodeURIComponent(
+        type,
+      )}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+  return {
+    merchants:
+      response.merchants.map(
+        mapMerchant,
+      ),
+
+    products:
+      response.products.map(
+        mapProduct,
+      ),
+
+    categories:
+      buildCategories(
+        response.products,
+      ),
+  };
+}
+
+>>>>>>> source/main
 
 export async function getCanteenCatalog() {
   const [
@@ -240,9 +521,15 @@ export async function getCooperativeCatalog() {
 }
 
 
+<<<<<<< HEAD
 export async function getProductDetail(
   productId: string,
 ) {
+=======
+export async function getProductCustomization(
+  productId: string,
+): Promise<Product> {
+>>>>>>> source/main
   const apiProduct =
     await apiRequest<ApiProduct>(
       `/products/${encodeURIComponent(
@@ -253,6 +540,28 @@ export async function getProductDetail(
       },
     );
 
+<<<<<<< HEAD
+=======
+  return mapProduct(
+    apiProduct,
+  );
+}
+
+
+export async function getProductDetail(
+  productId: string,
+) {
+  const apiProduct =
+    await apiRequest<ApiProduct>(
+      `/products/${encodeURIComponent(
+        productId,
+      )}?include_related=1`,
+      {
+        cache: "no-store",
+      },
+    );
+
+>>>>>>> source/main
   const product =
     mapProduct(apiProduct);
 
@@ -296,6 +605,7 @@ export async function getProductDetail(
         }
       : null;
 
+<<<<<<< HEAD
   const relatedApiProducts =
     await apiRequest<ApiProduct[]>(
       `/products?merchant_id=${encodeURIComponent(
@@ -309,11 +619,28 @@ export async function getProductDetail(
   const relatedProducts =
     relatedApiProducts
       .map(mapProduct)
+=======
+  const relatedProducts =
+    (
+      apiProduct.related_products ??
+      []
+    )
+      .map(
+        mapProduct,
+      )
+>>>>>>> source/main
       .filter(
         (item) =>
           item.id !== product.id,
       )
+<<<<<<< HEAD
       .slice(0, 4);
+=======
+      .slice(
+        0,
+        4,
+      );
+>>>>>>> source/main
 
   return {
     product,
@@ -321,6 +648,188 @@ export async function getProductDetail(
     category,
     relatedProducts,
   };
+}
+
+
+<<<<<<< HEAD
+export async function getCartProduct(
+  productId: string,
+): Promise<{
+  product: Product;
+=======
+interface ApiResolvedProductsResponse {
+  products: ApiProduct[];
+  unavailable_product_ids: string[];
+}
+
+export interface ResolvedCartProduct {
+  product: Product;
+
+>>>>>>> source/main
+  merchant: Pick<
+    Merchant,
+    "id" | "name" | "type"
+  >;
+<<<<<<< HEAD
+}> {
+  const apiProduct =
+    await apiRequest<ApiProduct>(
+      `/products/${encodeURIComponent(
+        productId,
+      )}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+=======
+}
+
+export interface ResolveCartProductsResult {
+  products: ResolvedCartProduct[];
+  unavailableProductIds: string[];
+}
+
+function mapResolvedCartProduct(
+  apiProduct: ApiProduct,
+): ResolvedCartProduct {
+>>>>>>> source/main
+  const merchantType: Merchant["type"] =
+    apiProduct.merchant.type ===
+    "canteen"
+      ? "CANTEEN"
+      : "COOPERATIVE";
+
+  return {
+    product:
+      mapProduct(apiProduct),
+
+    merchant: {
+      id:
+        apiProduct.merchant.id,
+
+      name:
+        apiProduct.merchant.name,
+
+      type:
+        merchantType,
+<<<<<<< HEAD
+=======
+    },
+  };
+}
+
+async function requestCartProducts(
+  productIds: string[],
+): Promise<ResolveCartProductsResult> {
+  const uniqueProductIds =
+    Array.from(
+      new Set(productIds),
+    );
+
+  if (uniqueProductIds.length === 0) {
+    return {
+      products: [],
+      unavailableProductIds: [],
+    };
+  }
+
+  const chunks: string[][] = [];
+
+  for (
+    let index = 0;
+    index < uniqueProductIds.length;
+    index += 50
+  ) {
+    chunks.push(
+      uniqueProductIds.slice(
+        index,
+        index + 50,
+      ),
+    );
+  }
+
+  const responses =
+    await Promise.all(
+      chunks.map(
+        (chunk) =>
+          apiRequest<ApiResolvedProductsResponse>(
+            "/products/resolve",
+            {
+              method: "POST",
+
+              body: {
+                product_ids:
+                  chunk,
+              },
+
+              cache: "no-store",
+            },
+          ),
+      ),
+    );
+
+  return {
+    products:
+      responses.flatMap(
+        (response) =>
+          response.products.map(
+            mapResolvedCartProduct,
+          ),
+      ),
+
+    unavailableProductIds:
+      responses.flatMap(
+        (response) =>
+          response.unavailable_product_ids,
+      ),
+  };
+}
+
+
+const inFlightCartResolveRequests =
+  new Map<
+    string,
+    Promise<ResolveCartProductsResult>
+  >();
+
+export function resolveCartProducts(
+  productIds: string[],
+): Promise<ResolveCartProductsResult> {
+  const uniqueProductIds =
+    Array.from(
+      new Set(productIds),
+    );
+
+  const requestKey =
+    JSON.stringify(
+      uniqueProductIds,
+    );
+
+  const existingRequest =
+    inFlightCartResolveRequests.get(
+      requestKey,
+    );
+
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const request =
+    requestCartProducts(
+      uniqueProductIds,
+    ).finally(() => {
+      inFlightCartResolveRequests.delete(
+        requestKey,
+      );
+    });
+
+  inFlightCartResolveRequests.set(
+    requestKey,
+    request,
+  );
+
+  return request;
 }
 
 
@@ -362,6 +871,7 @@ export async function getCartProduct(
 
       type:
         merchantType,
+>>>>>>> source/main
     },
   };
 }

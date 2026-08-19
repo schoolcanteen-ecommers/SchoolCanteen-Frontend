@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { GlobalHeader } from "@/components/layout/global-header";
@@ -8,19 +9,34 @@ import { apiRequest } from "@/lib/api/client";
 import { createClient } from "@/lib/supabase/server";
 
 type UserRole = "student" | "merchant" | "admin";
+=======
+import type {
+  ReactNode,
+} from "react";
 
-interface CurrentUser {
-  id: string;
-  name: string;
-  phone: string | null;
-  avatar_url: string | null;
-  role: UserRole;
-}
+import {
+  Suspense,
+} from "react";
+
+import {
+  PublicHeaderFallback,
+  PublicHeaderSession,
+} from "@/components/layout/public-auth-chrome";
+
+import {
+  PublicBottomNav,
+} from "@/components/layout/public-bottom-nav";
+>>>>>>> source/main
+
+import {
+  PublicSiteFooter,
+} from "@/components/layout/public-site-footer";
 
 interface PublicLayoutProps {
   children: ReactNode;
 }
 
+<<<<<<< HEAD
 function getRoleLabel(role: UserRole): string {
   switch (role) {
     case "student":
@@ -94,6 +110,28 @@ export default async function PublicLayout({ children }: PublicLayoutProps) {
       <SiteFooter />
       <PublicBottomNav isLoggedIn={isLoggedIn} profileHref={profileHref} />
 
+=======
+export default function PublicLayout({
+  children,
+}: PublicLayoutProps) {
+  return (
+    <div className="flex min-h-screen flex-col bg-neutral-surface">
+      <Suspense
+        fallback={
+          <PublicHeaderFallback />
+        }
+      >
+        <PublicHeaderSession />
+      </Suspense>
+
+      <main className="public-route-main flex-1">
+        {children}
+      </main>
+
+      <PublicSiteFooter />
+
+      <PublicBottomNav />
+>>>>>>> source/main
     </div>
   );
 }

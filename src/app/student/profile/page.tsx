@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   StudentProfileEditProvider,
 } from "@/features/students/components/profile/student-profile-edit-provider";
@@ -18,6 +19,30 @@ import {
 } from "@/features/students/components/profile/student-profile-wallet";
 
 import {
+=======
+import { Suspense } from "react";
+
+import {
+  StudentProfileEditProvider,
+} from "@/features/students/components/profile/student-profile-edit-provider";
+import {
+  StudentProfileHero,
+} from "@/features/students/components/profile/student-profile-hero";
+import {
+  StudentProfileInformation,
+} from "@/features/students/components/profile/student-profile-information";
+import {
+  StudentProfileLogoutButton,
+} from "@/features/students/components/profile/student-profile-logout-button";
+import {
+  StudentProfileSettings,
+} from "@/features/students/components/profile/student-profile-settings";
+import {
+  StudentProfileWallet,
+} from "@/features/students/components/profile/student-profile-wallet";
+
+import {
+>>>>>>> source/main
   getStudentProfile,
 } from "@/lib/api/student-profile";
 import {
@@ -27,17 +52,37 @@ import {
   createClient,
 } from "@/lib/supabase/server";
 
+<<<<<<< HEAD
+=======
+async function StudentProfileWalletSection() {
+  const wallet =
+    await getStudentWallet();
+
+  return (
+    <StudentProfileWallet
+      balance={wallet.balance}
+    />
+  );
+}
+
+>>>>>>> source/main
 export default async function StudentProfilePage() {
   const supabase =
     await createClient();
 
   const [
     profile,
+<<<<<<< HEAD
     wallet,
     authResult,
   ] = await Promise.all([
     getStudentProfile(),
     getStudentWallet(),
+=======
+    authResult,
+  ] = await Promise.all([
+    getStudentProfile(),
+>>>>>>> source/main
     supabase.auth.getUser(),
   ]);
 
@@ -100,9 +145,19 @@ export default async function StudentProfilePage() {
         </div>
 
         <div className="lg:col-span-4 lg:col-start-9 lg:row-start-1">
+<<<<<<< HEAD
           <StudentProfileWallet
             balance={wallet.balance}
           />
+=======
+          <Suspense
+            fallback={
+              <div className="h-[170px] animate-pulse rounded-[20px] border border-arctic-blue bg-white" />
+            }
+          >
+            <StudentProfileWalletSection />
+          </Suspense>
+>>>>>>> source/main
         </div>
 
         <div className="flex flex-col gap-6 lg:col-span-8 lg:row-start-2">

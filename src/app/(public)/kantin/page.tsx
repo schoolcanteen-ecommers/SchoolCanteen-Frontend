@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { CommerceProductBrowser } from "@/components/commerce/commerce-product-browser";
 import { getCanteenCatalog } from "@/lib/api/catalog";
 
@@ -29,6 +30,79 @@ export default async function CanteenPage() {
           emptyDescription="Coba gunakan kata kunci atau kategori makanan yang berbeda."
         />
       </section>
+=======
+"use client";
+
+import {
+  CommerceProductBrowser,
+} from "@/components/commerce/commerce-product-browser";
+
+import {
+  PublicCatalogIntro,
+} from "@/features/public-catalog/components/public-catalog-intro";
+
+import {
+  PublicCatalogPageError,
+  PublicCatalogPageSkeleton,
+} from "@/features/public-catalog/components/public-catalog-page-state";
+
+import {
+  useCanteenCatalogQuery,
+} from "@/features/public-catalog/hooks/use-public-catalog";
+
+export default function CanteenPage() {
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+  } = useCanteenCatalogQuery();
+
+  if (isPending) {
+    return (
+      <PublicCatalogPageSkeleton />
+    );
+  }
+
+  if (
+    isError ||
+    !data
+  ) {
+    return (
+      <PublicCatalogPageError
+        onRetry={() => {
+          void refetch();
+        }}
+      />
+    );
+  }
+
+  const {
+    merchants,
+    products,
+    categories,
+  } = data;
+
+  return (
+    <div className="bg-neutral-surface">
+      <PublicCatalogIntro
+        title="Mau makan apa hari ini?"
+        description="Cari makanan dan minuman dari kantin sekolah, lalu pesan sebelum waktu istirahat."
+      />
+
+      <CommerceProductBrowser
+        source="kantin"
+        merchants={merchants}
+        products={products}
+        categories={categories}
+        searchPlaceholder="Cari makanan, minuman, atau kantin..."
+        merchantTitle="Pilih kantin"
+        title="Semua menu"
+        subtitle="Menu yang tersedia dari kantin sekolah."
+        emptyTitle="Menu tidak ditemukan"
+        emptyDescription="Coba kata kunci, kategori, atau kantin yang berbeda."
+      />
+>>>>>>> source/main
     </div>
   );
 }
